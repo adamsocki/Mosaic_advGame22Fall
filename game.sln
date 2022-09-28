@@ -17,6 +17,8 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "game", "build\game.exe", "{
 		IORedirection = Auto
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{341FD251-F17E-4B93-A5C6-F91E59811313}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
