@@ -1,6 +1,5 @@
 
 
-
 MyData *Data = {};
 
 int32 freeList[10000];
@@ -87,8 +86,20 @@ void InitializeEntityBuffers() {
 	playerBuffer->count = 0;
 	playerBuffer->entities = (Player*)malloc(playerBuffer->capacity * playerBuffer->sizeInBytes);
 
-}
+	// PlayerCarryBuffer
+	EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry];
+	playerCarryBuffer->capacity = 100;
+	playerCarryBuffer->sizeInBytes = sizeof(PlayerCarry);
+	playerCarryBuffer->count = 0;
+	playerCarryBuffer->entities = (PlayerCarry*)malloc(playerCarryBuffer->capacity * playerCarryBuffer->sizeInBytes);
 
+	// BarrierBuffer
+	EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
+	barrierBuffer->capacity = 1000;
+	barrierBuffer->sizeInBytes = sizeof(Barrier);
+	barrierBuffer->count = 0;
+	barrierBuffer->entities = (Barrier*)malloc(barrierBuffer->capacity * barrierBuffer->sizeInBytes);
+}
 
 void CreatePlayer() {
 	EntityHandle playerHandle = AddEntity(&Data->em, EntityType_Player);
