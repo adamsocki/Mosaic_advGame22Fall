@@ -2,10 +2,12 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.playerSprite, "data/gameData/player_simple.png");
 	LoadSprite(&Data->sprites.street_Asprite, "data/gameData/street_A.png");
 	LoadSprite(&Data->sprites.street_Bsprite, "data/gameData/street_B.png");
-	LoadSprite(&Data->sprites.building_ASprite, "data/gameData/building_A.png");
+//	LoadSprite(&Data->sprites.building_ASprite, "data/gameData/building_A.png");
 
 	LoadSprite(&Data->sprites.suitcaseSprite, "data/suitcase.png");
 	LoadSprite(&Data->sprites.wall1Sprite, "data/wall1.png");
+	LoadSprite(&Data->sprites.wall1_vertSprite, "data/wall1_vert.png");
+	LoadSprite(&Data->sprites.stairsDown1Sprite, "data/stairsDown1.png");
 	LoadSprite(&Data->sprites.door1Sprite, "data/door1.png");
 
 	LoadSprite(&Data->sprites.backgroundColor1Sprite, "data/backgroundColor1.png");

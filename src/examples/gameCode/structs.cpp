@@ -5,10 +5,12 @@ enum EntityType {
 	EntityType_Player,
 
 	EntityType_PlayerCarry,
-	
+
 	EntityType_Barrier,
 
 	EntityType_MouseCrosshair,
+
+	EntityType_LevelPortal,
 
 	EntityType_Count,
 };
@@ -52,7 +54,10 @@ struct EntitySprites {
 	Sprite suitcaseSprite;
 
 	Sprite wall1Sprite;
+	Sprite wall1_vertSprite;
 	Sprite door1Sprite;
+
+	Sprite stairsDown1Sprite;
 
 	Sprite floor1Sprite;
 
@@ -96,6 +101,8 @@ struct Entity {
 	EntityHandle handle;
 };
 
+
+
 struct Base : Entity {
 	int32 id;
 };
@@ -130,3 +137,14 @@ struct Room {
 	Sprite* sprite;
 };
 
+
+struct Road {
+	vec2 startingPosition;
+	vec2 size;
+	bool horizontal;
+};
+
+struct LevelPortal : Entity {
+	bool isLevelPortal;
+	bool mouseIsOver;
+};

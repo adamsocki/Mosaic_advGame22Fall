@@ -20,7 +20,9 @@ void MyInit() {
     LoadSFX();
 
     CreatePlayer();
-    CreateLevel(1);
+
+    CreateLevel(0);
+    //CreateLevel(1);
 
     InitializeMouse();
 
@@ -43,12 +45,14 @@ void MyGameUpdate() {
     EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
     EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry];
     EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
+    EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
 
     //      For all entity types, second Point to EntityBuffer->entities (Logic A: 2 of 2 steps)
     Base* baseEntitiesInBuffer = (Base*)baseBuffer->entities;
     Player* playerEntitiesInBuffer = (Player*)playerBuffer->entities;
     PlayerCarry* playerCarryEntitiesInBuffer = (PlayerCarry*)playerCarryBuffer->entities;
     Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
+    LevelPortal* levelPortalEntitiesInBuffer = (LevelPortal*)levelPortalBuffer->entities;
 
     //      Handle Player Input for Movement
     InputPlayerController(&playerEntitiesInBuffer[0]);
@@ -144,7 +148,31 @@ void MyGameUpdate() {
         }
 
     }
+    //      Check to Stairs
+    for (int i = 0; i < levelPortalBuffer->count; i++) {
+        EntityHandle levelPortalHandle = levelPortalEntitiesInBuffer[i].handle;
+        LevelPortal* levelPortalEntity = (LevelPortal*)GetEntity(&Data->em, levelPortalHandle);
+        if (levelPortalEntity != NULL) {
+            Rect portalRect;
+            portalRect.max = levelPortalEntity->size;
+            portalRect.min = -levelPortalEntity->size;
+            if (RectTest(mouseRect, portalRect, levelPortalEntity->position, mousePos, &dir)) {
+                if (!levelPortalEntity->mouseIsOver) {
+                    PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
 
+                    levelPortalEntity->mouseIsOver = true;
+                    Data->mouseCrosshair.isLocked = true;
+                }
+                Data->mouseCrosshair.position = levelPortalEntity->position;
+            }
+            else {
+                levelPortalEntity->mouseIsOver = false;
+                Data->mouseCrosshair.isLocked = false;
+            }
+        }
+        
+
+    }
 
 
     //**********************
@@ -153,7 +181,7 @@ void MyGameUpdate() {
     
     //      This sets the background color. 
     ClearColor(RGB(0.0f, 0.0f, 0.0f));
-
+    
     //      Render Base
     for (int i = 0; i < baseBuffer->count; i++) {
         EntityHandle baseHandle = baseEntitiesInBuffer[i].handle;
@@ -171,6 +199,43 @@ void MyGameUpdate() {
                     DrawSprite(baseEntity->position, baseEntity->size, baseEntity->sprite);
                 }
                 
+            }
+        }
+    }
+    
+    //      Render Level Portals
+    for (int i = 0; i < levelPortalBuffer->count; i++) {
+        EntityHandle levelPortalHandle = levelPortalEntitiesInBuffer[i].handle;
+        LevelPortal* levelPortalEntity = (LevelPortal*)GetEntity(&Data->em, levelPortalHandle);
+        if (levelPortalEntity != NULL) {
+            if (levelPortalEntity->toDelete) {
+                DeleteEntity(&Data->em, levelPortalEntity->handle);
+            }
+            else {
+                if (levelPortalEntity->isQuad) {
+
+                    DrawRect(levelPortalEntity->position, levelPortalEntity->size, RGB(1.0f, 0.3f, 0.3f));
+                }
+                else {
+                    DrawSprite(levelPortalEntity->position, levelPortalEntity->size, levelPortalEntity->sprite);
+                }
+
+            }
+        }
+    }
+
+
+
+
+    for (int i = 0; i < playerCarryBuffer->count; i++) {
+        EntityHandle playerCarryHandle = playerCarryEntitiesInBuffer[i].handle;
+        Player* playerCarryEntity = (Player*)GetEntity(&Data->em, playerCarryHandle);
+        if (playerCarryEntity != NULL) {
+            if (playerCarryEntity->toDelete) {
+                DeleteEntity(&Data->em, playerCarryEntity->handle);
+            }
+            else {
+                DrawSprite(playerCarryEntity->position, playerCarryEntity->size, playerCarryEntity->sprite);
             }
         }
     }
@@ -226,5 +291,5 @@ void MyGameUpdate() {
     else {
 
     }
-    DrawSprite(Data->mouseCrosshair.position, V2(0.3f, 0.3f), &Data->sprites.crosshairUnlocked1Sprite);
+ DrawSprite(Data->mouseCrosshair.position, V2(0.3f, 0.3f), &Data->sprites.crosshairUnlocked1Sprite);
 }

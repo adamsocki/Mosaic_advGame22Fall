@@ -65,7 +65,7 @@ EntityHandle AddEntity(EntityManager *em, EntityType type) {
 
 void InitializeEntityManager() {
 	// Entity Manager
-	Data->em.entityCapacity = 1000;
+	Data->em.entityCapacity = 10000;
 	Data->em.entities = (EntityInfo*)malloc(sizeof(EntityInfo) * Data->em.entityCapacity);
 	memset(Data->em.entities, 0, sizeof(EntityInfo) * Data->em.entityCapacity);
 	Data->em.nextID = 0;
@@ -74,7 +74,7 @@ void InitializeEntityManager() {
 void InitializeEntityBuffers() {
 	// BaseBuffer
 	EntityTypeBuffer* baseBuffer = &Data->em.buffers[EntityType_Base];
-	baseBuffer->capacity = 200;
+	baseBuffer->capacity = 2000;
 	baseBuffer->sizeInBytes = sizeof(Base);
 	baseBuffer->count = 0;
 	baseBuffer->entities = (Base*)malloc(baseBuffer->capacity * baseBuffer->sizeInBytes);
@@ -85,6 +85,13 @@ void InitializeEntityBuffers() {
 	playerBuffer->sizeInBytes = sizeof(Player);
 	playerBuffer->count = 0;
 	playerBuffer->entities = (Player*)malloc(playerBuffer->capacity * playerBuffer->sizeInBytes);
+
+	// LevelPortalBuffer
+	EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
+	levelPortalBuffer->capacity = 50;
+	levelPortalBuffer->sizeInBytes = sizeof(LevelPortal);
+	levelPortalBuffer->count = 0;
+	levelPortalBuffer->entities = (LevelPortal*)malloc(levelPortalBuffer->capacity * levelPortalBuffer->sizeInBytes);
 
 	// PlayerCarryBuffer
 	EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry];
@@ -105,7 +112,7 @@ void CreatePlayer() {
 	EntityHandle playerHandle = AddEntity(&Data->em, EntityType_Player);
 	Player* playerEntity = (Player*)GetEntity(&Data->em, playerHandle);
 	playerEntity->handle = playerHandle;
-	playerEntity->position = V2(1, 1);
+	playerEntity->position = V2(-5.5f, -2);
 	playerEntity->speed = 1.5f;
 	playerEntity->sprite = &Data->sprites.playerSprite;
 	playerEntity->size = V2(0.2f, 0.24f);
