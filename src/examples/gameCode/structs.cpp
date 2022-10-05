@@ -1,3 +1,5 @@
+
+
 enum EntityType {
 	EntityType_Base,
 	EntityType_Player,
@@ -6,6 +8,7 @@ enum EntityType {
 	
 	EntityType_Barrier,
 
+	EntityType_MouseCrosshair,
 
 	EntityType_Count,
 };
@@ -51,7 +54,9 @@ struct EntitySprites {
 	Sprite wall1Sprite;
 	Sprite door1Sprite;
 
-	Sprite crosshair1Sprite;
+	Sprite floor1Sprite;
+
+	Sprite crosshairUnlocked1Sprite;
 
 
 	Sprite backgroundColor1Sprite;
@@ -61,10 +66,21 @@ struct Sounds {
 	SoundClip crosshairSound1;
 };
 
+struct MouseCrosshair {
+	bool isLocked;
+	vec2 position;
+	bool playInitialSound;
+
+	Sprite* crosshairUnlockedSprite;
+	Sprite* crosshairLockSprite;
+};
+
 struct MyData {
 
 	EntitySprites sprites;
 	Sounds sound;
+
+	MouseCrosshair mouseCrosshair;
 
 	EntityManager em;
 
@@ -75,6 +91,7 @@ struct Entity {
 	Sprite* sprite;
 	bool toDelete;
 	vec2 size;
+	bool isQuad;
 
 	EntityHandle handle;
 };
@@ -90,15 +107,26 @@ struct Player : Entity {
 
 struct PlayerCarry : Entity {
 	bool canBePickedUp;
-	bool soundPlayed;
+	bool mouseOverPlayerCarry;
 };
 
 struct Barrier : Entity {
 	bool isDoor;
+	bool mouseIsOver;
 };
 
 
-struct Level {
 
+
+struct Level {
+	
+	//DynamicArray<Room> rooms;
+};
+
+struct Room {
+	vec2 size;
+	vec2 startingPosition;
+	vec2 tileSize;
+	Sprite* sprite;
 };
 

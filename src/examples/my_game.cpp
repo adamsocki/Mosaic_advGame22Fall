@@ -21,6 +21,10 @@ void MyInit() {
 
     CreatePlayer();
     CreateLevel(1);
+
+    InitializeMouse();
+
+    Data->mouseCrosshair.isLocked = false;
 }
 
 void MyGameUpdate() {
@@ -32,6 +36,7 @@ void MyGameUpdate() {
     vec2 mousePos = Input->mousePosNormSigned;
     mousePos.x = mousePos.x * 8;
     mousePos.y = mousePos.y * 4.5f;
+    Data->mouseCrosshair.position = mousePos;
 
     //      For all entity types, first Point to EntityBuffers (Logic A: 1 of 2 steps)
     EntityTypeBuffer* baseBuffer = &Data->em.buffers[EntityType_Base];
@@ -45,11 +50,8 @@ void MyGameUpdate() {
     PlayerCarry* playerCarryEntitiesInBuffer = (PlayerCarry*)playerCarryBuffer->entities;
     Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
 
-
     //      Handle Player Input for Movement
-
     InputPlayerController(&playerEntitiesInBuffer[0]);
-
 
     // Detect Collision
     //      Player 
@@ -87,28 +89,60 @@ void MyGameUpdate() {
         }
     }
 
+    //  Crosshair Collission Check
+    //      Check to PlayerCarry
+
+    Rect mouseRect;
+    mouseRect.max = V2(0.2f, 0.2f);
+    mouseRect.min = -V2(0.2f, 0.2f);
+    vec2 dir = V2(0);
     for (int i = 0; i < playerCarryBuffer->count; i++) {
         Rect playerCarryRect;
         EntityHandle playerCarryHandle = playerCarryEntitiesInBuffer[i].handle;
         PlayerCarry* playerCarryEntity = (PlayerCarry*)GetEntity(&Data->em, playerCarryHandle);
         playerCarryRect.max = playerCarryEntity->size;
         playerCarryRect.min = -playerCarryEntity->size;
-        vec2 dir = V2(0);
-        Rect mouseRect;
-        mouseRect.max = V2(0.1f, 0.1f);
-        mouseRect.min = -V2(0.1f, 0.1f);
+       
         if (RectTest(mouseRect, playerCarryRect, playerCarryEntity->position, mousePos, &dir)) {
-            if (!playerCarryEntity->soundPlayed) {
+            if (!playerCarryEntity->mouseOverPlayerCarry) {
                 PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
+
+                Data->mouseCrosshair.isLocked = true;
+                playerCarryEntity->mouseOverPlayerCarry = true;
             }
-            playerCarryEntity->soundPlayed = true;
-            mousePos = playerCarryEntity->position;
+            Data->mouseCrosshair.position = playerCarryEntity->position;
         }
         else
         {
-            playerCarryEntity->soundPlayed = false;
+            playerCarryEntity->mouseOverPlayerCarry = false;
             playerCarryEntity->canBePickedUp = false;
+            Data->mouseCrosshair.isLocked = false;
         }
+    }
+    //      Check to Doors
+    for (int i = 0; i < barrierBuffer->count; i++) {
+        
+        EntityHandle barrierHandle = barrierEntitiesInBuffer[i].handle;
+        Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
+        if (barrierEntity->isDoor) {
+            Rect barrierDoorRect;
+            barrierDoorRect.max = barrierEntity->size;
+            barrierDoorRect.min = -barrierEntity->size;
+            if (RectTest(mouseRect, barrierDoorRect, barrierEntity->position, mousePos, &dir)) {
+                if (!barrierEntity->mouseIsOver) {
+                    PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
+
+                    barrierEntity->mouseIsOver = true;
+                    Data->mouseCrosshair.isLocked = true;
+                }
+                Data->mouseCrosshair.position = barrierEntity->position;
+            }
+            else {
+                barrierEntity->mouseIsOver = false;
+                Data->mouseCrosshair.isLocked = false;
+            }
+        }
+
     }
 
 
@@ -119,6 +153,27 @@ void MyGameUpdate() {
     
     //      This sets the background color. 
     ClearColor(RGB(0.0f, 0.0f, 0.0f));
+
+    //      Render Base
+    for (int i = 0; i < baseBuffer->count; i++) {
+        EntityHandle baseHandle = baseEntitiesInBuffer[i].handle;
+        Base* baseEntity = (Base*)GetEntity(&Data->em, baseHandle);
+        if (baseEntity != NULL) {
+            if (baseEntity->toDelete) {
+                DeleteEntity(&Data->em, baseEntity->handle);
+            }
+            else {
+                if (baseEntity->isQuad) {
+
+                    DrawRect(baseEntity->position, baseEntity->size, RGB(1.0f, 0.3f, 0.3f));
+                }
+                else {
+                    DrawSprite(baseEntity->position, baseEntity->size, baseEntity->sprite);
+                }
+                
+            }
+        }
+    }
 
     //      Render Barrier
     for (int i = 0; i < barrierBuffer->count; i++) {
@@ -163,7 +218,13 @@ void MyGameUpdate() {
         }
     }
 
+    // TODO: Fix this render issue where the value isLocked doesn't turn off
     //RenderMouse
+    if (!Data->mouseCrosshair.isLocked) {
+        
+    }
+    else {
 
-    DrawSprite(mousePos, V2(0.3f, 0.3f), &Data->sprites.crosshair1Sprite);
+    }
+    DrawSprite(Data->mouseCrosshair.position, V2(0.3f, 0.3f), &Data->sprites.crosshairUnlocked1Sprite);
 }

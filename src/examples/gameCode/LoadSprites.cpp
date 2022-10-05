@@ -9,7 +9,10 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.door1Sprite, "data/door1.png");
 
 	LoadSprite(&Data->sprites.backgroundColor1Sprite, "data/backgroundColor1.png");
-	LoadSprite(&Data->sprites.crosshair1Sprite, "data/crosshair1.png");
+	LoadSprite(&Data->sprites.crosshairUnlocked1Sprite, "data/crosshairUnlocked1.png");
+
+
+	LoadSprite(&Data->sprites.floor1Sprite, "data/floor1.png");
 
 }
 

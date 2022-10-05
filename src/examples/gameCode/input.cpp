@@ -32,4 +32,14 @@ void InputPlayerController(Player* p) {
 	p->position.y += p->speed * speedController.y * Game->deltaTime;
 }
 
+
+
+void InitializeMouse() {
+
+	Data->mouseCrosshair.isLocked = false;
+	Data->mouseCrosshair.playInitialSound = true;
+	Data->mouseCrosshair.crosshairUnlockedSprite = &Data->sprites.crosshairUnlocked1Sprite;
+
+	//Data->mouseCrosshair.crosshairUnlockSprite = &Data->sprites.crosshair1Sprite;
+}
  
