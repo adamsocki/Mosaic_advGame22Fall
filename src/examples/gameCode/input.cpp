@@ -43,3 +43,26 @@ void InitializeMouse() {
 	//Data->mouseCrosshair.crosshairUnlockSprite = &Data->sprites.crosshair1Sprite;
 }
  
+
+void MouseInputClick(Barrier* barrierEntity, int32 barrierBufferCount, EntityTypeBuffer* barrierEntitiesInBuffer) {
+
+	if (InputPressed(Mouse, Input_MouseLeft)) {
+		/*int32 doorNumberToOpen = barrierEntity->doorNumber;
+		barrierEntity->isOpen = true;
+		barrierEntity->sprite = &Data->sprites.blankSprite;
+		for (int d = 0; d < barrierBufferCount; d++) {
+			EntityHandle barrierHandle = barrierEntitiesInBuffer[d].handle;
+			Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
+			if (barrierEntity->doorNumber = doorNumberToOpen) {
+				barrierEntity->isOpen = true;
+				barrierEntity->&Data->sprites.blankSprite;
+			}
+		}*/
+		/*Barrier* leftDoorEntity = (Barrier*)GetEntity(&Data->em, barrierEntity->handleForOpenDoorLeft);
+		Barrier* rightDoorEntity = (Barrier*)GetEntity(&Data->em, barrierEntity->handleForOpenDoorRight);
+		leftDoorEntity->isOpen = true;
+		leftDoorEntity->sprite = &Data->sprites.blankSprite;
+		rightDoorEntity->isOpen = true;
+		rightDoorEntity->sprite = &Data->sprites.blankSprite;*/
+	}
+}

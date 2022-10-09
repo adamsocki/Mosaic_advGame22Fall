@@ -21,7 +21,7 @@ void MyInit() {
 
     CreatePlayer();
 
-    CreateLevel(0);
+    CreateLevel(2);
     //CreateLevel(1);
 
     InitializeMouse();
@@ -46,6 +46,7 @@ void MyGameUpdate() {
     EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry];
     EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
     EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
+    EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
 
     //      For all entity types, second Point to EntityBuffer->entities (Logic A: 2 of 2 steps)
     Base* baseEntitiesInBuffer = (Base*)baseBuffer->entities;
@@ -53,6 +54,7 @@ void MyGameUpdate() {
     PlayerCarry* playerCarryEntitiesInBuffer = (PlayerCarry*)playerCarryBuffer->entities;
     Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
     LevelPortal* levelPortalEntitiesInBuffer = (LevelPortal*)levelPortalBuffer->entities;
+    Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
 
     //      Handle Player Input for Movement
     InputPlayerController(&playerEntitiesInBuffer[0]);
@@ -79,7 +81,7 @@ void MyGameUpdate() {
                 playerCarryEntity->canBePickedUp = false;
             }
         }
-        // Player Walls
+        // Player Barriers (incl doors)
         for (int j = 0; j < barrierBuffer->count; j++) {
             Rect barrierRect;
             EntityHandle barrierHandle = barrierEntitiesInBuffer[j].handle;
@@ -88,7 +90,12 @@ void MyGameUpdate() {
             barrierRect.min = -barrierEntity->size;
             vec2(dir) = V2(0, 0);
             if (RectTest(barrierRect, playerRect, barrierEntity->position, playerEntitiesInBuffer[0].position, &dir)) {
-                playerEntitiesInBuffer[0].position = playerEntitiesInBuffer[0].previousPosition;
+                if (!barrierEntity->isDoor && !barrierEntity->isOpen) {
+                    playerEntitiesInBuffer[0].position = playerEntitiesInBuffer[0].previousPosition;
+                }
+               /* else if (barrierEntity->mouseIsOver) {
+                    MouseInputClick();
+                }*/
             }
         }
     }
@@ -128,11 +135,12 @@ void MyGameUpdate() {
         
         EntityHandle barrierHandle = barrierEntitiesInBuffer[i].handle;
         Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
-        if (barrierEntity->isDoor) {
-            Rect barrierDoorRect;
-            barrierDoorRect.max = barrierEntity->size;
-            barrierDoorRect.min = -barrierEntity->size;
-            if (RectTest(mouseRect, barrierDoorRect, barrierEntity->position, mousePos, &dir)) {
+        if (barrierEntity->isDoor && barrierEntity->isDoorCenter) {
+            Rect barrierbarrierRect;
+            barrierbarrierRect.max = barrierEntity->size;
+            barrierbarrierRect.min = -barrierEntity->size;
+            if (RectTest(mouseRect, barrierbarrierRect, barrierEntity->position, mousePos, &dir)) {
+                
                 if (!barrierEntity->mouseIsOver) {
                     PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
 
@@ -145,9 +153,24 @@ void MyGameUpdate() {
                 barrierEntity->mouseIsOver = false;
                 Data->mouseCrosshair.isLocked = false;
             }
-        }
 
+            // MOUSE IS OVER barrier FUNCTIONALITY
+            if (barrierEntity->mouseIsOver) {
+               // doorShouldBeOpen = barrierEntity->doorNumber;
+                barrierEntity->isOpen = true;
+                barrierEntity->sprite = &Data->sprites.blankSprite;
+                /*for (int d = 0; d < barrierBufferCount; d++) {
+                    EntityHandle barrierHandle = barrierEntitiesInBuffer[d].handle;
+                    Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
+                    if (barrierEntity->doorNumber = doorNumberToOpen) {
+                        barrierEntity->isOpen = true;
+                        barrierEntity->& Data->sprites.blankSprite;
+                    }
+                }*/
+            }
+        }
     }
+
     //      Check to Stairs
     for (int i = 0; i < levelPortalBuffer->count; i++) {
         EntityHandle levelPortalHandle = levelPortalEntitiesInBuffer[i].handle;
@@ -170,8 +193,6 @@ void MyGameUpdate() {
                 Data->mouseCrosshair.isLocked = false;
             }
         }
-        
-
     }
 
 
@@ -202,6 +223,32 @@ void MyGameUpdate() {
             }
         }
     }
+    //      Render Barriers
+    for (int i = 0; i < barrierBuffer->count; i++) {
+        EntityHandle barrierHandle = barrierEntitiesInBuffer[i].handle;
+        Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
+        if (barrierEntity != NULL) {
+            if (barrierEntity->toDelete) {
+                DeleteEntity(&Data->em, barrierEntity->handle);
+            }
+            else {
+                DrawSprite(barrierEntity->position, barrierEntity->size, barrierEntity->sprite);
+            }
+        }
+    }
+    //      Render Doors
+    for (int i = 0; i < doorBuffer->count; i++) {
+        EntityHandle doorHandle = doorEntitiesInBuffer[i].handle;
+        Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+        if (doorEntity != NULL) {
+            if (doorEntity->toDelete) {
+                DeleteEntity(&Data->em, doorEntity->handle);
+            }
+            else {
+                DrawSprite(doorEntity->position, doorEntity->size, doorEntity->sprite);
+            }
+        }
+    }
     
     //      Render Level Portals
     for (int i = 0; i < levelPortalBuffer->count; i++) {
@@ -226,7 +273,7 @@ void MyGameUpdate() {
 
 
 
-
+    //      Render PlayerCarry
     for (int i = 0; i < playerCarryBuffer->count; i++) {
         EntityHandle playerCarryHandle = playerCarryEntitiesInBuffer[i].handle;
         Player* playerCarryEntity = (Player*)GetEntity(&Data->em, playerCarryHandle);
@@ -240,19 +287,7 @@ void MyGameUpdate() {
         }
     }
 
-    //      Render Barrier
-    for (int i = 0; i < barrierBuffer->count; i++) {
-        EntityHandle barrierHandle = barrierEntitiesInBuffer[i].handle;
-        Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
-        if (barrierEntity != NULL) {
-            if (barrierEntity->toDelete) {
-                DeleteEntity(&Data->em, barrierEntity->handle);
-            }
-            else {
-                DrawSprite(barrierEntity->position, barrierEntity->size, barrierEntity->sprite);
-            }
-        }
-    }
+    
 
 
     //      Render Player Carry

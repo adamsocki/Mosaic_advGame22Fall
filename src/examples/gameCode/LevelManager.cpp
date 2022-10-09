@@ -1,4 +1,6 @@
-
+//TODO: CREATE LEVEL TRANSITIONER
+//TODO: CREATE DOOR CONTROLLER and POPUP
+//TODO: Create simple pathfinder for character
 
 void CreateWallWithDoorHorizontal(bool top, Room room, int32 length, vec2 startingPosition, bool horizontal, vec2 wallSize, int32 doorIndex, vec2 doorSize) {
 	
@@ -141,25 +143,25 @@ void CreateBackdrop(Sprite *spriteName) {
 	backgroundEntity->size = V2(20, 20);
 }
 
-void CreateRoomFloor(Room room) {
-	for (int i = 0; i < room.size.x; i += room.tileSize.x) {
-		for (int j = 0; j < room.size.y; j += room.tileSize.y) {
-			EntityHandle floorHandle = AddEntity(&Data->em, EntityType_Base);
-			Base* floorEntity = (Base*)GetEntity(&Data->em, floorHandle);
-			floorEntity->size = room.tileSize;
-			floorEntity->handle = floorHandle;
-			floorEntity->position = V2(i * room.tileSize.x * 2 + room.startingPosition.x, j * room.tileSize.y * 2 + room.startingPosition.y);
-			floorEntity->sprite = &Data->sprites.floor1Sprite;
-			floorEntity->isQuad = false;
-		}
-	}
-}
+//void CreateRoomFloor(Room room) {
+//	for (int i = 0; i < room.size.x; i += room.tileSize.x) {
+//		for (int j = 0; j < room.size.y; j += room.tileSize.y) {
+//			EntityHandle floorHandle = AddEntity(&Data->em, EntityType_Base);
+//			Base* floorEntity = (Base*)GetEntity(&Data->em, floorHandle);
+//			floorEntity->size = room.tileSize;
+//			floorEntity->handle = floorHandle;
+//			floorEntity->position = V2(i * room.tileSize.x * 2 + room.startingPosition.x, j * room.tileSize.y * 2 + room.startingPosition.y);
+//			floorEntity->sprite = &Data->sprites.floor1Sprite;
+//			floorEntity->isQuad = false;
+//		}
+//	}
+//}
 
 void CreateRoom(Room room) {
 	//bottom
 	//CreateWallWithDoor(room.size.x, room.startingPosition, true, V2(room.tileSize.x, 0.1f), 2, V2(room.tileSize.x, 0.1f));
 	// floor
-	CreateRoomFloor(room);
+	//CreateRoomFloor(room);
 	//CreateWallWithDoor(room.size.x, )
 
 }
@@ -188,8 +190,217 @@ void CreateLevelPortal(vec2 position) {
 	portalEntity->handle = portalHandle;
 }
 
+void CreateRoomFloor8th(Room room) {
+
+	for (int i = 0; i < room.size.x; i++) {
+		for (int j = 0; j < room.size.y; j++) {
+			
+			if (i == 0 || j == 0 || i == room.size.x - 1 || j == room.size.y - 1) {
+				EntityHandle edgeHandle = AddEntity(&Data->em, EntityType_Barrier);
+				Barrier* edgeEntity = (Barrier*)GetEntity(&Data->em, edgeHandle);
+				edgeEntity->size = room.tileSize;
+				edgeEntity->handle = edgeHandle;
+				edgeEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+				edgeEntity->sprite = &Data->sprites.blankSprite;
+			}
+			else {
+				EntityHandle floorHandle = AddEntity(&Data->em, EntityType_Base);
+				Base* floorEntity = (Base*)GetEntity(&Data->em, floorHandle);
+				floorEntity->size = room.tileSize;
+				floorEntity->handle = floorHandle;
+				floorEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+				floorEntity->sprite = &Data->sprites.floor1Sprite;
+			}
+		}
+	}
+}
+
+void CreateRoomFloor8thWithDoor(Room room, Door *door, uint32 numOfDoors) {
+	for (int i = 0; i < room.size.x; i++) {
+		for (int j = 0; j < room.size.y; j++) {
+			if (i == 0 || j == 0 || i == room.size.x - 1 || j == room.size.y - 1) {
+				/*for (int k = 0; k < numOfDoors; k++) {
+					if (door[k].startingPosition == V2(i, j)) {
+
+					}
+				}*/
+				if ((door[0].startingPosition.x == i && door[0].startingPosition.y == j) ||
+					(door[1].startingPosition.x == i && door[1].startingPosition.y == j) ||
+					(door[2].startingPosition.x == i && door[2].startingPosition.y == j)) {
+
+					EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
+					Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+					doorEntity->size = room.tileSize;
+					doorEntity->handle = doorHandle;
+					//doorEntity->doorNumber = door.doorNumber;
+					//doorEntity->isDoor = true;
+					doorEntity->isDoorOpen = false;
+					doorEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+					doorEntity->sprite = &Data->sprites.doorClosed1Sprite;
+
+				}
+				else {
+					EntityHandle edgeHandle = AddEntity(&Data->em, EntityType_Barrier);
+					Barrier* edgeEntity = (Barrier*)GetEntity(&Data->em, edgeHandle);
+					//// WALL CREATION
+					////EntityHandle edgeHandle = AddEntity(&Data->em, EntityType_Barrier);
+					////Barrier* edgeEntity = (Barrier*)GetEntity(&Data->em, edgeHandle);
+					edgeEntity->size = room.tileSize;
+					edgeEntity->handle = edgeHandle;
+					edgeEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+					edgeEntity->sprite = &Data->sprites.suitcaseSprite;
+				}
+				for (int k = 0; k < numOfDoors; k++) {
+					
+					if (door[k].startingPosition.x == i && door[k].startingPosition.y == j) {
+					
+					}
+					
+					//if (door[k].startingPosition.x == i && door[k].startingPosition.y == j) {
+					//	// DOOR CREATION
+					//	EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Barrier);
+					//	Barrier* doorEntity = (Barrier*)GetEntity(&Data->em, doorHandle);
+					//	doorEntity->size = room.tileSize;
+					//	doorEntity->handle = doorHandle;
+					//	doorEntity->doorNumber = door[k].doorNumber;
+					//	if (door[k].isDoorCenter) {
+					//		doorEntity->isDoorCenter = true;
+					//	}
+					//	//if (door[k].count == 0) {
+					//	//	doorEntity->handleForOpenDoorLeft = doorHandle;
+					//	//	door[k].count++;
+					//	//}
+					//	//else if (door[k].count == 1) {
+					//	//	doorEntity->isDoorCenter = true;
+					//	//	door[k].count++;
+					//	//}
+					//	//else if (door[k].count == 2) {
+					//	//	doorEntity->handleForOpenDoorRight = doorHandle;
+					//	//}
+					//	//if (door[k].isDoorCenter) {
+					//	//	//
+					//	//}
+					//	//else {
+					//	//	doorEntity->isDoorCenter = false;
+					//	//}
+					//	//doorEntity->size = V2(room.tileSize.x * door[k].doorSize.x, room.tileSize.y * door[k].doorSize.y);
+					//	doorEntity->isDoor = true;
+					//	doorEntity->isOpen = false;
+					//	doorEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+					//	doorEntity->sprite = &Data->sprites.doorClosed1Sprite;
+					//	
+					//}
+				}
+			}
+			else {
+				EntityHandle floorHandle = AddEntity(&Data->em, EntityType_Base);
+				Base* floorEntity = (Base*)GetEntity(&Data->em, floorHandle);
+				floorEntity->size = room.tileSize;
+				floorEntity->handle = floorHandle;
+				floorEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+				floorEntity->sprite = &Data->sprites.floor1Sprite;
+			}
+		}
+	}
+}
+
+void CreateDoor(Door door) {
+
+	EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
+	Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+	doorEntity->position = V2(door.startingPosition.x, door.startingPosition.y + (door.tileSize.y));
+	doorEntity->handle = doorHandle;
+	doorEntity->sprite = &Data->sprites.doorClosed1Sprite;
+	doorEntity->size = door.tileSize;
+	for (int i = 0; i < door.size.x; i++) {
+		for (int j = 0; j < door.size.y; j++) {
+			
+		}
+	}
+}
 
 
+
+void CreateRoomV2(Room room, Door* door, int32 numOfDoors) {
+	int32 test;
+	int32 val;
+	for (int i = 0; i < 8; i++) {
+
+	}
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < room.size.y; j++) {
+			
+				if (i == 0 || j == 0 || i == room.size.x - 1 || j == room.size.y - 1) {
+					for (int k = 0; k < numOfDoors; k++) {
+						if (i == door[k].startingPosition.x) {
+							break;
+						}
+
+						else {
+							EntityHandle edgeHandle = AddEntity(&Data->em, EntityType_Barrier);
+							Barrier* edgeEntity = (Barrier*)GetEntity(&Data->em, edgeHandle);
+							edgeEntity->size = room.tileSize;
+							edgeEntity->handle = edgeHandle;
+							edgeEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+							edgeEntity->sprite = &Data->sprites.suitcaseSprite;
+
+						}
+					}
+				
+				}
+				else {
+					EntityHandle floorHandle = AddEntity(&Data->em, EntityType_Base);
+					Base* floorEntity = (Base*)GetEntity(&Data->em, floorHandle);
+					floorEntity->size = room.tileSize;
+					floorEntity->handle = floorHandle;
+					floorEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+					floorEntity->sprite = &Data->sprites.floor1Sprite;
+				}
+
+		}
+		test = i;
+	}
+
+	
+	val = test;
+
+}
+
+void CreateBarrierLinear(Wall wall) {
+	for (int i = 0; i < wall.length; i++) {
+		EntityHandle wallHandle = AddEntity(&Data->em, EntityType_Barrier);
+		Barrier* wallEntity = (Barrier*)GetEntity(&Data->em, wallHandle);
+		wallEntity->position = wall.startingPosition;
+		wallEntity->size = wall.tileSize;
+		if (wall.horizontal) {
+			wallEntity->position.x += (i * (wall.tileSize.x * 2));
+		}
+		else {
+			wallEntity->position.y += (i * (wall.tileSize.y * 2));
+		}
+		wallEntity->sprite = &Data->sprites.suitcaseSprite;
+		wallEntity->handle = wallHandle;
+	}
+}
+
+void CreateRoomFloor(Room room) {
+	for (int i = 0; i < room.size.x; i++) {
+		for (int j = 0; j < room.size.y; j++) {
+			EntityHandle floorHandle = AddEntity(&Data->em, EntityType_Base);
+			Base* floorEntity = (Base*)GetEntity(&Data->em, floorHandle);
+			floorEntity->size = room.tileSize;
+			floorEntity->handle = floorHandle;
+			
+
+			floorEntity->position = V2(((room.tileSize.x * 2) * i) + room.startingPosition.x, ((room.tileSize.y * 2) * j) + room.startingPosition.y);
+			floorEntity->sprite = &Data->sprites.floor1Sprite;
+		}
+	}
+}
+
+void AddDoors(Door* door, Room room) {
+	//EntityHandle
+}
 void CreateLevel(int32 level) {
 
 	if (level == 0) {
@@ -259,6 +470,77 @@ void CreateLevel(int32 level) {
 		//CreateWallWithDoor(room1, room1.size.x, V2(room1.startingPosition.x, room1.startingPosition.y + room1.size.y + room1.tileSize.x), true, V2(room1.tileSize.x, 0.1f), 2, V2(room1.tileSize.x, 0.1f));
 		
 
+	}
+
+	if (level == 2) {
+
+		// Create 0.1 tile size
+		Room room1;
+		room1.size = V2(8,8);
+		room1.tileSize = V2(0.125f, 0.125f);
+		room1.startingPosition = V2(-6, -3);
+		room1.roomNumber = 1;
+		room1.levelNumber = level;
+
+		Door door1;
+		door1.startingPosition = V2(2,0);
+		//door1.sizeOfDoor = 3;
+		//door1.doorPositions[0] = V2(2, 0);
+		//door1.doorPositions[1] = V2(3, 0);
+		//door1.horizontal = true;
+		door1.count = 0;
+		door1.level = level;
+		door1.doorNumber = 1;
+		door1.isDoorCenter = false;
+		//door1.doorSize = V2(3, 1);
+		Door door2;
+		door2.startingPosition = V2(1, 0);
+		door2.level = level;
+		door2.doorNumber = 1;
+		door2.isDoorCenter = true;
+		Door door3;
+
+		door3.startingPosition = V2(3, 0);
+		door3.level = level;
+		door3.doorNumber = 1;
+		door3.isDoorCenter = false;
+
+		Wall wall1;
+		wall1.startingPosition = V2(-6, -3.25f);
+		wall1.length = 8;
+		wall1.horizontal = true;
+		wall1.roomNumber = 1;
+		wall1.levelNumber = level;
+		wall1.tileSize = V2(0.125f, 0.125f);
+
+		door1.tileSize = V2(0.375f, 0.125f);
+		//Door door2;
+		//door2.startingPosition = V2(3, 0);
+		//CreateRoomFloor8th(room1);
+		
+		Wall wall2;
+		wall2.startingPosition = V2(-6.25f, -3.25f);
+		wall2.length = 10;
+		wall2.horizontal = false;
+		wall2.roomNumber = 1;
+		wall2.levelNumber = level;
+		wall2.tileSize = V2(0.125f, 0.125f);
+
+		Wall wall3;
+		wall3.startingPosition = V2(-6, -1);
+		wall3.length = 8;
+		wall3.horizontal = true;
+		wall3.roomNumber = 1;
+		wall3.levelNumber = level;
+		wall3.tileSize = V2(0.125f, 0.125f);
+		
+		Door doors[] = { door1, door2, door3 };
+		uint32 numberOfDoors = sizeof(doors) / sizeof(doors[0]);
+		//CreateRoomFloor8thWithDoor(room1, doors, numberOfDoors);
+		CreateRoomFloor(room1);
+		CreateBarrierLinear(wall1);
+		CreateBarrierLinear(wall2);
+		CreateBarrierLinear(wall3);
 	}
 }
 

@@ -15,6 +15,8 @@ void LoadSprites() {
 
 
 	LoadSprite(&Data->sprites.floor1Sprite, "data/floor1.png");
+	LoadSprite(&Data->sprites.blankSprite, "data/blank.png");
+	LoadSprite(&Data->sprites.doorClosed1Sprite, "data/doorClosed1.png");
 
 }
 

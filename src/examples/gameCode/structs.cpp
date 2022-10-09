@@ -7,6 +7,7 @@ enum EntityType {
 	EntityType_PlayerCarry,
 
 	EntityType_Barrier,
+	EntityType_Door,
 
 	EntityType_MouseCrosshair,
 
@@ -60,7 +61,9 @@ struct EntitySprites {
 	Sprite stairsDown1Sprite;
 
 	Sprite floor1Sprite;
+	Sprite blankSprite;
 
+	Sprite doorClosed1Sprite;
 	Sprite crosshairUnlocked1Sprite;
 
 
@@ -120,9 +123,13 @@ struct PlayerCarry : Entity {
 struct Barrier : Entity {
 	bool isDoor;
 	bool mouseIsOver;
+	bool isOpen;
+	bool isDoorCenter;
+	EntityHandle handleForOpenDoorLeft;
+	EntityHandle handleForOpenDoorRight;
+	int32 doorNumber;
+	int32 roomNumber;
 };
-
-
 
 
 struct Level {
@@ -135,6 +142,8 @@ struct Room {
 	vec2 startingPosition;
 	vec2 tileSize;
 	Sprite* sprite;
+	int32 roomNumber;
+	int32 levelNumber;
 };
 
 
@@ -147,4 +156,29 @@ struct Road {
 struct LevelPortal : Entity {
 	bool isLevelPortal;
 	bool mouseIsOver;
+};
+
+struct Door :Entity {
+	vec2 startingPosition;
+	vec2 tileSize;
+	vec2 doorSize;
+	bool horizontal;
+	int32 level;
+	bool mouseIsOver;
+	int32 length;
+	bool isDoorCenter;
+	bool isDoorOpen;
+	int32 count;
+	int32 doorNumber;
+	//DynamicArray<vec2> doorPositions;
+};
+
+struct Wall {
+
+	int32 levelNumber;
+	int32 length;
+	bool horizontal;
+	vec2 tileSize;
+	vec2 startingPosition;
+	int32 roomNumber;
 };

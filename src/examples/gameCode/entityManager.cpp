@@ -65,7 +65,7 @@ EntityHandle AddEntity(EntityManager *em, EntityType type) {
 
 void InitializeEntityManager() {
 	// Entity Manager
-	Data->em.entityCapacity = 10000;
+	Data->em.entityCapacity = 100000;
 	Data->em.entities = (EntityInfo*)malloc(sizeof(EntityInfo) * Data->em.entityCapacity);
 	memset(Data->em.entities, 0, sizeof(EntityInfo) * Data->em.entityCapacity);
 	Data->em.nextID = 0;
@@ -78,13 +78,16 @@ void InitializeEntityBuffers() {
 	baseBuffer->sizeInBytes = sizeof(Base);
 	baseBuffer->count = 0;
 	baseBuffer->entities = (Base*)malloc(baseBuffer->capacity * baseBuffer->sizeInBytes);
-	
+	memset(baseBuffer->entities, 0, sizeof(Base) * baseBuffer->capacity);
+
+
 	// PlayerBuffer
 	EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
 	playerBuffer->capacity = 1;
 	playerBuffer->sizeInBytes = sizeof(Player);
 	playerBuffer->count = 0;
 	playerBuffer->entities = (Player*)malloc(playerBuffer->capacity * playerBuffer->sizeInBytes);
+	//smemset(playerBuffer->entities, 0, sizeof(Player) * playerBuffer->capacity);
 
 	// LevelPortalBuffer
 	EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
@@ -92,6 +95,7 @@ void InitializeEntityBuffers() {
 	levelPortalBuffer->sizeInBytes = sizeof(LevelPortal);
 	levelPortalBuffer->count = 0;
 	levelPortalBuffer->entities = (LevelPortal*)malloc(levelPortalBuffer->capacity * levelPortalBuffer->sizeInBytes);
+	//memset(levelPortalBuffer->entities, 0, sizeof(LevelPortal) * levelPortalBuffer->capacity);
 
 	// PlayerCarryBuffer
 	EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry];
@@ -99,6 +103,8 @@ void InitializeEntityBuffers() {
 	playerCarryBuffer->sizeInBytes = sizeof(PlayerCarry);
 	playerCarryBuffer->count = 0;
 	playerCarryBuffer->entities = (PlayerCarry*)malloc(playerCarryBuffer->capacity * playerCarryBuffer->sizeInBytes);
+	//memset(playerCarryBuffer->entities, 0, sizeof(PlayerCarry) * playerCarryBuffer->capacity);
+
 
 	// BarrierBuffer
 	EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
@@ -106,6 +112,16 @@ void InitializeEntityBuffers() {
 	barrierBuffer->sizeInBytes = sizeof(Barrier);
 	barrierBuffer->count = 0;
 	barrierBuffer->entities = (Barrier*)malloc(barrierBuffer->capacity * barrierBuffer->sizeInBytes);
+	memset(barrierBuffer->entities, 0, sizeof(Barrier) * barrierBuffer->capacity);
+
+	// DoorBuffer
+	EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
+	doorBuffer->capacity = 1000;
+	doorBuffer->sizeInBytes = sizeof(Door);
+	doorBuffer->count = 0;
+	doorBuffer->entities = (Door*)malloc(barrierBuffer->capacity * barrierBuffer->sizeInBytes);
+	//memset(doorBuffer->entities, 0, sizeof(Door) * doorBuffer->capacity);
+
 }
 
 void CreatePlayer() {
