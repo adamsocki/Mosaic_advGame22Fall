@@ -117,22 +117,22 @@ void CreateWallWithDoorVertical(bool left, Room room, int32 length, vec2 startin
 	}
 }
 
-void CreateWall(int32 length, vec2 startingPosition, bool horizontal, vec2 size) {
-	
-	for (int i = 0; i < length - 1; i++) {
-		EntityHandle barrierHandle = AddEntity(&Data->em, EntityType_Barrier);
-		Barrier* wallEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
-		wallEntity->handle = barrierHandle;
-		wallEntity->size = size;
-		wallEntity->position = startingPosition;
-		if (horizontal) {
-			wallEntity->position.x += i * wallEntity->size.x ;
-		}
-		wallEntity->isDoor = false;
-		wallEntity->sprite = &Data->sprites.wall1Sprite;
-		wallEntity->toDelete = false;
-	}
-}
+//void CreateWall(int32 length, vec2 startingPosition, bool horizontal, vec2 size) {
+//	
+//	for (int i = 0; i < length - 1; i++) {
+//		EntityHandle barrierHandle = AddEntity(&Data->em, EntityType_Barrier);
+//		Barrier* wallEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
+//		wallEntity->handle = barrierHandle;
+//		wallEntity->size = size;
+//		wallEntity->position = startingPosition;
+//		if (horizontal) {
+//			wallEntity->position.x += i * wallEntity->size.x ;
+//		}
+//		wallEntity->isDoor = false;
+//		wallEntity->sprite = &Data->sprites.wall1Sprite;
+//		wallEntity->toDelete = false;
+//	}
+//}
 
 void CreateBackdrop(Sprite *spriteName) {
 	EntityHandle backgroundHandle = AddEntity(&Data->em, EntityType_Base);
@@ -304,20 +304,20 @@ void CreateRoomFloor8thWithDoor(Room room, Door *door, uint32 numOfDoors) {
 	}
 }
 
-void CreateDoor(Door door) {
-
-	EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
-	Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
-	doorEntity->position = V2(door.startingPosition.x, door.startingPosition.y + (door.tileSize.y));
-	doorEntity->handle = doorHandle;
-	doorEntity->sprite = &Data->sprites.doorClosed1Sprite;
-	doorEntity->size = door.tileSize;
-	for (int i = 0; i < door.size.x; i++) {
-		for (int j = 0; j < door.size.y; j++) {
-			
-		}
-	}
-}
+//void CreateDoor(Door door) {
+//
+//	EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
+//	Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+//	doorEntity->position = V2(door.startingPosition.x, door.startingPosition.y + (door.tileSize.y));
+//	doorEntity->handle = doorHandle;
+//	doorEntity->sprite = &Data->sprites.doorClosed1Sprite;
+//	doorEntity->size = door.tileSize;
+//	for (int i = 0; i < door.size.x; i++) {
+//		for (int j = 0; j < door.size.y; j++) {
+//			
+//		}
+//	}
+//}
 
 
 
@@ -398,9 +398,48 @@ void CreateRoomFloor(Room room) {
 	}
 }
 
-void AddDoors(Door* door, Room room) {
-	//EntityHandle
+void CreateDoorLinear(Door door) {
+	for (int i = 0; i < door.length; i++) {
+		EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
+		Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+		doorEntity->position = door.startingPosition;
+		doorEntity->size = door.tileSize;
+		doorEntity->isDoorOpen = false;
+		if (door.horizontal) {
+			doorEntity->position.x += (i * (door.tileSize.x * 2));
+		}
+		else {
+			doorEntity->position.y += (i * (door.tileSize.y * 2));
+		}
+		if (i == door.doorCenterSeq) {
+			doorEntity->isDoorCenter = true;
+		}
+		else {
+			doorEntity->isDoorCenter = false;
+		}
+		doorEntity->sprite = &Data->sprites.doorClosed1Sprite;
+		doorEntity->handle = doorHandle;
+	}
 }
+
+Wall CreateWall(vec2 pos, vec2 tileSize, int32 length, bool isHorizontal, int32 rowNum, int32 levNum) {
+	Wall wall;
+
+	wall.startingPosition = pos;
+	wall.tileSize = tileSize;
+	wall.length = length;
+	wall.horizontal = isHorizontal;
+	wall.roomNumber = rowNum;
+	wall.levelNumber = levNum;
+
+	return wall;
+}
+
+Door CreateDoor() {
+	Door door;
+	return door;
+}
+
 void CreateLevel(int32 level) {
 
 	if (level == 0) {
@@ -483,64 +522,38 @@ void CreateLevel(int32 level) {
 		room1.levelNumber = level;
 
 		Door door1;
-		door1.startingPosition = V2(2,0);
+		door1.startingPosition = V2(-4.75f,-3.25f);
 		//door1.sizeOfDoor = 3;
 		//door1.doorPositions[0] = V2(2, 0);
 		//door1.doorPositions[1] = V2(3, 0);
 		//door1.horizontal = true;
 		door1.count = 0;
+		door1.tileSize = V2(0.125f, 0.125f);
 		door1.level = level;
+		door1.horizontal = true;
+		door1.length = 3;
 		door1.doorNumber = 1;
 		door1.isDoorCenter = false;
-		//door1.doorSize = V2(3, 1);
-		Door door2;
-		door2.startingPosition = V2(1, 0);
-		door2.level = level;
-		door2.doorNumber = 1;
-		door2.isDoorCenter = true;
-		Door door3;
+		door1.doorCenterSeq = 1;
 
-		door3.startingPosition = V2(3, 0);
-		door3.level = level;
-		door3.doorNumber = 1;
-		door3.isDoorCenter = false;
+		vec2 tileSize = V2(0.125f, 0.125f);
 
-		Wall wall1;
-		wall1.startingPosition = V2(-6, -3.25f);
-		wall1.length = 8;
-		wall1.horizontal = true;
-		wall1.roomNumber = 1;
-		wall1.levelNumber = level;
-		wall1.tileSize = V2(0.125f, 0.125f);
+		Wall wall1 = CreateWall(V2(-6, -3.25f), tileSize, 5, true, 1, level);
+		Wall wall2 = CreateWall(V2(-6.25f, -3.25f), tileSize, 10, false, 1, level);
+		Wall wall3 = CreateWall(V2(-6, -1), tileSize, 8, true, 1, level);
+		Wall wall4 = CreateWall(V2(-4,-3), tileSize, 8, false, 1, level);
 
-		door1.tileSize = V2(0.375f, 0.125f);
-		//Door door2;
-		//door2.startingPosition = V2(3, 0);
-		//CreateRoomFloor8th(room1);
-		
-		Wall wall2;
-		wall2.startingPosition = V2(-6.25f, -3.25f);
-		wall2.length = 10;
-		wall2.horizontal = false;
-		wall2.roomNumber = 1;
-		wall2.levelNumber = level;
-		wall2.tileSize = V2(0.125f, 0.125f);
-
-		Wall wall3;
-		wall3.startingPosition = V2(-6, -1);
-		wall3.length = 8;
-		wall3.horizontal = true;
-		wall3.roomNumber = 1;
-		wall3.levelNumber = level;
-		wall3.tileSize = V2(0.125f, 0.125f);
-		
-		Door doors[] = { door1, door2, door3 };
+		Door doors[] = { door1 };
 		uint32 numberOfDoors = sizeof(doors) / sizeof(doors[0]);
-		//CreateRoomFloor8thWithDoor(room1, doors, numberOfDoors);
+
 		CreateRoomFloor(room1);
 		CreateBarrierLinear(wall1);
 		CreateBarrierLinear(wall2);
 		CreateBarrierLinear(wall3);
+		CreateBarrierLinear(wall4);
+		CreateDoorLinear(door1);
+
+
 	}
 }
 

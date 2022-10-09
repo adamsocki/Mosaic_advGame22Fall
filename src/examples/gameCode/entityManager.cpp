@@ -119,8 +119,8 @@ void InitializeEntityBuffers() {
 	doorBuffer->capacity = 1000;
 	doorBuffer->sizeInBytes = sizeof(Door);
 	doorBuffer->count = 0;
-	doorBuffer->entities = (Door*)malloc(barrierBuffer->capacity * barrierBuffer->sizeInBytes);
-	//memset(doorBuffer->entities, 0, sizeof(Door) * doorBuffer->capacity);
+	doorBuffer->entities = (Door*)malloc(doorBuffer->capacity * doorBuffer->sizeInBytes);
+	memset(doorBuffer->entities, 0, sizeof(Door) * doorBuffer->capacity);
 
 }
 

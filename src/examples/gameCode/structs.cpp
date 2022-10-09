@@ -170,6 +170,7 @@ struct Door :Entity {
 	bool isDoorOpen;
 	int32 count;
 	int32 doorNumber;
+	int32 doorCenterSeq;
 	//DynamicArray<vec2> doorPositions;
 };
 

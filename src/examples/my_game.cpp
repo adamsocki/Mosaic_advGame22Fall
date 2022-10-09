@@ -81,7 +81,7 @@ void MyGameUpdate() {
                 playerCarryEntity->canBePickedUp = false;
             }
         }
-        // Player Barriers (incl doors)
+        // Player Barriers 
         for (int j = 0; j < barrierBuffer->count; j++) {
             Rect barrierRect;
             EntityHandle barrierHandle = barrierEntitiesInBuffer[j].handle;
@@ -96,6 +96,20 @@ void MyGameUpdate() {
                /* else if (barrierEntity->mouseIsOver) {
                     MouseInputClick();
                 }*/
+            }
+        }
+        //  Player to Doors
+        for (int j = 0; j < doorBuffer->count; j++) {
+            Rect doorRect;
+            EntityHandle doorHandle = doorEntitiesInBuffer[j].handle;
+            Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+            doorRect.max = doorEntity->size;
+            doorRect.min = -doorEntity->size;
+            vec2(dir) = V2(0, 0);
+            if (RectTest(doorRect, playerRect, doorEntity->position, playerEntitiesInBuffer[0].position, &dir)) {
+                if (!doorEntity->isDoorOpen) {
+                    playerEntitiesInBuffer[0].position = playerEntitiesInBuffer[0].previousPosition;
+                }
             }
         }
     }
@@ -131,43 +145,29 @@ void MyGameUpdate() {
         }
     }
     //      Check to Doors
-    for (int i = 0; i < barrierBuffer->count; i++) {
+    for (int i = 0; i < doorBuffer->count; i++) {
         
-        EntityHandle barrierHandle = barrierEntitiesInBuffer[i].handle;
-        Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
-        if (barrierEntity->isDoor && barrierEntity->isDoorCenter) {
-            Rect barrierbarrierRect;
-            barrierbarrierRect.max = barrierEntity->size;
-            barrierbarrierRect.min = -barrierEntity->size;
-            if (RectTest(mouseRect, barrierbarrierRect, barrierEntity->position, mousePos, &dir)) {
+        EntityHandle doorHandle = doorEntitiesInBuffer[i].handle;
+        Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+        if (doorEntity->isDoorCenter) {
+            Rect centerDoorRect;
+            centerDoorRect.max = doorEntity->size;
+            centerDoorRect.min = -doorEntity->size;
+            if (RectTest(mouseRect, centerDoorRect, doorEntity->position, mousePos, &dir)) {
                 
-                if (!barrierEntity->mouseIsOver) {
+                if (!doorEntity->mouseIsOver) {
                     PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
 
-                    barrierEntity->mouseIsOver = true;
+                    doorEntity->mouseIsOver = true;
                     Data->mouseCrosshair.isLocked = true;
                 }
-                Data->mouseCrosshair.position = barrierEntity->position;
+                Data->mouseCrosshair.position = doorEntity->position;
             }
             else {
-                barrierEntity->mouseIsOver = false;
+                doorEntity->mouseIsOver = false;
                 Data->mouseCrosshair.isLocked = false;
             }
 
-            // MOUSE IS OVER barrier FUNCTIONALITY
-            if (barrierEntity->mouseIsOver) {
-               // doorShouldBeOpen = barrierEntity->doorNumber;
-                barrierEntity->isOpen = true;
-                barrierEntity->sprite = &Data->sprites.blankSprite;
-                /*for (int d = 0; d < barrierBufferCount; d++) {
-                    EntityHandle barrierHandle = barrierEntitiesInBuffer[d].handle;
-                    Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
-                    if (barrierEntity->doorNumber = doorNumberToOpen) {
-                        barrierEntity->isOpen = true;
-                        barrierEntity->& Data->sprites.blankSprite;
-                    }
-                }*/
-            }
         }
     }
 
