@@ -378,7 +378,7 @@ void CreateBarrierLinear(Wall wall) {
 		else {
 			wallEntity->position.y += (i * (wall.tileSize.y * 2));
 		}
-		wallEntity->sprite = &Data->sprites.suitcaseSprite;
+		wallEntity->sprite = &Data->sprites.blankSprite;
 		wallEntity->handle = wallHandle;
 	}
 }
@@ -399,7 +399,25 @@ void CreateRoomFloor(Room room) {
 }
 
 void CreateDoorLinear(Door door) {
-	for (int i = 0; i < door.length; i++) {
+
+	EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
+	Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+	doorEntity->position = door.startingPosition;
+	doorEntity->position.x += (door.length / 2);
+	
+	if (door.horizontal) {
+		doorEntity->size.x = door.tileSize.x * door.length;
+		doorEntity->size.y = door.tileSize.y;
+		doorEntity->sprite = &Data->sprites.doorClosed1hSprite;
+	}
+	else {
+		doorEntity->size.x = door.tileSize.x;
+		doorEntity->size.y = door.tileSize.y * door.length;
+		doorEntity->sprite = &Data->sprites.doorClosed1vSprite;
+	}
+	doorEntity->handle = doorHandle;
+
+	/*for (int i = 0; i < door.length; i++) {
 		EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
 		Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
 		doorEntity->position = door.startingPosition;
@@ -419,7 +437,7 @@ void CreateDoorLinear(Door door) {
 		}
 		doorEntity->sprite = &Data->sprites.doorClosed1Sprite;
 		doorEntity->handle = doorHandle;
-	}
+	}*/
 }
 
 Wall CreateWall(vec2 pos, vec2 tileSize, int32 length, bool isHorizontal, int32 rowNum, int32 levNum) {
@@ -438,6 +456,19 @@ Wall CreateWall(vec2 pos, vec2 tileSize, int32 length, bool isHorizontal, int32 
 Door CreateDoor() {
 	Door door;
 	return door;
+}
+
+void CreateAndPlaceRoomTrigger(vec2 pos, int32 level, int32 roomToTrigger, vec2 tileSize) {
+
+	EntityHandle roomTriggerHandle = AddEntity(&Data->em, EntityType_RoomTrigger);
+	RoomTrigger* roomTriggerEntity = (RoomTrigger*)GetEntity(&Data->em, roomTriggerHandle);
+	roomTriggerEntity->position = pos;
+	roomTriggerEntity->level = level;
+	roomTriggerEntity->roomToTrigger = roomToTrigger;
+	roomTriggerEntity->size = tileSize;
+	roomTriggerEntity->sprite = &Data->sprites.suitcaseSprite;
+
+
 }
 
 void CreateLevel(int32 level) {
@@ -522,7 +553,7 @@ void CreateLevel(int32 level) {
 		room1.levelNumber = level;
 
 		Door door1;
-		door1.startingPosition = V2(-4.75f,-3.25f);
+		door1.startingPosition = V2(-5.5f,-3.25f);
 		//door1.sizeOfDoor = 3;
 		//door1.doorPositions[0] = V2(2, 0);
 		//door1.doorPositions[1] = V2(3, 0);
@@ -541,7 +572,7 @@ void CreateLevel(int32 level) {
 		Wall wall1 = CreateWall(V2(-6, -3.25f), tileSize, 5, true, 1, level);
 		Wall wall2 = CreateWall(V2(-6.25f, -3.25f), tileSize, 10, false, 1, level);
 		Wall wall3 = CreateWall(V2(-6, -1), tileSize, 8, true, 1, level);
-		Wall wall4 = CreateWall(V2(-4,-3), tileSize, 8, false, 1, level);
+		Wall wall4 = CreateWall(V2(-4,-3.25f), tileSize, 10, false, 1, level);
 
 		Door doors[] = { door1 };
 		uint32 numberOfDoors = sizeof(doors) / sizeof(doors[0]);
@@ -552,7 +583,7 @@ void CreateLevel(int32 level) {
 		CreateBarrierLinear(wall3);
 		CreateBarrierLinear(wall4);
 		CreateDoorLinear(door1);
-
+		CreateAndPlaceRoomTrigger(V2(0,0), level, 2, tileSize);
 
 	}
 }

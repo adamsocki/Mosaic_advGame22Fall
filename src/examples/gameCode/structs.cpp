@@ -8,6 +8,7 @@ enum EntityType {
 
 	EntityType_Barrier,
 	EntityType_Door,
+	EntityType_RoomTrigger,
 
 	EntityType_MouseCrosshair,
 
@@ -64,6 +65,8 @@ struct EntitySprites {
 	Sprite blankSprite;
 
 	Sprite doorClosed1Sprite;
+	Sprite doorClosed1hSprite;
+	Sprite doorClosed1vSprite;
 	Sprite crosshairUnlocked1Sprite;
 
 
@@ -108,6 +111,14 @@ struct Entity {
 
 struct Base : Entity {
 	int32 id;
+};
+
+struct RoomTrigger : Entity {
+	bool isTriggered;
+	int32 roomToTrigger;
+	int32 level;
+	vec2 tileSize;
+
 };
 
 struct Player : Entity {

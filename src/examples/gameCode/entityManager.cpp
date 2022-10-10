@@ -87,7 +87,7 @@ void InitializeEntityBuffers() {
 	playerBuffer->sizeInBytes = sizeof(Player);
 	playerBuffer->count = 0;
 	playerBuffer->entities = (Player*)malloc(playerBuffer->capacity * playerBuffer->sizeInBytes);
-	//smemset(playerBuffer->entities, 0, sizeof(Player) * playerBuffer->capacity);
+	memset(playerBuffer->entities, 0, sizeof(Player) * playerBuffer->capacity);
 
 	// LevelPortalBuffer
 	EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
@@ -121,6 +121,14 @@ void InitializeEntityBuffers() {
 	doorBuffer->count = 0;
 	doorBuffer->entities = (Door*)malloc(doorBuffer->capacity * doorBuffer->sizeInBytes);
 	memset(doorBuffer->entities, 0, sizeof(Door) * doorBuffer->capacity);
+
+	// RoomTriggerBuffer
+	EntityTypeBuffer* roomTriggerBuffer = &Data->em.buffers[EntityType_RoomTrigger];
+	roomTriggerBuffer->capacity = 1000;
+	roomTriggerBuffer->sizeInBytes = sizeof(RoomTrigger);
+	roomTriggerBuffer->count = 0;
+	roomTriggerBuffer->entities = (RoomTrigger*)malloc(roomTriggerBuffer->capacity * roomTriggerBuffer->sizeInBytes);
+	memset(roomTriggerBuffer->entities, 0, sizeof(RoomTrigger) * roomTriggerBuffer->capacity);
 
 }
 

@@ -4,7 +4,7 @@
 #include "gameCode/LevelManager.cpp"
 
 #include "gameCode/input.cpp"
-
+#include "gameCode/collision.cpp"
 
 void MyInit() {
     Game->myData = malloc(sizeof(MyData));
@@ -47,6 +47,7 @@ void MyGameUpdate() {
     EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
     EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
     EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
+    EntityTypeBuffer* roomTriggerBuffer = &Data->em.buffers[EntityType_RoomTrigger];
 
     //      For all entity types, second Point to EntityBuffer->entities (Logic A: 2 of 2 steps)
     Base* baseEntitiesInBuffer = (Base*)baseBuffer->entities;
@@ -55,6 +56,7 @@ void MyGameUpdate() {
     Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
     LevelPortal* levelPortalEntitiesInBuffer = (LevelPortal*)levelPortalBuffer->entities;
     Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
+    RoomTrigger* roomTriggerEntitiesInBuffer = (RoomTrigger*)roomTriggerBuffer->entities;
 
     //      Handle Player Input for Movement
     InputPlayerController(&playerEntitiesInBuffer[0]);
@@ -63,9 +65,7 @@ void MyGameUpdate() {
     //      Player 
     for (int i = 0; i < playerBuffer->count; i++) {
         // PlayerCarry
-        Rect playerRect;
-        playerRect.max = playerEntitiesInBuffer[0].size;
-        playerRect.min = -playerEntitiesInBuffer[0].size;
+        Rect playerRect = playerCollisionRect(1, &playerEntitiesInBuffer[0]);
         for (int j = 0; j < playerCarryBuffer->count; j++) {
             Rect playerCarryRect;
             EntityHandle playerCarryHandle = playerCarryEntitiesInBuffer[j].handle;
@@ -112,6 +112,19 @@ void MyGameUpdate() {
                 }
             }
         }
+        // Player to LevelTrigger
+        for (int j = 0; j < roomTriggerBuffer->count; j++) {
+
+            Rect roomTriggerRect;
+            RoomTrigger* roomTriggerEntity = &roomTriggerEntitiesInBuffer[j];
+            DrawSprite(roomTriggerEntity->position, roomTriggerEntity->size, roomTriggerEntity->sprite);
+            roomTriggerRect.max = roomTriggerEntity->size;
+            roomTriggerRect.min = -roomTriggerEntity->size;
+            vec2(dir) = V2(0, 0);
+            if (RectTest(roomTriggerRect, playerRect, roomTriggerEntity->position, playerEntitiesInBuffer[0].position, &dir)) {
+                DrawSprite(V2(1, 1), V2(1, 1), &Data->sprites.stairsDown1Sprite);
+            }
+        }
     }
 
     //  Crosshair Collission Check
@@ -149,25 +162,41 @@ void MyGameUpdate() {
         
         EntityHandle doorHandle = doorEntitiesInBuffer[i].handle;
         Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+        Rect centerDoorRect;
+        centerDoorRect.max = doorEntity->size;
+        centerDoorRect.min = -doorEntity->size;
+        if (RectTest(mouseRect, centerDoorRect, doorEntity->position, mousePos, &dir)) {
+
+            if (!doorEntity->mouseIsOver) {
+                PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
+
+                doorEntity->mouseIsOver = true;
+                Data->mouseCrosshair.isLocked = true;
+            }
+            Data->mouseCrosshair.position = doorEntity->position;
+        }
+        else {
+            doorEntity->mouseIsOver = false;
+            Data->mouseCrosshair.isLocked = false;
+        }
         if (doorEntity->isDoorCenter) {
-            Rect centerDoorRect;
-            centerDoorRect.max = doorEntity->size;
-            centerDoorRect.min = -doorEntity->size;
-            if (RectTest(mouseRect, centerDoorRect, doorEntity->position, mousePos, &dir)) {
+            
+        }
+        // OPEN DOOR ON CLICK && PLAYER PROXIMITY
+        if (doorEntity->mouseIsOver) {
+            if (InputPressed(Mouse, Input_MouseLeft)) {
+                // door proximity
+                Rect expandedDoorProximityRect;
+                expandedDoorProximityRect.max = doorEntity->size * 2;
+                expandedDoorProximityRect.min = -doorEntity->size * 2;
+                Rect playerRect = playerCollisionRect(1, &playerEntitiesInBuffer[0]);
                 
-                if (!doorEntity->mouseIsOver) {
-                    PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
-
-                    doorEntity->mouseIsOver = true;
-                    Data->mouseCrosshair.isLocked = true;
+                if (RectTest(playerRect, expandedDoorProximityRect, playerEntitiesInBuffer[0].position, doorEntity->position, &dir)) { 
+                    
+                    doorEntity->isDoorOpen = true;
+                    doorEntity->sprite = &Data->sprites.floor1Sprite;
                 }
-                Data->mouseCrosshair.position = doorEntity->position;
             }
-            else {
-                doorEntity->mouseIsOver = false;
-                Data->mouseCrosshair.isLocked = false;
-            }
-
         }
     }
 
@@ -249,6 +278,8 @@ void MyGameUpdate() {
             }
         }
     }
+
+    //      
     
     //      Render Level Portals
     for (int i = 0; i < levelPortalBuffer->count; i++) {
@@ -272,7 +303,6 @@ void MyGameUpdate() {
     }
 
 
-
     //      Render PlayerCarry
     for (int i = 0; i < playerCarryBuffer->count; i++) {
         EntityHandle playerCarryHandle = playerCarryEntitiesInBuffer[i].handle;
@@ -286,9 +316,6 @@ void MyGameUpdate() {
             }
         }
     }
-
-    
-
 
     //      Render Player Carry
     for (int i = 0; i < playerCarryBuffer->count; i++) {
@@ -326,5 +353,6 @@ void MyGameUpdate() {
     else {
 
     }
+    
  DrawSprite(Data->mouseCrosshair.position, V2(0.3f, 0.3f), &Data->sprites.crosshairUnlocked1Sprite);
 }

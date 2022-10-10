@@ -47,6 +47,8 @@ void InitializeMouse() {
 void MouseInputClick(Barrier* barrierEntity, int32 barrierBufferCount, EntityTypeBuffer* barrierEntitiesInBuffer) {
 
 	if (InputPressed(Mouse, Input_MouseLeft)) {
+
+
 		/*int32 doorNumberToOpen = barrierEntity->doorNumber;
 		barrierEntity->isOpen = true;
 		barrierEntity->sprite = &Data->sprites.blankSprite;

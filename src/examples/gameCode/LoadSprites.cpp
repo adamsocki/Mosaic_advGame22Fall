@@ -1,5 +1,5 @@
 void LoadSprites() {
-	LoadSprite(&Data->sprites.playerSprite, "data/gameData/player_simple.png");
+	LoadSprite(&Data->sprites.playerSprite, "data/Player_Simple.png");
 	LoadSprite(&Data->sprites.street_Asprite, "data/gameData/street_A.png");
 	LoadSprite(&Data->sprites.street_Bsprite, "data/gameData/street_B.png");
 //	LoadSprite(&Data->sprites.building_ASprite, "data/gameData/building_A.png");
@@ -17,6 +17,8 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.floor1Sprite, "data/floor1.png");
 	LoadSprite(&Data->sprites.blankSprite, "data/blank.png");
 	LoadSprite(&Data->sprites.doorClosed1Sprite, "data/doorClosed1.png");
+	LoadSprite(&Data->sprites.doorClosed1hSprite, "data/doorClosed1h.png");
+	LoadSprite(&Data->sprites.doorClosed1vSprite, "data/doorClosed1v.png");
 
 }
 
