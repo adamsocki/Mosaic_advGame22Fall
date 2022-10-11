@@ -458,31 +458,41 @@ Wall CreateWall(vec2 pos, vec2 tileSize, int32 length, bool isHorizontal, int32 
 	return wall;
 }
 
-Wall CreateWall2(Room room, int32 length, int32 side, bool showSprite) {
+Wall CreateWall2(Room room, int32 length, int32 side, bool showSprite, int32 awayFromStart) {
 	Wall wall;
 	wall.startingPosition = room.startingPosition;
+	wall.roomNumber = room.roomNumber;
+	wall.activeRoom = false;
 	switch (side) 
 	{
+		// top
 		case 1: 
 		{
+			wall.startingPosition.x += (room.tileSize.x * 2 * awayFromStart);
 			wall.startingPosition.y = room.startingPosition.y + (room.size.y * room.tileSize.y * 2);
 			wall.horizontal = true;
 			break;
 		}
+		// bottom
 		case 2:
 		{
+			wall.startingPosition.x += (room.tileSize.x * 2 * awayFromStart);;
 			wall.startingPosition.y = room.startingPosition.y - (room.tileSize.y * 2);
 			wall.horizontal = true;
 			break;
 		}
+		// left
 		case 3:
 		{
+			wall.startingPosition.y += (room.tileSize.y * 2 * awayFromStart);;
 			wall.startingPosition.x = room.startingPosition.x - (room.tileSize.x * 2);
 			wall.horizontal = false;
 			break;
 		}
+		// right
 		case 4:
 		{
+			wall.startingPosition.y += (room.tileSize.y * 2 * awayFromStart);;
 			wall.startingPosition.x = room.startingPosition.x + (room.size.x * room.tileSize.x * 2);
 			wall.horizontal = false;
 			break;
@@ -600,12 +610,12 @@ void CreateLevel(int32 level) {
 		Room room1;
 		room1.size = V2(8,8);
 		room1.tileSize = V2(0.125f, 0.125f);
-		room1.startingPosition = V2(2, -2);
+		room1.startingPosition = V2(-6.25f, -2.5f);
 		room1.roomNumber = 1;
 		room1.levelNumber = level;
 
 		Door door1;
-		door1.startingPosition = V2(-5.5f,-3.25f);
+		door1.startingPosition = V2(-5.75f,-2.75f);
 		//door1.sizeOfDoor = 3;
 		//door1.doorPositions[0] = V2(2, 0);
 		//door1.doorPositions[1] = V2(3, 0);
@@ -631,10 +641,10 @@ void CreateLevel(int32 level) {
 		int32 left = 3;
 		int32 right = 4;
 
-		Wall wall1 = CreateWall2(room1, 5, bottom, true);
-		Wall wall2 = CreateWall2(room1, 8, left, true);
-		Wall wall3 = CreateWall2(room1, 8, top, true);
-		Wall wall4 = CreateWall2(room1, 8, right, true);
+		Wall wall1 = CreateWall2(room1, 5, bottom, true, 0);
+		Wall wall2 = CreateWall2(room1, 8, left, true, 0);
+		Wall wall3 = CreateWall2(room1, 8, top, true,0);
+		Wall wall4 = CreateWall2(room1, 8, right, true,0);
 
 		Door doors[] = { door1 };
 		uint32 numberOfDoors = sizeof(doors) / sizeof(doors[0]);
@@ -657,6 +667,14 @@ void CreateLevel(int32 level) {
 
 
 		CreateRoomFloor(room2);
+		wall1 = CreateWall2(room2, 28, bottom, true,0);
+		wall2 = CreateWall2(room2, 5, left, true,0);
+		wall3 = CreateWall2(room2, 28, top, true,3);
+		wall4 = CreateWall2(room2, 5, right, true,0);
+		CreateBarrierLinear(wall1);
+		CreateBarrierLinear(wall2);
+		CreateBarrierLinear(wall3);
+		CreateBarrierLinear(wall4);
 
 	}
 }

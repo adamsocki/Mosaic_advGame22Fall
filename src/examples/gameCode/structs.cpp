@@ -180,6 +180,8 @@ struct Door :Entity {
 	int32 length;
 	bool isDoorCenter;
 	bool isDoorOpen;
+	int32 roomNumber;
+	bool activeRoom;
 	int32 count;
 	int32 doorNumber;
 	int32 doorCenterSeq;
@@ -195,4 +197,5 @@ struct Wall {
 	vec2 startingPosition;
 	int32 roomNumber;
 	bool showSprite;
+	bool activeRoom;
 };
