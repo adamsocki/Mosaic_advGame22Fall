@@ -140,6 +140,7 @@ struct Barrier : Entity {
 	EntityHandle handleForOpenDoorRight;
 	int32 doorNumber;
 	int32 roomNumber;
+	
 };
 
 
@@ -193,4 +194,5 @@ struct Wall {
 	vec2 tileSize;
 	vec2 startingPosition;
 	int32 roomNumber;
+	bool showSprite;
 };

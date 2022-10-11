@@ -378,7 +378,12 @@ void CreateBarrierLinear(Wall wall) {
 		else {
 			wallEntity->position.y += (i * (wall.tileSize.y * 2));
 		}
-		wallEntity->sprite = &Data->sprites.blankSprite;
+		if (wall.showSprite) {
+			wallEntity->sprite = &Data->sprites.suitcaseSprite;
+		}
+		else {
+			wallEntity->sprite = &Data->sprites.blankSprite;
+		}
 		wallEntity->handle = wallHandle;
 	}
 }
@@ -451,6 +456,53 @@ Wall CreateWall(vec2 pos, vec2 tileSize, int32 length, bool isHorizontal, int32 
 	wall.levelNumber = levNum;
 
 	return wall;
+}
+
+Wall CreateWall2(Room room, int32 length, int32 side, bool showSprite) {
+	Wall wall;
+	wall.startingPosition = room.startingPosition;
+	switch (side) 
+	{
+		case 1: 
+		{
+			wall.startingPosition.y = room.startingPosition.y + (room.size.y * room.tileSize.y * 2);
+			wall.horizontal = true;
+			break;
+		}
+		case 2:
+		{
+			wall.startingPosition.y = room.startingPosition.y - (room.tileSize.y * 2);
+			wall.horizontal = true;
+			break;
+		}
+		case 3:
+		{
+			wall.startingPosition.x = room.startingPosition.x - (room.tileSize.x * 2);
+			wall.horizontal = false;
+			break;
+		}
+		case 4:
+		{
+			wall.startingPosition.x = room.startingPosition.x + (room.size.x * room.tileSize.x * 2);
+			wall.horizontal = false;
+			break;
+		}
+	}
+	
+	wall.tileSize = room.tileSize;
+	wall.length = length;
+	wall.roomNumber = room.roomNumber;
+	wall.levelNumber = room.levelNumber;
+	if (showSprite) {
+		wall.showSprite = true;
+	}
+	else {
+		wall.showSprite = false;
+	}
+
+	return wall;
+
+	// create wall based on room to allow user to move the room around.
 }
 
 Door CreateDoor() {
@@ -548,7 +600,7 @@ void CreateLevel(int32 level) {
 		Room room1;
 		room1.size = V2(8,8);
 		room1.tileSize = V2(0.125f, 0.125f);
-		room1.startingPosition = V2(-6, -3);
+		room1.startingPosition = V2(2, -2);
 		room1.roomNumber = 1;
 		room1.levelNumber = level;
 
@@ -568,11 +620,21 @@ void CreateLevel(int32 level) {
 		door1.doorCenterSeq = 1;
 
 		vec2 tileSize = V2(0.125f, 0.125f);
+		
+		//Wall wall1 = CreateWall(V2(-6, -3.25f), tileSize, 5, true, 1, level);
+		//Wall wall3 = CreateWall(V2(-6, -1), tileSize, 8, true, 1, level);
+		//Wall wall2 = CreateWall(V2(-6.25f, -3.25f), tileSize, 10, false, 1, level);
+		//Wall wall4 = CreateWall(V2(-4,-3.25f), tileSize, 10, false, 1, level);
 
-		Wall wall1 = CreateWall(V2(-6, -3.25f), tileSize, 5, true, 1, level);
-		Wall wall2 = CreateWall(V2(-6.25f, -3.25f), tileSize, 10, false, 1, level);
-		Wall wall3 = CreateWall(V2(-6, -1), tileSize, 8, true, 1, level);
-		Wall wall4 = CreateWall(V2(-4,-3.25f), tileSize, 10, false, 1, level);
+		int32 top = 1;
+		int32 bottom = 2;
+		int32 left = 3;
+		int32 right = 4;
+
+		Wall wall1 = CreateWall2(room1, 5, bottom, true);
+		Wall wall2 = CreateWall2(room1, 8, left, true);
+		Wall wall3 = CreateWall2(room1, 8, top, true);
+		Wall wall4 = CreateWall2(room1, 8, right, true);
 
 		Door doors[] = { door1 };
 		uint32 numberOfDoors = sizeof(doors) / sizeof(doors[0]);
@@ -584,6 +646,17 @@ void CreateLevel(int32 level) {
 		CreateBarrierLinear(wall4);
 		CreateDoorLinear(door1);
 		CreateAndPlaceRoomTrigger(V2(0,0), level, 2, tileSize);
+
+		// ROOM 2
+		Room room2;
+		room2.size = V2(30, 5);
+		room2.tileSize = tileSize;
+		room2.startingPosition = V2(-5, -4);
+		room2.roomNumber = 2;
+		room2.levelNumber = level;
+
+
+		CreateRoomFloor(room2);
 
 	}
 }
