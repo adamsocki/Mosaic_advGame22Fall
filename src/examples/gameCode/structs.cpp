@@ -111,6 +111,7 @@ struct Entity {
 
 struct Base : Entity {
 	int32 id;
+	bool activeRoom;
 };
 
 struct RoomTrigger : Entity {
@@ -140,7 +141,7 @@ struct Barrier : Entity {
 	EntityHandle handleForOpenDoorRight;
 	int32 doorNumber;
 	int32 roomNumber;
-	
+	bool activeRoom;
 };
 
 

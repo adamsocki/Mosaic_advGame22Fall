@@ -40,6 +40,8 @@ void MyGameUpdate() {
     mousePos.y = mousePos.y * 4.5f;
     Data->mouseCrosshair.position = mousePos;
 
+    
+
     //      For all entity types, first Point to EntityBuffers (Logic A: 1 of 2 steps)
     EntityTypeBuffer* baseBuffer = &Data->em.buffers[EntityType_Base];
     EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
@@ -237,19 +239,22 @@ void MyGameUpdate() {
         EntityHandle baseHandle = baseEntitiesInBuffer[i].handle;
         Base* baseEntity = (Base*)GetEntity(&Data->em, baseHandle);
         if (baseEntity != NULL) {
-            if (baseEntity->toDelete) {
-                DeleteEntity(&Data->em, baseEntity->handle);
-            }
-            else {
-                if (baseEntity->isQuad) {
-
-                    DrawRect(baseEntity->position, baseEntity->size, RGB(1.0f, 0.3f, 0.3f));
+            if (baseEntity->activeRoom) {
+                if (baseEntity->toDelete) {
+                    DeleteEntity(&Data->em, baseEntity->handle);
                 }
                 else {
-                    DrawSprite(baseEntity->position, baseEntity->size, baseEntity->sprite);
+                    if (baseEntity->isQuad) {
+
+                        DrawRect(baseEntity->position, baseEntity->size, RGB(1.0f, 0.3f, 0.3f));
+                    }
+                    else {
+                        DrawSprite(baseEntity->position, baseEntity->size, baseEntity->sprite);
+                    }
+
                 }
-                
             }
+           
         }
     }
     //      Render Barriers
@@ -257,12 +262,15 @@ void MyGameUpdate() {
         EntityHandle barrierHandle = barrierEntitiesInBuffer[i].handle;
         Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
         if (barrierEntity != NULL) {
-            if (barrierEntity->toDelete) {
-                DeleteEntity(&Data->em, barrierEntity->handle);
+            if (barrierEntity->activeRoom) {
+                if (barrierEntity->toDelete) {
+                    DeleteEntity(&Data->em, barrierEntity->handle);
+                }
+                else {
+                    DrawSprite(barrierEntity->position, barrierEntity->size, barrierEntity->sprite);
+                }
             }
-            else {
-                DrawSprite(barrierEntity->position, barrierEntity->size, barrierEntity->sprite);
-            }
+            
         }
     }
     //      Render Doors
@@ -270,12 +278,15 @@ void MyGameUpdate() {
         EntityHandle doorHandle = doorEntitiesInBuffer[i].handle;
         Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
         if (doorEntity != NULL) {
-            if (doorEntity->toDelete) {
-                DeleteEntity(&Data->em, doorEntity->handle);
+            if (doorEntity->activeRoom) {
+                if (doorEntity->toDelete) {
+                    DeleteEntity(&Data->em, doorEntity->handle);
+                }
+                else {
+                    DrawSprite(doorEntity->position, doorEntity->size, doorEntity->sprite);
+                }
             }
-            else {
-                DrawSprite(doorEntity->position, doorEntity->size, doorEntity->sprite);
-            }
+          
         }
     }
 
