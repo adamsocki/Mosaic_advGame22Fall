@@ -17,6 +17,8 @@ enum EntityType {
 	EntityType_Count,
 };
 
+
+
 struct EntityHandle {
 	int32 generation;
 	int32 indexInInfo;
@@ -41,10 +43,12 @@ struct EntityTypeBuffer {
 
 
 struct EntityManager {
-	EntityTypeBuffer buffers[EntityType_Count];
+	EntityTypeBuffer buffers[EntityType_Count][4];
 	EntityInfo *entities;
 	int32 entityCapacity;
 	int32 nextID;
+
+	int32 currentLevel;
 };
 
 
