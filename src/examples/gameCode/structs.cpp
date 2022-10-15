@@ -17,6 +17,14 @@ enum EntityType {
 	EntityType_Count,
 };
 
+enum Level {
+	Level_1,
+	Level_2,
+	
+
+	Level_Count,
+};
+
 struct EntityHandle {
 	int32 generation;
 	int32 indexInInfo;
@@ -39,9 +47,14 @@ struct EntityTypeBuffer {
 	void* entities;
 };
 
+struct LevelContainer {
+	EntityTypeBuffer* buffers;
+};
+
 
 struct EntityManager {
-	EntityTypeBuffer buffers[EntityType_Count];
+	int32 currentLevel;
+	EntityTypeBuffer buffers[EntityType_Count][Level_Count];
 	EntityInfo *entities;
 	int32 entityCapacity;
 	int32 nextID;
@@ -90,6 +103,7 @@ struct MyData {
 
 	EntitySprites sprites;
 	Sounds sound;
+	int32 currentLevel;
 
 	MouseCrosshair mouseCrosshair;
 
@@ -144,11 +158,6 @@ struct Barrier : Entity {
 	bool activeRoom;
 };
 
-
-struct Level {
-	
-	//DynamicArray<Room> rooms;
-};
 
 struct Room {
 	vec2 size;

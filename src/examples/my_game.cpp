@@ -40,16 +40,22 @@ void MyGameUpdate() {
     mousePos.y = mousePos.y * 4.5f;
     Data->mouseCrosshair.position = mousePos;
 
-    
 
+ 
     //      For all entity types, first Point to EntityBuffers (Logic A: 1 of 2 steps)
-    EntityTypeBuffer* baseBuffer = &Data->em.buffers[EntityType_Base];
-    EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
-    EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry];
-    EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
-    EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
-    EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
-    EntityTypeBuffer* roomTriggerBuffer = &Data->em.buffers[EntityType_RoomTrigger];
+    int32 currentLevel = 2;
+    EntityTypeBuffer* baseBuffer = &Data->em.buffers[EntityType_Base][currentLevel];
+    EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player][currentLevel];
+    EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry][currentLevel];
+    EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier][currentLevel];
+    EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal][currentLevel];
+    EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door][currentLevel];
+    EntityTypeBuffer* roomTriggerBuffer = &Data->em.buffers[EntityType_RoomTrigger][currentLevel];
+
+
+    LevelContainer level1;
+    level1.buffers = (EntityTypeBuffer*)malloc(sizeof(EntityTypeBuffer) * 10);
+   // level1.buffers[0] = baseBuffer;
 
     //      For all entity types, second Point to EntityBuffer->entities (Logic A: 2 of 2 steps)
     Base* baseEntitiesInBuffer = (Base*)baseBuffer->entities;
