@@ -20,7 +20,7 @@ void* GetEntity(EntityManager* em, EntityHandle handle) {
 		return NULL;
 	}
 
-	EntityTypeBuffer* buffer = &em->buffers[info->type];
+	EntityTypeBuffer* buffer = &em->buffers[info->type][em->currentLevel];
 
 	return ((u8*)buffer->entities + (buffer->sizeInBytes * info->indexInBuffer));
 }
@@ -29,7 +29,7 @@ void DeleteEntity(EntityManager* em, EntityHandle handle) {
 	freeList[freeListCount] = handle.indexInInfo;
 	freeListCount++;
 
-	EntityTypeBuffer* buffer = &em->buffers[handle.type];
+	EntityTypeBuffer* buffer = &em->buffers[handle.type][em->currentLevel];
 	EntityInfo* info = &em->entities[handle.indexInInfo];
 	EntityHandle handleOfSwappedEntity;
 
@@ -51,7 +51,7 @@ EntityHandle AddEntity(EntityManager *em, EntityType type) {
 	info->type = type;
 	info->generation++;
 
-	EntityTypeBuffer* buffer = &em->buffers[type];
+	EntityTypeBuffer* buffer = &em->buffers[type][em->currentLevel];
 	info->indexInBuffer = buffer->count;
 	buffer->count++;
 
@@ -65,7 +65,7 @@ EntityHandle AddEntity(EntityManager *em, EntityType type) {
 
 void InitializeEntityManager() {
 	// Entity Manager
-	Data->em.entityCapacity = 100000;
+	Data->em.entityCapacity = 1000000;
 	Data->em.entities = (EntityInfo*)malloc(sizeof(EntityInfo) * Data->em.entityCapacity);
 	memset(Data->em.entities, 0, sizeof(EntityInfo) * Data->em.entityCapacity);
 	Data->em.nextID = 0;

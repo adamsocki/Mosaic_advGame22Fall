@@ -43,13 +43,13 @@ void MyGameUpdate() {
     
 
     //      For all entity types, first Point to EntityBuffers (Logic A: 1 of 2 steps)
-    EntityTypeBuffer* baseBuffer = &Data->em.buffers[EntityType_Base];
-    EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
-    EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry];
-    EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
-    EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
-    EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
-    EntityTypeBuffer* roomTriggerBuffer = &Data->em.buffers[EntityType_RoomTrigger];
+    EntityTypeBuffer* baseBuffer = &Data->em.buffers[EntityType_Base][Data->em.currentLevel];
+    EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player][Data->em.currentLevel];
+    EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry][Data->em.currentLevel];
+    EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier][Data->em.currentLevel];
+    EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal][Data->em.currentLevel];
+    EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door][Data->em.currentLevel];
+    EntityTypeBuffer* roomTriggerBuffer = &Data->em.buffers[EntityType_RoomTrigger][Data->em.currentLevel];
 
     //      For all entity types, second Point to EntityBuffer->entities (Logic A: 2 of 2 steps)
     Base* baseEntitiesInBuffer = (Base*)baseBuffer->entities;

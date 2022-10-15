@@ -17,7 +17,13 @@ enum EntityType {
 	EntityType_Count,
 };
 
+enum Level {
+	Level_1,
+	Level_2,
 
+
+	Level_Count,
+};
 
 struct EntityHandle {
 	int32 generation;
@@ -43,7 +49,7 @@ struct EntityTypeBuffer {
 
 
 struct EntityManager {
-	EntityTypeBuffer buffers[EntityType_Count][4];
+	EntityTypeBuffer buffers[EntityType_Count][Level_Count];
 	EntityInfo *entities;
 	int32 entityCapacity;
 	int32 nextID;
@@ -146,12 +152,6 @@ struct Barrier : Entity {
 	int32 doorNumber;
 	int32 roomNumber;
 	bool activeRoom;
-};
-
-
-struct Level {
-	
-	//DynamicArray<Room> rooms;
 };
 
 struct Room {
