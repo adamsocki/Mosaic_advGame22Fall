@@ -17,6 +17,14 @@ enum EntityType {
 	EntityType_Count,
 };
 
+struct FreeList {
+	int32 freeList[1000];
+	int32 freelistCount;
+
+};
+
+
+
 struct EntityHandle {
 	int32 generation;
 	int32 indexInInfo;
@@ -44,6 +52,9 @@ struct EntityManager {
 	EntityTypeBuffer buffers[EntityType_Count];
 	EntityInfo *entities;
 	int32 entityCapacity;
+	
+	FreeList levelIDtest[10];
+
 	int32 nextID;
 };
 
@@ -94,7 +105,7 @@ struct MyData {
 	MouseCrosshair mouseCrosshair;
 
 	EntityManager em;
-
+	int32 currentLevel;
 };
 
 struct Entity {
@@ -112,6 +123,7 @@ struct Entity {
 struct Base : Entity {
 	int32 id;
 	bool activeRoom;
+	int32 roomNumber;
 };
 
 struct RoomTrigger : Entity {
@@ -145,10 +157,6 @@ struct Barrier : Entity {
 };
 
 
-struct Level {
-	
-	//DynamicArray<Room> rooms;
-};
 
 struct Room {
 	vec2 size;
@@ -157,6 +165,8 @@ struct Room {
 	Sprite* sprite;
 	int32 roomNumber;
 	int32 levelNumber;
+
+	bool activeRoom;
 };
 
 
@@ -186,6 +196,8 @@ struct Door :Entity {
 	int32 count;
 	int32 doorNumber;
 	int32 doorCenterSeq;
+	bool doorActivatesRoom;
+	int32 roomDoorActivates;
 	//DynamicArray<vec2> doorPositions;
 };
 
@@ -199,4 +211,34 @@ struct Wall {
 	int32 roomNumber;
 	bool showSprite;
 	bool activeRoom;
+};
+
+
+
+struct LevelState {
+	//<DynamicArray>
+	Door door[10];
+	Player player[3];
+	int32 roomActive[10];
+	//Base base[2000];
+
+};
+
+struct DoorLevelData {
+	vec2 position;
+
+	int32 level;
+	
+};
+
+struct WallLevelData {
+	vec2 position;
+
+	int32 level;
+};
+
+
+struct Level {
+	DynamicArray<Door> doors;
+	DynamicArray<WallLevelData> walls;
 };

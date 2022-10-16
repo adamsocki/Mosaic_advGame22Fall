@@ -1,10 +1,14 @@
 
 
-MyData *Data = {};
+MyData* Data = {};
 
-int32 freeList[10000];
+
+FreeList freelistTest[10];
+
+//freelistTest[2].freeList
+
+int32 freeList[1000];
 int32 freeListCount = 0;
-
 
 void* GetEntity(EntityManager* em, EntityHandle handle) {
 	if (handle.indexInInfo >= em->entityCapacity) {
@@ -26,6 +30,8 @@ void* GetEntity(EntityManager* em, EntityHandle handle) {
 }
 
 void DeleteEntity(EntityManager* em, EntityHandle handle) {
+	
+	
 	freeList[freeListCount] = handle.indexInInfo;
 	freeListCount++;
 
@@ -69,9 +75,22 @@ void InitializeEntityManager() {
 	Data->em.entities = (EntityInfo*)malloc(sizeof(EntityInfo) * Data->em.entityCapacity);
 	memset(Data->em.entities, 0, sizeof(EntityInfo) * Data->em.entityCapacity);
 	Data->em.nextID = 0;
+	
 }
 
-void InitializeEntityBuffers() {
+void InitializeEntityBuffers(bool levelRestart) {
+	
+
+	if (!levelRestart) {
+		// PlayerBuffer
+		EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
+		playerBuffer->capacity = 1;
+		playerBuffer->sizeInBytes = sizeof(Player);
+		playerBuffer->count = 0;
+		playerBuffer->entities = (Player*)malloc(playerBuffer->capacity * playerBuffer->sizeInBytes);
+		memset(playerBuffer->entities, 0, sizeof(Player) * playerBuffer->capacity);
+	}
+	
 	// BaseBuffer
 	EntityTypeBuffer* baseBuffer = &Data->em.buffers[EntityType_Base];
 	baseBuffer->capacity = 2000;
@@ -80,14 +99,6 @@ void InitializeEntityBuffers() {
 	baseBuffer->entities = (Base*)malloc(baseBuffer->capacity * baseBuffer->sizeInBytes);
 	memset(baseBuffer->entities, 0, sizeof(Base) * baseBuffer->capacity);
 
-
-	// PlayerBuffer
-	EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
-	playerBuffer->capacity = 1;
-	playerBuffer->sizeInBytes = sizeof(Player);
-	playerBuffer->count = 0;
-	playerBuffer->entities = (Player*)malloc(playerBuffer->capacity * playerBuffer->sizeInBytes);
-	memset(playerBuffer->entities, 0, sizeof(Player) * playerBuffer->capacity);
 
 	// LevelPortalBuffer
 	EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
@@ -130,6 +141,8 @@ void InitializeEntityBuffers() {
 	roomTriggerBuffer->entities = (RoomTrigger*)malloc(roomTriggerBuffer->capacity * roomTriggerBuffer->sizeInBytes);
 	memset(roomTriggerBuffer->entities, 0, sizeof(RoomTrigger) * roomTriggerBuffer->capacity);
 
+
+	
 }
 
 void CreatePlayer() {
@@ -141,4 +154,10 @@ void CreatePlayer() {
 	playerEntity->sprite = &Data->sprites.playerSprite;
 	playerEntity->size = V2(0.2f, 0.24f);
 	playerEntity->toDelete = false;
+}
+
+
+void InitializeEntityBuffersForLevelTransition()
+{
+
 }

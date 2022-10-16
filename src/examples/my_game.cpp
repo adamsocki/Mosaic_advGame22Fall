@@ -1,3 +1,5 @@
+
+
 #include "gameCode/structs.cpp"
 #include "gameCode/entityManager.cpp"
 #include "gameCode/loadSprites.cpp"
@@ -5,6 +7,8 @@
 
 #include "gameCode/input.cpp"
 #include "gameCode/collision.cpp"
+
+LevelState levelState[5];
 
 void MyInit() {
     Game->myData = malloc(sizeof(MyData));
@@ -14,15 +18,15 @@ void MyInit() {
 
     
     InitializeEntityManager();
-    InitializeEntityBuffers();
+    InitializeEntityBuffers(false);
     
     LoadSprites();
     LoadSFX();
 
     CreatePlayer();
 
-    CreateLevel(2);
-    //CreateLevel(1);
+    CreateLevel(2, levelState[2]);
+    Data->currentLevel = 2;
 
     InitializeMouse();
 
@@ -39,7 +43,15 @@ void MyGameUpdate() {
     mousePos.x = mousePos.x * 8;
     mousePos.y = mousePos.y * 4.5f;
     Data->mouseCrosshair.position = mousePos;
+    
+    
+    if (InputPressed(Keyboard, Input_Z)) {
 
+        // Save levelConditions condition
+
+        LevelTransition(levelState);
+
+    }
     
 
     //      For all entity types, first Point to EntityBuffers (Logic A: 1 of 2 steps)
@@ -60,8 +72,22 @@ void MyGameUpdate() {
     Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
     RoomTrigger* roomTriggerEntitiesInBuffer = (RoomTrigger*)roomTriggerBuffer->entities;
 
+
+
     //      Handle Player Input for Movement
     InputPlayerController(&playerEntitiesInBuffer[0]);
+
+
+
+
+    //      CONTROL LEVEL CHANGE Test
+    
+
+
+
+    doorBuffer = &Data->em.buffers[EntityType_Door];
+    doorEntitiesInBuffer = (Door*)doorBuffer->entities;
+
 
     // Detect Collision
     //      Player 
@@ -105,14 +131,17 @@ void MyGameUpdate() {
             Rect doorRect;
             EntityHandle doorHandle = doorEntitiesInBuffer[j].handle;
             Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
-            doorRect.max = doorEntity->size;
-            doorRect.min = -doorEntity->size;
-            vec2(dir) = V2(0, 0);
-            if (RectTest(doorRect, playerRect, doorEntity->position, playerEntitiesInBuffer[0].position, &dir)) {
-                if (!doorEntity->isDoorOpen) {
-                    playerEntitiesInBuffer[0].position = playerEntitiesInBuffer[0].previousPosition;
+            if (doorEntity != NULL) {
+                doorRect.max = doorEntity->size;
+                doorRect.min = -doorEntity->size;
+                vec2(dir) = V2(0, 0);
+                if (RectTest(doorRect, playerRect, doorEntity->position, playerEntitiesInBuffer[0].position, &dir)) {
+                    if (!doorEntity->isDoorOpen) {
+                        playerEntitiesInBuffer[0].position = playerEntitiesInBuffer[0].previousPosition;
+                    }
                 }
             }
+           
         }
         // Player to LevelTrigger
         for (int j = 0; j < roomTriggerBuffer->count; j++) {
@@ -185,6 +214,7 @@ void MyGameUpdate() {
             
         }
         // OPEN DOOR ON CLICK && PLAYER PROXIMITY
+        // SHOW HIDDEN ROOM IF DOOR OPEN ACTIVATES ROOM
         if (doorEntity->mouseIsOver) {
             if (InputPressed(Mouse, Input_MouseLeft)) {
                 // door proximity
@@ -195,8 +225,18 @@ void MyGameUpdate() {
                 
                 if (RectTest(playerRect, expandedDoorProximityRect, playerEntitiesInBuffer[0].position, doorEntity->position, &dir)) { 
                     
-                    doorEntity->isDoorOpen = true;
-                    doorEntity->sprite = &Data->sprites.floor1Sprite;
+                    doorEntity->isDoorOpen = !doorEntity->isDoorOpen;
+                    if (doorEntity->doorActivatesRoom) 
+                    {
+                        for (int i = 0; i < baseBuffer->count; i++) 
+                        {
+                            Base* baseEntity = (Base*)GetEntity(&Data->em, baseEntitiesInBuffer[i].handle);
+                            if (baseEntity->roomNumber == doorEntity->roomDoorActivates)
+                            {
+                                baseEntity->activeRoom = true;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -226,6 +266,32 @@ void MyGameUpdate() {
         }
     }
 
+
+    // RENDER LOGIC
+    for (int i = 0; i < doorBuffer->count; i++) 
+    {
+        EntityHandle doorHandle = doorEntitiesInBuffer[i].handle;
+        Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
+
+        if (doorEntity->isDoorOpen)
+        {   
+            doorEntity->sprite = &Data->sprites.blankSprite;
+        }
+        else
+        {
+            if (doorEntity->horizontal)
+            {
+                doorEntity->sprite = &Data->sprites.doorClosed1hSprite;
+            }
+            else 
+            {
+                doorEntity->sprite = &Data->sprites.doorClosed1vSprite;
+            }
+        }
+    }
+    
+
+    
 
     //**********************
     //  RENDER
@@ -283,6 +349,7 @@ void MyGameUpdate() {
                     DeleteEntity(&Data->em, doorEntity->handle);
                 }
                 else {
+
                     DrawSprite(doorEntity->position, doorEntity->size, doorEntity->sprite);
                 }
             }
@@ -366,4 +433,6 @@ void MyGameUpdate() {
     }
     
  DrawSprite(Data->mouseCrosshair.position, V2(0.3f, 0.3f), &Data->sprites.crosshairUnlocked1Sprite);
+
+
 }
