@@ -226,7 +226,7 @@ void CreateLevel(int32 level, LevelState levelState) {
 		room2.tileSize = tileSize;
 		room2.startingPosition = V2(-5, -4);
 		room2.roomNumber = 2;
-		room2.activeRoom = false;
+		room2.activeRoom = levelState.roomActive[room2.roomNumber - 1];
 		room2.levelNumber = level;
 
 
