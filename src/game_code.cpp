@@ -1,6 +1,7 @@
 
 #define MOSAIC 0
-#define MY_GAME 1
+#define MY_GAME 0
+#define LEVEL_EDITOR 1
 
 #define NETWORK_SIMPLE 1
 #define MESSAGING 1
@@ -29,6 +30,9 @@
 
 #elif MY_GAME
 #include "examples/my_game.cpp"
+
+#elif LEVEL_EDITOR
+#include "examples/my_levelEditor.cpp"
 
 #elif NETWORK_SIMPLE
 #include "examples/network_simple.cpp"
