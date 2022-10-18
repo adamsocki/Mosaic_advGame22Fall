@@ -10,12 +10,12 @@
 
 LevelState levelState[5];
 
-void MyInit() {
+void MyInit() 
+{
     Game->myData = malloc(sizeof(MyData));
     memset(Game->myData, 0, sizeof(MyData));
 
     Data = (MyData*)Game->myData;
-
     
     InitializeEntityManager();
     InitializeEntityBuffers(false);
@@ -25,18 +25,20 @@ void MyInit() {
 
     CreatePlayer();
 
-    CreateLevel(2, levelState[2]);
-    Data->currentLevel = 2;
+    CreateLevel(0, levelState[0]);
+    Data->currentLevel = 0;
 
     InitializeMouse();
 
     Data->mouseCrosshair.isLocked = false;
 }
 
-void MyGameUpdate() {
+void MyGameUpdate() 
+{
     //**********************
     //  LOGIC
     //**********************
+    
     //      Hide mouse cursor & Get Mouse Position
     while (ShowCursor(false) >= 0);
     vec2 mousePos = Input->mousePosNormSigned;
@@ -45,12 +47,15 @@ void MyGameUpdate() {
     Data->mouseCrosshair.position = mousePos;
     
     
-    if (InputPressed(Keyboard, Input_Z)) {
-
+    if (InputPressed(Keyboard, Input_X)) 
+    {
         // Save levelConditions condition
-
-        LevelTransition(levelState);
-
+        LevelTransition(levelState, true);
+    }
+    if (InputPressed(Keyboard, Input_Z))
+    {
+        // Save levelConditions condition
+        LevelTransition(levelState, false);
     }
     
 
@@ -144,7 +149,8 @@ void MyGameUpdate() {
            
         }
         // Player to LevelTrigger
-        for (int j = 0; j < roomTriggerBuffer->count; j++) {
+        for (int j = 0; j < roomTriggerBuffer->count; j++) 
+        {
 
             Rect roomTriggerRect;
             RoomTrigger* roomTriggerEntity = &roomTriggerEntitiesInBuffer[j];
@@ -152,7 +158,8 @@ void MyGameUpdate() {
             roomTriggerRect.max = roomTriggerEntity->size;
             roomTriggerRect.min = -roomTriggerEntity->size;
             vec2(dir) = V2(0, 0);
-            if (RectTest(roomTriggerRect, playerRect, roomTriggerEntity->position, playerEntitiesInBuffer[0].position, &dir)) {
+            if (RectTest(roomTriggerRect, playerRect, roomTriggerEntity->position, playerEntitiesInBuffer[0].position, &dir)) 
+            {
                 DrawSprite(V2(1, 1), V2(1, 1), &Data->sprites.stairsDown1Sprite);
             }
         }
@@ -165,7 +172,8 @@ void MyGameUpdate() {
     mouseRect.max = V2(0.2f, 0.2f);
     mouseRect.min = -V2(0.2f, 0.2f);
     vec2 dir = V2(0);
-    for (int i = 0; i < playerCarryBuffer->count; i++) {
+    for (int i = 0; i < playerCarryBuffer->count; i++) 
+    {
         Rect playerCarryRect;
         EntityHandle playerCarryHandle = playerCarryEntitiesInBuffer[i].handle;
         PlayerCarry* playerCarryEntity = (PlayerCarry*)GetEntity(&Data->em, playerCarryHandle);
@@ -173,7 +181,8 @@ void MyGameUpdate() {
         playerCarryRect.min = -playerCarryEntity->size;
        
         if (RectTest(mouseRect, playerCarryRect, playerCarryEntity->position, mousePos, &dir)) {
-            if (!playerCarryEntity->mouseOverPlayerCarry) {
+            if (!playerCarryEntity->mouseOverPlayerCarry) 
+            {
                 PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
 
                 Data->mouseCrosshair.isLocked = true;
@@ -189,16 +198,18 @@ void MyGameUpdate() {
         }
     }
     //      Check to Doors
-    for (int i = 0; i < doorBuffer->count; i++) {
-        
+    for (int i = 0; i < doorBuffer->count; i++) 
+    {
         EntityHandle doorHandle = doorEntitiesInBuffer[i].handle;
         Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
         Rect centerDoorRect;
         centerDoorRect.max = doorEntity->size;
         centerDoorRect.min = -doorEntity->size;
-        if (RectTest(mouseRect, centerDoorRect, doorEntity->position, mousePos, &dir)) {
+        if (RectTest(mouseRect, centerDoorRect, doorEntity->position, mousePos, &dir)) 
+        {
 
-            if (!doorEntity->mouseIsOver) {
+            if (!doorEntity->mouseIsOver) 
+            {
                 PlaySound(&Game->audioPlayer, Data->sound.crosshairSound1, 1.0f, false);
 
                 doorEntity->mouseIsOver = true;
@@ -206,25 +217,28 @@ void MyGameUpdate() {
             }
             Data->mouseCrosshair.position = doorEntity->position;
         }
-        else {
+        else 
+        {
             doorEntity->mouseIsOver = false;
             Data->mouseCrosshair.isLocked = false;
         }
-        if (doorEntity->isDoorCenter) {
+        if (doorEntity->isDoorCenter) 
+        {
             
         }
         // OPEN DOOR ON CLICK && PLAYER PROXIMITY
         // SHOW HIDDEN ROOM IF DOOR OPEN ACTIVATES ROOM
-        if (doorEntity->mouseIsOver) {
-            if (InputPressed(Mouse, Input_MouseLeft)) {
+        if (doorEntity->mouseIsOver) 
+        {
+            if (InputPressed(Mouse, Input_MouseLeft)) 
+            {
                 // door proximity
                 Rect expandedDoorProximityRect;
                 expandedDoorProximityRect.max = doorEntity->size * 2;
                 expandedDoorProximityRect.min = -doorEntity->size * 2;
                 Rect playerRect = playerCollisionRect(1, &playerEntitiesInBuffer[0]);
-                
-                if (RectTest(playerRect, expandedDoorProximityRect, playerEntitiesInBuffer[0].position, doorEntity->position, &dir)) { 
-                    
+                if (RectTest(playerRect, expandedDoorProximityRect, playerEntitiesInBuffer[0].position, doorEntity->position, &dir)) 
+                { 
                     doorEntity->isDoorOpen = !doorEntity->isDoorOpen;
                     if (doorEntity->doorActivatesRoom) 
                     {
@@ -275,7 +289,7 @@ void MyGameUpdate() {
 
         if (doorEntity->isDoorOpen)
         {   
-            doorEntity->sprite = &Data->sprites.blankSprite;
+            doorEntity->sprite = &Data->sprites.floor1Sprite;
         }
         else
         {

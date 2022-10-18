@@ -141,8 +141,6 @@ void InitializeEntityBuffers(bool levelRestart) {
 	roomTriggerBuffer->entities = (RoomTrigger*)malloc(roomTriggerBuffer->capacity * roomTriggerBuffer->sizeInBytes);
 	memset(roomTriggerBuffer->entities, 0, sizeof(RoomTrigger) * roomTriggerBuffer->capacity);
 
-
-	
 }
 
 void CreatePlayer() {

@@ -214,13 +214,14 @@ struct Wall {
 };
 
 
-
 struct LevelState {
 	//<DynamicArray>
 	Door door[10];
 	Player player[3];
-	int32 roomActive[10];
-	//Base base[2000];
+	bool roomActive[10];
+	
+	//Barrier barrier[
+	Base base[2000];
 
 };
 

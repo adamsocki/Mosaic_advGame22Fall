@@ -4,9 +4,6 @@
 
 
 
-
-
-
 void CreateBackdrop(Sprite *spriteName) {
 	EntityHandle backgroundHandle = AddEntity(&Data->em, EntityType_Base);
 	Base* backgroundEntity = (Base*)GetEntity(&Data->em, backgroundHandle);
@@ -51,8 +48,10 @@ void CreateBarrierLinear(Wall wall) {
 }
 
 void CreateRoomFloor(Room room) {
-	for (int i = 0; i < room.size.x; i++) {
-		for (int j = 0; j < room.size.y; j++) {
+	for (int i = 0; i < room.size.x; i++) 
+	{
+		for (int j = 0; j < room.size.y; j++) 
+		{
 			EntityHandle floorHandle = AddEntity(&Data->em, EntityType_Base);
 			Base* floorEntity = (Base*)GetEntity(&Data->em, floorHandle);
 			floorEntity->size = room.tileSize;
@@ -65,8 +64,8 @@ void CreateRoomFloor(Room room) {
 	}
 }
 
-void CreateDoorLinear(Door door) {
-
+void CreateDoorLinear(Door door) 
+{
 	EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
 	Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
 	doorEntity->position = door.startingPosition;
@@ -76,12 +75,14 @@ void CreateDoorLinear(Door door) {
 	doorEntity->doorActivatesRoom = door.doorActivatesRoom;
 	doorEntity->roomDoorActivates = door.roomDoorActivates;
 
-	if (door.horizontal) {
+	if (door.horizontal) 
+	{
 		doorEntity->size.x = door.tileSize.x * door.length;
 		doorEntity->size.y = door.tileSize.y;
 		doorEntity->sprite = &Data->sprites.doorClosed1hSprite;
 	}
-	else {
+	else 
+	{
 		doorEntity->size.x = door.tileSize.x;
 		doorEntity->size.y = door.tileSize.y * door.length;
 		doorEntity->sprite = &Data->sprites.doorClosed1vSprite;
@@ -148,6 +149,16 @@ Wall CreateWall2(Room room, int32 length, int32 side, bool showSprite, int32 awa
 }
 
 
+void SetPlayerLevelStart(vec2 startingPosition) {
+
+	EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
+	Player* playerEntitiesInBuffer = (Player*)playerBuffer->entities;
+	for (int i = 0; i < playerBuffer->count; i++) {
+		Player* playerEntity = (Player*)GetEntity(&Data->em, playerEntitiesInBuffer[i].handle);
+		playerEntity->position = startingPosition;
+	}
+}
+
 void CreateAndPlaceRoomTrigger(vec2 pos, int32 level, int32 roomToTrigger, vec2 tileSize) {
 
 	EntityHandle roomTriggerHandle = AddEntity(&Data->em, EntityType_RoomTrigger);
@@ -161,23 +172,66 @@ void CreateAndPlaceRoomTrigger(vec2 pos, int32 level, int32 roomToTrigger, vec2 
 }
 
 
-void CreateLevel(int32 level, LevelState levelState) {
-	
-	if (level == 0) {
+void CreateLevel(int32 level, LevelState levelState) 
+{	
+	vec2 tileSize = V2(0.125f, 0.125f);
+	int32 top = 1;
+	int32 bottom = 2;
+	int32 left = 3;
+	int32 right = 4;
+
+	if (level == 0) 
+	{
+		SetPlayerLevelStart(V2(-6, 0));
+
+		Room room1;
+
+		room1.size = V2(53, 10);
+		room1.tileSize = tileSize;
+		room1.startingPosition = V2(-6.5f, -1);
+		room1.roomNumber = 1;
+		room1.levelNumber = level;
+		room1.activeRoom = true;
+
+
+		CreateRoomFloor(room1);
+
+		Door door1;
+
+		door1.startingPosition = V2(-5.75f, -2.75f);
+		door1.count = 0;
+		door1.tileSize = tileSize;
+		door1.level = level;
+		door1.horizontal = false;
+		door1.length = 3;
+		door1.doorNumber = 1;
+		door1.isDoorCenter = true;
+		door1.doorActivatesRoom = false;
+		door1.doorCenterSeq = 1;
+		door1.isDoorOpen = levelState.door[0].isDoorOpen;
+
+		// finish making walls
+		Wall wall1 = CreateWall2(room1, 30, bottom, true, 0);
+		Wall wall2 = CreateWall2(room1, 8, left, true, 0);
+		Wall wall3 = CreateWall2(room1, 8, top, true, 0);
+		Wall wall4 = CreateWall2(room1, 8, right, true, 0);
 	}
 
 	if (level == 1) {
+		SetPlayerLevelStart(V2(1, 1));
 
 
 	}
 
 	if (level == 2) {
 		
-		vec2 tileSize = V2(0.125f, 0.125f);
+		SetPlayerLevelStart(V2(-5, -2));
+
+		
 		Room room1;
 
 		room1.size = V2(8,8);
-		room1.tileSize = V2(0.125f, 0.125f);
+		room1.tileSize = tileSize;
 		room1.startingPosition = V2(-6.25f, -2.5f);
 		room1.roomNumber = 1;
 		room1.levelNumber = level;
@@ -226,9 +280,16 @@ void CreateLevel(int32 level, LevelState levelState) {
 		room2.tileSize = tileSize;
 		room2.startingPosition = V2(-5, -4);
 		room2.roomNumber = 2;
-		room2.activeRoom = levelState.roomActive[room2.roomNumber - 1];
-		room2.levelNumber = level;
 
+		uint32 numberOfFloors = sizeof(levelState.base) / sizeof(levelState.base[0]);
+		for (int i = 0; i < numberOfFloors; i++) 
+		{
+			if (levelState.base[i].roomNumber == room2.roomNumber) {
+				room2.activeRoom = levelState.base[i].activeRoom;
+			}
+		}
+
+		room2.levelNumber = level;
 
 		CreateRoomFloor(room2);
 		wall1 = CreateWall2(room2, 28, bottom, true,0);
@@ -239,11 +300,10 @@ void CreateLevel(int32 level, LevelState levelState) {
 		CreateBarrierLinear(wall2);
 		CreateBarrierLinear(wall3);
 		CreateBarrierLinear(wall4);
-
 	}
 }
 
-void LevelTransition(LevelState *levelState)
+void LevelTransition(LevelState *levelState, bool forward)
 {
 
 	// Entity Buffer Setup
@@ -261,7 +321,6 @@ void LevelTransition(LevelState *levelState)
 	Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
 
 
-
 	// SET SAVE STATE FOR CURRENT LEVEL
 	if (Data->currentLevel == 2)
 	{
@@ -277,12 +336,13 @@ void LevelTransition(LevelState *levelState)
 		// Apply Base Save & Delete
 		for (int i = 0; i < baseBuffer->count; i++) {
 			Base* baseEntity = (Base*)GetEntity(&Data->em, baseEntitiesInBuffer[i].handle);
-			//levelState[Data->currentLevel].base[i].activeRoom = baseEntity->activeRoom;
+			levelState[Data->currentLevel].base[i].activeRoom = baseEntity->activeRoom;
+			levelState[Data->currentLevel].base[i].roomNumber = baseEntity->roomNumber;
 			DeleteEntity(&Data->em, baseEntity->handle);
 		}
 
-		// Apply Save for RoomActive
-		//levelState[Data->currentLevel].roomActive[]
+		// Apply Room Save
+		
 
 		// Apply Barrier Delete
 		for (int i = 0; i < barrierBuffer->count; i++) {
@@ -299,19 +359,28 @@ void LevelTransition(LevelState *levelState)
 			//DeleteEntity(&Data->em, playerEntity->handle);
 		}
 
-
-
-
 	}
-
-
 
 
 	// Advance Level
 
 	// 1. Reinitialize Buffers for things in level
 	InitializeEntityBuffers(true);
+
+	if (forward)
+	{
+		Data->currentLevel++;
+	}
+	else
+	{
+		Data->currentLevel--;
+	}
+	CreateLevel(Data->currentLevel, levelState[Data->currentLevel]);
 	// Apply saved level state to level
-	CreateLevel(2, levelState[2]);
+
+	
+
+
+
 
 }
