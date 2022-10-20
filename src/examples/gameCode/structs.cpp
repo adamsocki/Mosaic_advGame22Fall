@@ -80,6 +80,9 @@ struct EntitySprites {
 	Sprite doorClosed1vSprite;
 	Sprite crosshairUnlocked1Sprite;
 
+	Sprite levelEditorBG1Sprite;
+	Sprite cursorForLevelEditorSprite;
+
 
 	Sprite backgroundColor1Sprite;
 };
@@ -92,6 +95,7 @@ struct MouseCrosshair {
 	bool isLocked;
 	vec2 position;
 	bool playInitialSound;
+	vec2 previousPosition;
 
 	Sprite* crosshairUnlockedSprite;
 	Sprite* crosshairLockSprite;

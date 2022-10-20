@@ -20,6 +20,11 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.doorClosed1hSprite, "data/doorClosed1h.png");
 	LoadSprite(&Data->sprites.doorClosed1vSprite, "data/doorClosed1v.png");
 
+	// LEVEL EDITOR
+	LoadSprite(&Data->sprites.levelEditorBG1Sprite, "data/levelEditorBG1.png");
+	LoadSprite(&Data->sprites.cursorForLevelEditorSprite, "data/cursorLE1.png");
+
+
 }
 
 void LoadSFX() {

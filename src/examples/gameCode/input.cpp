@@ -40,6 +40,8 @@ void InitializeMouse() {
 	Data->mouseCrosshair.playInitialSound = true;
 	Data->mouseCrosshair.crosshairUnlockedSprite = &Data->sprites.crosshairUnlocked1Sprite;
 
+	Data->mouseCrosshair.previousPosition = V2(0);
+
 	//Data->mouseCrosshair.crosshairUnlockSprite = &Data->sprites.crosshair1Sprite;
 }
  
