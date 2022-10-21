@@ -1,6 +1,8 @@
 
 
+
 enum EntityType {
+	None,
 	EntityType_Base,
 	EntityType_Player,
 
@@ -15,6 +17,11 @@ enum EntityType {
 	EntityType_LevelPortal,
 
 	EntityType_Count,
+};
+
+struct LevelEditor
+{
+	EntityType editorType;
 };
 
 struct FreeList {
@@ -82,7 +89,9 @@ struct EntitySprites {
 
 	Sprite levelEditorBG1Sprite;
 	Sprite cursorForLevelEditorSprite;
-
+	Sprite cursorHandSprite;
+	Sprite spritePalette;
+	Sprite xSprite;
 
 	Sprite backgroundColor1Sprite;
 };
@@ -107,6 +116,7 @@ struct MyData {
 	Sounds sound;
 
 	MouseCrosshair mouseCrosshair;
+	LevelEditor levelEditor;
 
 	EntityManager em;
 	int32 currentLevel;

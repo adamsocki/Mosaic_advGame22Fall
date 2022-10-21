@@ -8,6 +8,8 @@
 #include "gameCode/input.cpp"
 #include "gameCode/collision.cpp"
 
+#include "gameCode/levelEditor.cpp"
+
 //TODO: properly set up entity Manager and all input files
 
 //MyData* Data = NULL;
@@ -25,6 +27,8 @@ void MyInit()
     InitializeEntityBuffers(false);
 
     InitializeMouse();
+
+    InitializeLevelEditor();
 
     LoadSprites();
    
@@ -57,71 +61,80 @@ void MyInit()
 
 void MyGameUpdate()
 {
-    
     //**********************
     //  LOGIC
     //**********************
+    
+    //     HIDE CURSOR
+    while (ShowCursor(false) >= 0);
 
-    // DrawSprite(V2(0), V2(4, 4), 0, sprite2);
-   // while (ShowCursor(false) >= 0);
-
+    //      LOCAL VARIABLES
     real32 factorValue = 1.25f;
     vec2 levelMapOffset = V2(1, 0);
     bool updateMouseRender = false;
+    bool showMouseOnMap = false;
+    vec2 tileSize = V2(0.125f, 0.125f);
+    vec2 mouseIndex;
+    vec2 realMousePosition = Input->mousePosNormSigned;
+    realMousePosition.x *= 8;
+    realMousePosition.y *= 4.5f;
 
     //      CAMERA DATA
     Camera* cam = &Game->camera;
-    //cam->size = 1.25f;
-
+        
     //      GET MOUSE POSITION
     vec2 mousePos = Input->mousePosNormSigned;
-    //mousePos.x = mousePos.x - Game->cameraPosition.x;
-    //mousePos.y = mousePos.y - Game->cameraPosition.y;
-   // Data->mouseCrosshair.position = mousePos;
     mousePos.x = mousePos.x * (8 * factorValue) - (levelMapOffset.x * factorValue) + 8;
     mousePos.y = mousePos.y * (4.5f * factorValue) - (levelMapOffset.y * factorValue) + 4.5f;
 
-    //      DETECT MOUSE WITHIN LEVEL
-   
-    bool showMouse = false;
-
+    //      DETECT MOUSE WITHIN LEVEL MAP
     if (mousePos.x >= 0 && mousePos.x <= 16 &&
         mousePos.y >= 0 && mousePos.y <=  9)
     {
-        showMouse = true;
+        showMouseOnMap = true;
+        //      STEP G: LOGIC TO SET UP HOW MOUSE OPERATES WHEN IT IS WITHIN MAP (MOVE AT TILESIZE INTERVALS)
+        mousePos.x = SnapUp(mousePos.x, tileSize.x);
+        mousePos.y = SnapUp(mousePos.y, tileSize.y);
+        if (Data->mouseCrosshair.previousPosition != mousePos)
+        {
+            updateMouseRender = true;
+        }
     }
     else
     {   
         // TODO: make a new mosue variable ??? 
         mousePos = V2(0, 0);
-        showMouse = false;
+        showMouseOnMap = false;
     }
-
-   // vec2 displayMouse = V2(SnapUp(mousePos.x, 0.125f), SnapUp(mousePos.y, 0.125f));
-    
-
-   mousePos.x = SnapUp(mousePos.x, 0.125f);
-    
-   mousePos.y = SnapUp(mousePos.y, 0.125f);
-   if (Data->mouseCrosshair.previousPosition != mousePos) {
-       updateMouseRender = true;
-   }
-
-
-   Data->mouseCrosshair.previousPosition = mousePos;
-   
-   /* if (mousePos.x < 16)
+    //      SET MOUSE PREVIOUS POSITION FOR INTERVAL MOVEMENT IN STEP G
+    Data->mouseCrosshair.previousPosition = mousePos;
+  
+    //      SET UP MOUSE INDEX
+    if (showMouseOnMap)
     {
-        mousePos.x = 16;
-    }*/
-
-    // calculate mouseIndex
-    vec2 mouseIndex;
-    if (showMouse)
-    {
-        mouseIndex = V2((mousePos.x / 16) * (16 / 0.125f), (mousePos.y / 9) * (9 / 0.125f));
+        mouseIndex = V2((mousePos.x / 16) * (16 / tileSize.x), (mousePos.y / 9) * (9 / tileSize.y));
     }
     
+    //      SPRITE PALATE LOGIC
+    //      Collission with Mouse Obj 1
+    bool overBase = false;
+    Rect spritePalellteSelectionRect;
+    spritePalellteSelectionRect.max =  V2(0.125f, 0.125f);
+    spritePalellteSelectionRect.min = -V2(0.125f, 0.125f);
+    Rect mouseRect = spritePalellteSelectionRect;
+    realMousePosition.y += 0.125f ;
+    vec2 dir = V2(0);
+    if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, V2(-7.25f, 2.75f), &dir))
+    {
+        overBase = true;
+        if (InputPressed(Mouse, Input_MouseLeft)) {
+            Data->levelEditor.editorType = EntityType_Base;
+        }
+    }
+
+
+
+
 
     //**********************
     //  RENDER
@@ -131,66 +144,60 @@ void MyGameUpdate()
     ClearColor(RGB(0.3f, 0.0f, 0.0f));
 
     //      Display Game Coordinates & Index
-    
-
     DrawTextScreenPixel(&Game->monoFont, V2(530, 20), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X: %.3f", mousePos.x);
     DrawTextScreenPixel(&Game->monoFont, V2(530, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y: %.3f", mousePos.y);
     DrawTextScreenPixel(&Game->monoFont, V2(530, 60), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X-Index %.0f of 128", mouseIndex.x);
     DrawTextScreenPixel(&Game->monoFont, V2(530, 80), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y-Index %.0f of 72", mouseIndex.y);
 
+    //      DISPLAY CURRENT LEVEL
+    DrawTextScreenPixel(&Game->monoFont, V2(750, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Level:");
 
-    //      Desplay Current Level
-    DrawTextScreenPixel(&Game->monoFont, V2(640, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Level:");
-
-    // 1.25 factor
-    DrawSprite(levelMapOffset, V2(8 / factorValue + (0.125f / 2), 4.5f / factorValue + (0.125f / 2)), 0, &Data->sprites.levelEditorBG1Sprite);
-    //DrawSprite(V2(0), V2(4, 4), 0, &Data->sprite2);
+    //      RENDER LEVEL MAP
+    DrawSprite(levelMapOffset, V2(8 / factorValue + (tileSize.x / 2), 4.5f / factorValue + (tileSize.y / 2)), 0, &Data->sprites.levelEditorBG1Sprite);
 
 
-
-   
-    //      RENDER MOUSE
-    if (showMouse)
+    //      RENDER SPRITE PALATE
+     DrawSprite(V2(-6.75f,1), V2(1,2.5f), 0, &Data->sprites.spritePalette);
+    if (Data->levelEditor.editorType == EntityType_Base || overBase)
     {
-       /* vec2 mousePos = Input->mousePosNormSigned;
-        if (mousePos.x > 16)
-        {
-            mousePos.x = 0;
-        }
-        if (mousePos.y > 9)
-        {
-            mousePos.x = 0;
-        }*/
+       
+        DrawSprite(V2(-7.25f, 2.75f), V2(0.25f, 0.25f), 0, &Data->sprites.floor1Sprite);
+    }
+    else
+    {
+        DrawSprite(V2(-7.25f, 2.75f), V2(0.25f, 0.25f), 0, &Data->sprites.wall1Sprite);
 
+    }
+    
+
+    //      RENDER MOUSE
+    if (showMouseOnMap)
+    {
         if (updateMouseRender)
         {
-            mousePosRender = Input->mousePosNormSigned;
-            
+            mousePosRender = Input->mousePosNormSigned;        
             mousePosRender.x = mousePosRender.x * (8);
             mousePosRender.y = mousePosRender.y * (4.5f);
         }
 
-        //mousePos.x = SnapUp(mousePos.x, 0.125f / 8) * 8 - (0.125f / 8);
-            //mousePos.y = SnapUp(mousePos.y, 0.125f / 4.5f) * 4.5f;
+        //      MOUSE WITHIN MAP
+        if (Data->levelEditor.editorType == EntityType_Base)
+        {
+            DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.floor1Sprite);
+        }
+        else
+        {
+            DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.xSprite);
+        }
         
-        //if (mousePos.x >= 0 && mousePos.x <= 16 &&
-        //    mousePos.y >= 0 && mousePos.y <= 9)
-        //{
-        //   // showMouse = true;
-        //}
-        //else
-        //{
-        //    // TODO: make a new mosue variable ??? 
-        //   // mousePos = V2(0, 0);
-        //    //showMouse = false;
-        //}
-        //mousePos.x = mousePos.x * (8 * factorValue) - (levelMapOffset.x * factorValue) + 8;
-        ////mousePos.y = mousePos.y * (4.5f * factorValue) - (levelMapOffset.y * factorValue) + 4.5f;*/
-        DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.cursorForLevelEditorSprite);
-
+    } 
+    else
+    {
+        //      MOUSE OUTSIDE MAP
+        mousePosRender = Input->mousePosNormSigned;
+        mousePosRender.x = mousePosRender.x * (8);
+        mousePosRender.y = mousePosRender.y * (4.5f);
+        DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f, 0.125f), 0, &Data->sprites.cursorHandSprite);
     }
-    //DrawSprite(Data->mouseCrosshair.position, V2(0.3f, 0.3f), &Data->sprites.crosshairUnlocked1Sprite);
-    
-   
     
 }

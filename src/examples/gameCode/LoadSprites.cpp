@@ -23,8 +23,11 @@ void LoadSprites() {
 	// LEVEL EDITOR
 	LoadSprite(&Data->sprites.levelEditorBG1Sprite, "data/levelEditorBG1.png");
 	LoadSprite(&Data->sprites.cursorForLevelEditorSprite, "data/cursorLE1.png");
+	LoadSprite(&Data->sprites.cursorHandSprite, "data/mouseHand.png");
+	LoadSprite(&Data->sprites.spritePalette, "data/spritePalette.png");
+	LoadSprite(&Data->sprites.xSprite, "data/xSprite.png");
 
-
+	
 }
 
 void LoadSFX() {
