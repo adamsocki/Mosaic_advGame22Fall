@@ -12,7 +12,8 @@ void LoadSprites() {
 
 	LoadSprite(&Data->sprites.backgroundColor1Sprite, "data/backgroundColor1.png");
 	LoadSprite(&Data->sprites.crosshairUnlocked1Sprite, "data/crosshairUnlocked1.png");
-
+	
+	LoadSprite(&Data->sprites.monster1Sprite, "data/monster1Sprite.png");
 
 	LoadSprite(&Data->sprites.floor1Sprite, "data/floor1.png");
 	LoadSprite(&Data->sprites.blankSprite, "data/blank.png");
@@ -26,6 +27,14 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.cursorHandSprite, "data/mouseHand.png");
 	LoadSprite(&Data->sprites.spritePalette, "data/spritePalette.png");
 	LoadSprite(&Data->sprites.xSprite, "data/xSprite.png");
+	LoadSprite(&Data->sprites.saveSpriteLevelEditor, "data/saveSpriteLevelEditor.png");
+	LoadSprite(&Data->sprites.saveButtonLevelEditor_mouse, "data/saveButtonLevelEditor_mouse.png");
+	LoadSprite(&Data->sprites.minusSprite, "data/minusSprite.png");
+	LoadSprite(&Data->sprites.plusSprite, "data/plusSprite.png");
+	LoadSprite(&Data->sprites.minusSprite_mouse, "data/minusSprite_mouse.png");
+	LoadSprite(&Data->sprites.plusSprite_mosue, "data/plusSprite_mosue.png");
+	LoadSprite(&Data->sprites.entitySpecificsSprite, "data/entitySpecificsSprite.png");
+
 
 	
 }

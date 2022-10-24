@@ -12,8 +12,6 @@
 
 //TODO: properly set up entity Manager and all input files
 
-//MyData* Data = NULL;
-
 vec2 mousePosRender;
 
 void MyInit() 
@@ -25,32 +23,18 @@ void MyInit()
     
     InitializeEntityManager();
     InitializeEntityBuffers(false);
-
     InitializeMouse();
-
     InitializeLevelEditor();
-
     LoadSprites();
-   
-    //GameMemory* gameMem
 
     Camera* cam = &Game->camera;
-    //cam->size = 1.5f;
-    // cam->type = CameraType_Orthographic;
-    cam->width = 16;
-     cam->height = 9;
-   cam->projection = Orthographic(cam->width * -0.5f * cam->size, cam->width * 0.5f * cam->size,
-      cam->height * -0.5f * cam->size, cam->height * 0.5f * cam->size,
-       0.0, 100.0f);
 
-    // Game->camAngle = 0;
-    //Game->cameraPosition = V3(1,0,0);
-    //Game->cameraRotation = AxisAngle(V3(0, 100, 30), Game->camAngle);
+    cam->width = 16;
+    cam->height = 9;
+    cam->projection = Orthographic(cam->width * -0.5f * cam->size, cam->width * 0.5f * cam->size,
+        cam->height * -0.5f * cam->size, cam->height * 0.5f * cam->size, 0.0, 100.0f);
 
     UpdateCamera(cam, Game->cameraPosition, Game->cameraRotation);
-
-
-    // read file
 
     FileHandle file;
     if (OpenFileForRead("data/file_reading_example.txt", &file, &Game->frameMem))
@@ -86,6 +70,8 @@ void MyGameUpdate()
     vec2 mousePos = Input->mousePosNormSigned;
     mousePos.x = mousePos.x * (8 * factorValue) - (levelMapOffset.x * factorValue) + 8;
     mousePos.y = mousePos.y * (4.5f * factorValue) - (levelMapOffset.y * factorValue) + 4.5f;
+    //      CREATE MOUSE RECT
+    Rect mouseRect;
 
     //      DETECT MOUSE WITHIN LEVEL MAP
     if (mousePos.x >= 0 && mousePos.x <= 16 &&
@@ -121,8 +107,8 @@ void MyGameUpdate()
     Rect spritePalellteSelectionRect;
     spritePalellteSelectionRect.max =  V2(0.125f, 0.125f);
     spritePalellteSelectionRect.min = -V2(0.125f, 0.125f);
-    Rect mouseRect = spritePalellteSelectionRect;
-    realMousePosition.y += 0.125f ;
+    mouseRect = spritePalellteSelectionRect;
+    realMousePosition.y += 0.125f;
     vec2 dir = V2(0);
     if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, V2(-7.25f, 2.75f), &dir))
     {
@@ -132,14 +118,66 @@ void MyGameUpdate()
         }
     }
 
+    //      SPRITE SPECIFICS LOGIC
+    //      Collision with Mouse +/-
+    Rect spritePlusRect;
+    Rect spriteMinusRect;
+    vec2 spriteExtraPosition = V2(-6.275f, -2.5f);
+    real32 plusMinusOffset = 0.25f;
+    vec2 spriteMinusPosition = spriteExtraPosition; 
+    spriteMinusPosition.x = spriteMinusPosition.x - plusMinusOffset;
+    vec2 spritePlusPosition = spriteExtraPosition;
+    spritePlusPosition.x = spritePlusPosition.x + plusMinusOffset;
+    vec2 spritePlusMinusSize = V2(0.1f, 0.1f);
+    spritePlusRect.max =   V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
+    spritePlusRect.min =  -V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
+    spriteMinusRect.max =  V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
+    spriteMinusRect.min = -V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
 
+    //      plus collission
+   // mouseRect = spritePlusRect;
+    bool overPlus = false;
+    if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusPosition, &dir))
+    {
+        overPlus = true;
+        if (InputPressed(Mouse, Input_MouseLeft)) 
+        {
 
+        }
+    }
+    //      plus collission
+   // mouseRect = spriteMinusRect;
+    bool overMinus = false;
+    if (RectTest(spriteMinusRect, mouseRect, realMousePosition, spriteMinusPosition, &dir))
+    {
+        overMinus = true;
+        if (InputPressed(Mouse, Input_MouseLeft)) 
+        {
+            
+        }
+    }
+
+    //      SAVE GAME LOGIC
+    bool overSave = false;
+    Rect saveButtonRect;
+    saveButtonRect.max =  V2(0.125f, 0.125f / 2);
+    saveButtonRect.min = -V2(0.125f, 0.125f / 2);
+    if (RectTest(saveButtonRect, mouseRect, realMousePosition, V2(4, 4.125f), &dir))
+    {
+        overSave = true;
+        if (InputPressed(Mouse, Input_MouseLeft)) 
+        {
+            SaveLevel();
+        }
+    }
 
 
     //**********************
-    //  RENDER
     //**********************
-
+    //      RENDER
+    //**********************
+    //**********************
+    
     //      This sets the background color. 
     ClearColor(RGB(0.3f, 0.0f, 0.0f));
 
@@ -150,25 +188,54 @@ void MyGameUpdate()
     DrawTextScreenPixel(&Game->monoFont, V2(530, 80), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y-Index %.0f of 72", mouseIndex.y);
 
     //      DISPLAY CURRENT LEVEL
-    DrawTextScreenPixel(&Game->monoFont, V2(750, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Level:");
+    DrawTextScreenPixel(&Game->monoFont, V2(750, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Level: %d", Data->currentLevel);
 
     //      RENDER LEVEL MAP
     DrawSprite(levelMapOffset, V2(8 / factorValue + (tileSize.x / 2), 4.5f / factorValue + (tileSize.y / 2)), 0, &Data->sprites.levelEditorBG1Sprite);
 
 
-    //      RENDER SPRITE PALATE
-     DrawSprite(V2(-6.75f,1), V2(1,2.5f), 0, &Data->sprites.spritePalette);
+    //      RENDER SPRITE PALATTE
+    DrawSprite(V2(-6.75f,1), V2(1,2.5f), 0, &Data->sprites.spritePalette);
     if (Data->levelEditor.editorType == EntityType_Base || overBase)
-    {
-       
+    { 
         DrawSprite(V2(-7.25f, 2.75f), V2(0.25f, 0.25f), 0, &Data->sprites.floor1Sprite);
     }
     else
     {
         DrawSprite(V2(-7.25f, 2.75f), V2(0.25f, 0.25f), 0, &Data->sprites.wall1Sprite);
+    }
 
+    //      RENDER ENTITY SPECIFICS
+    DrawSprite(V2(-6.75f, -3), V2(1, 1.2f), 0, &Data->sprites.entitySpecificsSprite);
+    //      for loop across entity specifics, have plus / minus buttons to change.
+
+    DrawTextScreenPixel(&Game->monoFont, V2(30, 680), 10.0f, RGB(0.0f, 0.0f, 0.10f), "Room Number:", mouseIndex.x);
+    if (overMinus)
+    {
+        DrawSprite(spriteMinusPosition, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
+    }
+    else
+    {
+        DrawSprite(spriteMinusPosition, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
+    }
+    if (overPlus)
+    {
+        DrawSprite(spritePlusPosition, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
+    }
+    else
+    {
+        DrawSprite(spritePlusPosition, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
     }
     
+    //      RENDER SAVE BUTTON
+    if (overSave)
+    {
+        DrawSprite(V2(4, 4.125f), V2(0.25f, 0.125f), 0, &Data->sprites.saveButtonLevelEditor_mouse);
+    }
+    else
+    {
+        DrawSprite(V2(4, 4.125f), V2(0.25f, 0.125f), 0, &Data->sprites.saveSpriteLevelEditor);
+    }
 
     //      RENDER MOUSE
     if (showMouseOnMap)
@@ -189,7 +256,6 @@ void MyGameUpdate()
         {
             DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.xSprite);
         }
-        
     } 
     else
     {
@@ -199,5 +265,4 @@ void MyGameUpdate()
         mousePosRender.y = mousePosRender.y * (4.5f);
         DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f, 0.125f), 0, &Data->sprites.cursorHandSprite);
     }
-    
 }

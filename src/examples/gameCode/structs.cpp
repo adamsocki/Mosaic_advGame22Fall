@@ -5,6 +5,7 @@ enum EntityType {
 	None,
 	EntityType_Base,
 	EntityType_Player,
+	EntityType_Monster1,
 
 	EntityType_PlayerCarry,
 
@@ -73,6 +74,8 @@ struct EntitySprites {
 	Sprite building_ASprite;
 	Sprite suitcaseSprite;
 
+	Sprite monster1Sprite;
+
 	Sprite wall1Sprite;
 	Sprite wall1_vertSprite;
 	Sprite door1Sprite;
@@ -92,6 +95,14 @@ struct EntitySprites {
 	Sprite cursorHandSprite;
 	Sprite spritePalette;
 	Sprite xSprite;
+
+	Sprite saveSpriteLevelEditor;
+	Sprite saveButtonLevelEditor_mouse;
+	Sprite minusSprite;
+	Sprite plusSprite;
+	Sprite minusSprite_mouse;
+	Sprite plusSprite_mosue;
+	Sprite entitySpecificsSprite;
 
 	Sprite backgroundColor1Sprite;
 };
@@ -170,6 +181,11 @@ struct Barrier : Entity {
 	bool activeRoom;
 };
 
+struct Monster : Entity
+{
+	real32 speed;
+	vec2 previousPosition;
+};
 
 
 struct Room {
