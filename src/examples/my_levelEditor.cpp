@@ -1,4 +1,5 @@
 
+MemoryArena arena = {};
 
 #include "gameCode/structs.cpp"
 #include "gameCode/entityManager.cpp"
@@ -9,6 +10,7 @@
 #include "gameCode/collision.cpp"
 
 #include "gameCode/levelEditor.cpp"
+#include "gameCode/levelParser.cpp"
 
 //TODO: properly set up entity Manager and all input files
 
@@ -20,6 +22,8 @@ void MyInit()
     memset(Game->myData, 0, sizeof(MyData));
 
     Data = (MyData*)Game->myData;
+
+    AllocateMemoryArena(&arena, Megabytes(64));
     
     InitializeEntityManager();
     InitializeEntityBuffers(false);
@@ -43,6 +47,7 @@ void MyInit()
     }
 }
 
+bool* test = false;
 void MyGameUpdate()
 {
     //**********************
@@ -160,9 +165,10 @@ void MyGameUpdate()
     //      SAVE GAME LOGIC
     bool overSave = false;
     Rect saveButtonRect;
+    vec2 saveButtonLocation = V2(4, 4);
     saveButtonRect.max =  V2(0.125f, 0.125f / 2);
     saveButtonRect.min = -V2(0.125f, 0.125f / 2);
-    if (RectTest(saveButtonRect, mouseRect, realMousePosition, V2(4, 4.125f), &dir))
+    if (RectTest(saveButtonRect, mouseRect, realMousePosition, saveButtonLocation, &dir))
     {
         overSave = true;
         if (InputPressed(Mouse, Input_MouseLeft)) 
@@ -170,8 +176,58 @@ void MyGameUpdate()
             SaveLevel();
         }
     }
+    //      Testing Load Level
+    
+    //      Collision with Mouse +/-
+    Rect spriteLevelPlusRect;
+    Rect spriteLevelMinusRect;
+    vec2 spriteLevelExtraPosition = V2(3, 4);
+    real32 levelPlusMinusOffset = 0.25f;
+    vec2 spriteLevelMinusPosition = spriteLevelExtraPosition;
+    spriteLevelMinusPosition.x = spriteLevelMinusPosition.x - levelPlusMinusOffset;
+    vec2 spriteLevelPlusPosition = spriteLevelExtraPosition;
+    spriteLevelPlusPosition.x = spriteLevelPlusPosition.x + levelPlusMinusOffset;
+    vec2 spriteLevelPlusMinusSize = V2(0.1f, 0.1f);
+    spriteLevelPlusRect.max =   V2(spriteLevelPlusMinusSize.x / 2, spriteLevelPlusMinusSize.y / 2);
+    spriteLevelPlusRect.min =  -V2(spriteLevelPlusMinusSize.x / 2, spriteLevelPlusMinusSize.y / 2);
+    spriteLevelMinusRect.max =  V2(spriteLevelPlusMinusSize.x / 2, spriteLevelPlusMinusSize.y / 2);
+    spriteLevelMinusRect.min = -V2(spriteLevelPlusMinusSize.x / 2, spriteLevelPlusMinusSize.y / 2);
 
+    //      plus collission
+  // mouseRect = spritePlusRect;
+    bool overLevelPlus = false;
+    if (RectTest(spriteLevelPlusRect, mouseRect, realMousePosition, spriteLevelPlusPosition, &dir))
+    {
+        overLevelPlus = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            LoadLevelParse(Data->currentLevel++);
+        }
+    }
+    //      plus collission
+   // mouseRect = spriteMinusRect;
+    bool overLevelMinus = false;
+    if (RectTest(spriteLevelMinusRect, mouseRect, realMousePosition, spriteLevelMinusPosition, &dir))
+    {
+        overLevelMinus = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            LoadLevelParse(Data->currentLevel--);
+        }
+    }
 
+    if (InputPressed(Mouse, Input_MouseRight))
+    {
+        
+       
+       
+    }
+    if (test)
+    {
+        DrawTextScreenPixel(&Game->monoFont, V2(590, 80), 10.0f, RGB(1.0f, 1.0f, 1.0f), "test");
+
+    }
+    
     //**********************
     //**********************
     //      RENDER
@@ -189,6 +245,24 @@ void MyGameUpdate()
 
     //      DISPLAY CURRENT LEVEL
     DrawTextScreenPixel(&Game->monoFont, V2(750, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Level: %d", Data->currentLevel);
+    //      RENDER LEVEL CHANGE BUTTONS
+    if (overLevelMinus)
+    {
+        DrawSprite(spriteLevelMinusPosition, spriteLevelPlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
+    }
+    else
+    {
+        DrawSprite(spriteLevelMinusPosition, spriteLevelPlusMinusSize, 0, &Data->sprites.minusSprite);
+    }
+    if (overLevelPlus)
+    {
+        DrawSprite(spriteLevelPlusPosition, spriteLevelPlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
+    }
+    else
+    {
+        DrawSprite(spriteLevelPlusPosition, spriteLevelPlusMinusSize, 0, &Data->sprites.plusSprite);
+    }
+
 
     //      RENDER LEVEL MAP
     DrawSprite(levelMapOffset, V2(8 / factorValue + (tileSize.x / 2), 4.5f / factorValue + (tileSize.y / 2)), 0, &Data->sprites.levelEditorBG1Sprite);
@@ -230,11 +304,11 @@ void MyGameUpdate()
     //      RENDER SAVE BUTTON
     if (overSave)
     {
-        DrawSprite(V2(4, 4.125f), V2(0.25f, 0.125f), 0, &Data->sprites.saveButtonLevelEditor_mouse);
+        DrawSprite(saveButtonLocation, V2(0.25f, 0.125f), 0, &Data->sprites.saveButtonLevelEditor_mouse);
     }
     else
     {
-        DrawSprite(V2(4, 4.125f), V2(0.25f, 0.125f), 0, &Data->sprites.saveSpriteLevelEditor);
+        DrawSprite(saveButtonLocation, V2(0.25f, 0.125f), 0, &Data->sprites.saveSpriteLevelEditor);
     }
 
     //      RENDER MOUSE

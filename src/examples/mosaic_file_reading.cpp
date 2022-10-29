@@ -160,6 +160,7 @@ struct MyGame {
 
 MyGame game = {};
 
+
 void MyMosaicInit() {
     SetMosaicGridSize(19, 19);
 

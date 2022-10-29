@@ -1,5 +1,25 @@
 
 
+enum TokenTypeForLevel
+{
+	TokenType_LeftParen,
+	TokenType_RightParen,
+	TokenType_AmpSymb,
+	TokenType_PoundSymb,
+
+	TokenType_Integer,
+	TokenType_Identifier,
+	TokenType_Count,
+
+};
+
+struct TokenVal
+{
+	TokenTypeForLevel type;
+	char* start;
+	int32 length;
+};
+
 
 enum EntityType {
 	None,
@@ -125,6 +145,8 @@ struct MyData {
 
 	EntitySprites sprites;
 	Sounds sound;
+
+	MemoryArena tokenArena;
 
 	MouseCrosshair mouseCrosshair;
 	LevelEditor levelEditor;
