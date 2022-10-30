@@ -1,0 +1,33 @@
+
+
+
+
+$room
+#pos
+(3,3)
+#size
+(10,10)
+#roomNum
+1
+#isInitiallyVisible
+1
+
+$room
+#pos
+(13,3)
+#size
+(5,2)
+#roomNum
+2
+#isInitiallyVisible
+1
+
+
+$monster
+#pos
+(40, 10)
+#size
+(2, 2)
+#power
+10
+

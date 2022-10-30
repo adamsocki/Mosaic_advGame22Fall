@@ -149,6 +149,21 @@ void InitializeEntityBuffers(bool levelRestart) {
 	monster1Buffer->entities = (Monster*)malloc(monster1Buffer->capacity * monster1Buffer->sizeInBytes);
 	memset(monster1Buffer->entities, 0, sizeof(Monster) * monster1Buffer->capacity);
 
+	// RoomBuffer
+	EntityTypeBuffer* roomBuffer = &Data->em.buffers[EntityType_Room];
+	roomBuffer->capacity = 1000;
+	roomBuffer->sizeInBytes = sizeof(Room);
+	roomBuffer->count = 0;
+	roomBuffer->entities = (Room*)malloc(roomBuffer->capacity * roomBuffer->sizeInBytes);
+	memset(roomBuffer->entities, 0, sizeof(Room) * roomBuffer->capacity);
+
+	// MonsterBuffer
+	EntityTypeBuffer* monsterBuffer = &Data->em.buffers[EntityType_Monster];
+	monsterBuffer->capacity = 1000;
+	monsterBuffer->sizeInBytes = sizeof(Monster);
+	monsterBuffer->count = 0;
+	monsterBuffer->entities = (Monster*)malloc(monsterBuffer->capacity * monsterBuffer->sizeInBytes);
+	memset(monsterBuffer->entities, 0, sizeof(Monster) * monsterBuffer->capacity);
 }
 
 void CreatePlayer() {

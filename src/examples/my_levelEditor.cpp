@@ -1,5 +1,7 @@
 
 MemoryArena arena = {};
+MemoryArena roomArena = {};
+MemoryArena monsterArena = {};
 
 #include "gameCode/structs.cpp"
 #include "gameCode/entityManager.cpp"
@@ -16,6 +18,8 @@ MemoryArena arena = {};
 
 vec2 mousePosRender;
 
+LevelState levelState[5];
+
 void MyInit() 
 {
     Game->myData = malloc(sizeof(MyData));
@@ -24,6 +28,8 @@ void MyInit()
     Data = (MyData*)Game->myData;
 
     AllocateMemoryArena(&arena, Megabytes(64));
+    AllocateMemoryArena(&roomArena, Megabytes(2));
+    AllocateMemoryArena(&monsterArena, Megabytes(2));
     
     InitializeEntityManager();
     InitializeEntityBuffers(false);
@@ -67,6 +73,15 @@ void MyGameUpdate()
     vec2 realMousePosition = Input->mousePosNormSigned;
     realMousePosition.x *= 8;
     realMousePosition.y *= 4.5f;
+
+    //      CREATE ENTITY BUFFER REFERENCES
+    //          BUFFER
+    EntityTypeBuffer* roomBuffer = &Data->em.buffers[EntityType_Room];
+    EntityTypeBuffer* monsterBuffer = &Data->em.buffers[EntityType_Monster];
+    //          ENTITIES
+    Room* roomEntitiesInBuffer = (Room*)roomBuffer->entities;
+    Monster* monsterEntitiesInBuffer = (Monster*)monsterBuffer->entities;
+
 
     //      CAMERA DATA
     Camera* cam = &Game->camera;
@@ -177,7 +192,6 @@ void MyGameUpdate()
         }
     }
     //      Testing Load Level
-    
     //      Collision with Mouse +/-
     Rect spriteLevelPlusRect;
     Rect spriteLevelMinusRect;
@@ -201,7 +215,7 @@ void MyGameUpdate()
         overLevelPlus = true;
         if (InputPressed(Mouse, Input_MouseLeft))
         {
-            LoadLevelParse(Data->currentLevel++);
+            LoadLevelParse(Data->currentLevel++, levelState);
         }
     }
     //      plus collission
@@ -212,21 +226,16 @@ void MyGameUpdate()
         overLevelMinus = true;
         if (InputPressed(Mouse, Input_MouseLeft))
         {
-            LoadLevelParse(Data->currentLevel--);
+            LoadLevelParse(Data->currentLevel--, levelState);
+           // LevelTransition(levelState, false);
         }
     }
 
-    if (InputPressed(Mouse, Input_MouseRight))
-    {
-        
-       
-       
-    }
-    if (test)
-    {
-        DrawTextScreenPixel(&Game->monoFont, V2(590, 80), 10.0f, RGB(1.0f, 1.0f, 1.0f), "test");
+    //      LEVEL MAP LOGIC
+    vec2 levelMapdisplayRatio = V2(8 / factorValue + (tileSize.x / 2), 4.5f / factorValue + (tileSize.y / 2));
+    vec2 sizeOfLevelCanvas = V2(levelMapdisplayRatio.x * 2, levelMapdisplayRatio.y * 2);
+    vec2 startingPosForLevelCanvasBottomLeft = V2(-levelMapdisplayRatio.x + 1, -levelMapdisplayRatio.y);
 
-    }
     
     //**********************
     //**********************
@@ -245,6 +254,7 @@ void MyGameUpdate()
 
     //      DISPLAY CURRENT LEVEL
     DrawTextScreenPixel(&Game->monoFont, V2(750, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Level: %d", Data->currentLevel);
+    
     //      RENDER LEVEL CHANGE BUTTONS
     if (overLevelMinus)
     {
@@ -265,7 +275,38 @@ void MyGameUpdate()
 
 
     //      RENDER LEVEL MAP
-    DrawSprite(levelMapOffset, V2(8 / factorValue + (tileSize.x / 2), 4.5f / factorValue + (tileSize.y / 2)), 0, &Data->sprites.levelEditorBG1Sprite);
+    //          Render Map Canvas
+    DrawSprite(levelMapOffset, levelMapdisplayRatio, 0, &Data->sprites.levelEditorBG1Sprite);
+    
+    //          Render GameEntities
+    //              ROOM
+    for (int i = 0; i < roomBuffer->count; i++) 
+    {
+        Room* roomEntity = (Room*)GetEntity(&Data->em, roomEntitiesInBuffer[i].handle);
+        if (roomEntity != NULL)
+        {
+            if (roomEntity->activeRoom)
+            {
+                vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(roomEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+                vec2 sizeForEntityInIndex = convertSizeToIndexSize(roomEntity->size, sizeOfLevelCanvas);
+                
+                DrawRectBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, RGB(1.0f, 0.3f, 0.3f));
+            }
+        }
+    }
+    //              MONSTER
+    for (int i = 0; i < monsterBuffer->count; i++)
+    {
+        Monster* monsterEntity = (Monster*)GetEntity(&Data->em, monsterEntitiesInBuffer[i].handle);
+        if (monsterEntity != NULL)
+        {
+            vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(monsterEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+            vec2 sizeForEntityInIndex = convertSizeToIndexSize(monsterEntity->size, sizeOfLevelCanvas);
+
+            DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.monster1Sprite);
+
+        }
+    }
 
 
     //      RENDER SPRITE PALATTE
@@ -339,4 +380,7 @@ void MyGameUpdate()
         mousePosRender.y = mousePosRender.y * (4.5f);
         DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f, 0.125f), 0, &Data->sprites.cursorHandSprite);
     }
+
+    //DrawSpriteBottomLeft(startingPosForLevelCanvasBottomLeft, V2(2, 2), 0, &Data->sprites.monster1Sprite);
+    //DrawRectBottomLeft(V2(-levelMapdisplayRatio.x + 1, -levelMapdisplayRatio.y), V2(levelMapdisplayRatio.x *2, levelMapdisplayRatio.y * 2),0,  RGB(1.0f, 0.3f, 0.3f));
 }

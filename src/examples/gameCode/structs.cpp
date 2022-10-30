@@ -6,10 +6,14 @@ enum TokenTypeForLevel
 	TokenType_RightParen,
 	TokenType_AmpSymb,
 	TokenType_PoundSymb,
+	TokenType_Comma,
 
 	TokenType_Integer,
+	TokenType_PeriodSymb,
 	TokenType_Identifier,
+	TokenType_DollarSymb,
 	TokenType_Count,
+
 
 };
 
@@ -26,12 +30,14 @@ enum EntityType {
 	EntityType_Base,
 	EntityType_Player,
 	EntityType_Monster1,
+	EntityType_Monster,
 
 	EntityType_PlayerCarry,
 
 	EntityType_Barrier,
 	EntityType_Door,
 	EntityType_RoomTrigger,
+	EntityType_Room,
 
 	EntityType_MouseCrosshair,
 
@@ -125,6 +131,7 @@ struct EntitySprites {
 	Sprite entitySpecificsSprite;
 
 	Sprite backgroundColor1Sprite;
+
 };
 
 struct Sounds {
@@ -205,18 +212,26 @@ struct Barrier : Entity {
 
 struct Monster : Entity
 {
+
+	int32 monsterType;
+	vec2 size;
+	vec2 position1;
+
+	int32 strength;
 	real32 speed;
 	vec2 previousPosition;
 };
 
 
-struct Room {
+struct Room : Entity{
 	vec2 size;
 	vec2 startingPosition;
 	vec2 tileSize;
 	Sprite* sprite;
 	int32 roomNumber;
 	int32 levelNumber;
+	vec2 position1;
+	vec2 position2;
 
 	bool activeRoom;
 };
@@ -233,7 +248,7 @@ struct LevelPortal : Entity {
 	bool mouseIsOver;
 };
 
-struct Door :Entity {
+struct Door : Entity {
 	vec2 startingPosition;
 	vec2 tileSize;
 	vec2 doorSize;
@@ -267,7 +282,7 @@ struct Wall {
 
 
 struct LevelState {
-	//<DynamicArray>
+	Room room[12];
 	Door door[10];
 	Player player[3];
 	bool roomActive[10];
@@ -291,7 +306,11 @@ struct WallLevelData {
 };
 
 
+
+
 struct Level {
 	DynamicArray<Door> doors;
 	DynamicArray<WallLevelData> walls;
+
+	int32 currentLevel;
 };

@@ -34,8 +34,12 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.minusSprite_mouse, "data/minusSprite_mouse.png");
 	LoadSprite(&Data->sprites.plusSprite_mosue, "data/plusSprite_mosue.png");
 	LoadSprite(&Data->sprites.entitySpecificsSprite, "data/entitySpecificsSprite.png");
+	
+	
+	LoadSprite(&Data->sprites.monster1Sprite, "data/monster1Sprite.png");
 
 
+	Sprite monster1Sprite;
 	
 }
 

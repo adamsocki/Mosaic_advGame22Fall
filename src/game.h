@@ -104,6 +104,7 @@ struct GameMemory {
     Mesh quad;
     Mesh glyphQuad;
     Mesh quadTopLeft;
+    Mesh quadBottomLeft;
     Mesh cube;
 
     InputManager inputManager;
