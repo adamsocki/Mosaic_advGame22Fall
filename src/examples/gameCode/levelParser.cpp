@@ -20,6 +20,9 @@ bool isComma(char c)
 }
 
 
+
+
+
 vec2 IndexForLevelCanvasObjectStartingPosition(vec2 objectPosition, vec2 canvasSize, vec2 canvasBottomLeft)
 {
 	vec2 positionOnCanvas;
@@ -40,14 +43,13 @@ vec2 convertSizeToIndexSize(vec2 sizeOfObject, vec2 canvasSize)
 }
 
 
-
 void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 {
-
-	
 	DynamicArray<TokenVal> tokens = MakeDynamicArray<TokenVal>(&arena, 100);
 	DynamicArray<Room> rooms = MakeDynamicArray<Room>(&roomArena, 12);
 	DynamicArray<Monster> monsters = MakeDynamicArray<Monster>(&monsterArena, 40);
+	DynamicArray<Door> doors = MakeDynamicArray<Door>(&doorArena, 40);
+	DynamicArray<Object> objects = MakeDynamicArray<Object>(&objectArena, 100);
 
 	FileHandle file;
 
@@ -157,8 +159,6 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 
 	//	READ DEM TOKENS
 	int32 tokenIndex = 0;
-
-
 
 	while (tokenIndex < tokens.count)
 	{
@@ -423,6 +423,219 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 
 					PushBack(&monsters, m);
 				}
+
+				if (strncmp(t.start, "door", t.length) == 0)
+				{
+					tokenIndex++;
+					t = tokens[tokenIndex];
+
+					Door d = {};
+
+					while (t.type == TokenType_PoundSymb)
+					{
+						tokenIndex++;
+						t = tokens[tokenIndex];
+
+						if (strncmp(t.start, "pos", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							// CREATE DOOR ENTITY
+
+							while (t.type == TokenType_LeftParen)
+							{
+								tokenIndex++;
+								t = tokens[tokenIndex];
+
+								if (t.type == TokenType_Integer)
+								{
+									if (d.position1.x == NULL)
+									{
+										d.position1.x = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Comma)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Integer)
+								{
+									if (d.position1.y == NULL)
+									{
+										d.position1.y = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+
+								if (t.type == TokenType_RightParen)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+							}
+						}
+						if (strncmp(t.start, "size", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							// CREATE DOOR ENTITY
+							while (t.type == TokenType_LeftParen)
+							{
+								tokenIndex++;
+								t = tokens[tokenIndex];
+
+								if (t.type == TokenType_Integer)
+								{
+									if (d.size.x == NULL)
+									{
+										d.size.x = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Comma)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Integer)
+								{
+									if (d.size.y == NULL)
+									{
+										d.size.y = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+
+								if (t.type == TokenType_RightParen)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+							}
+						}
+					}
+									
+					PushBack(&doors, d);
+				}
+
+				if (strncmp(t.start, "object", t.length) == 0)
+				{
+					tokenIndex++;
+					t = tokens[tokenIndex];
+
+					Object o = {};
+
+					while (t.type == TokenType_PoundSymb)
+					{
+						tokenIndex++;
+						t = tokens[tokenIndex];
+
+						if (strncmp(t.start, "pos", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							// CREATE DOOR ENTITY
+
+							while (t.type == TokenType_LeftParen)
+							{
+								tokenIndex++;
+								t = tokens[tokenIndex];
+
+								if (t.type == TokenType_Integer)
+								{
+									if (o.position1.x == NULL)
+									{
+										o.position1.x = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Comma)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Integer)
+								{
+									if (o.position1.y == NULL)
+									{
+										o.position1.y = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+
+								if (t.type == TokenType_RightParen)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+							}
+						}
+						if (strncmp(t.start, "size", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							// CREATE DOOR ENTITY
+							while (t.type == TokenType_LeftParen)
+							{
+								tokenIndex++;
+								t = tokens[tokenIndex];
+
+								if (t.type == TokenType_Integer)
+								{
+									if (o.size.x == NULL)
+									{
+										o.size.x = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Comma)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Integer)
+								{
+									if (o.size.y == NULL)
+									{
+										o.size.y = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+
+								if (t.type == TokenType_RightParen)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+							}
+						}
+						if (strncmp(t.start, "objectType", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+
+							if (t.type == TokenType_Integer)
+							{
+								o.objectType = strtoll(t.start, NULL, 10);
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+					}
+
+					PushBack(&objects, o);
+				}
+
 				
 			}
 		
@@ -441,6 +654,12 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 	EntityTypeBuffer* monsterBuffer = &Data->em.buffers[EntityType_Monster];
 	Monster* monsterEntitiesInBuffer = (Monster*)monsterBuffer->entities;
 
+	EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
+	Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
+
+	EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
+	Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
+
 	for (int i = 0; i < rooms.count; i++)
 	{
 
@@ -454,6 +673,31 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		roomEntity->handle = roomHandle;
 
 		//levelState[currentLevel].room[roomEntity->roomNumber].position1 = roomEntity;
+		
+		//	LEFT WALL
+		EntityHandle barrierHandleLeft = AddEntity(&Data->em, EntityType_Barrier);
+		Barrier* barrierEntityLeft = (Barrier*)GetEntity(&Data->em, barrierHandleLeft);
+		barrierEntityLeft->position1 = V2(rooms[i].position1.x - 1, rooms[i].position1.y - 1);
+		barrierEntityLeft->size = V2(1, rooms[i].size.y + 2);
+		barrierEntityLeft->handle = barrierHandleLeft;
+		//	RIGHT WALL
+		EntityHandle barrierHandleRight = AddEntity(&Data->em, EntityType_Barrier);
+		Barrier* barrierEntityRight = (Barrier*)GetEntity(&Data->em, barrierHandleRight);
+		barrierEntityRight->position1 = V2(rooms[i].position1.x + rooms[i].size.x, rooms[i].position1.y - 1);
+		barrierEntityRight->size = V2(1, rooms[i].size.y + 2);
+		barrierEntityRight->handle = barrierHandleRight;
+		//	TOP WALL
+		EntityHandle barrierHandleTop = AddEntity(&Data->em, EntityType_Barrier);
+		Barrier* barrierEntityTop = (Barrier*)GetEntity(&Data->em, barrierHandleTop);
+		barrierEntityTop->position1 = V2(rooms[i].position1.x - 1, rooms[i].position1.y + rooms[i].size.y);
+		barrierEntityTop->size = V2(rooms[i].size.x + 2, 1);
+		barrierEntityTop->handle = barrierHandleTop;
+		//	BOTTOM WALL
+		EntityHandle barrierHandleBottom = AddEntity(&Data->em, EntityType_Barrier);
+		Barrier* barrierEntityBottom = (Barrier*)GetEntity(&Data->em, barrierHandleBottom);
+		barrierEntityBottom->position1 = V2(rooms[i].position1.x - 1, rooms[i].position1.y - 1);
+		barrierEntityBottom->size = V2(rooms[i].size.x + 2, 1);
+		barrierEntityBottom->handle = barrierHandleBottom;
 
 	}
 
@@ -467,67 +711,42 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		monsterEntity->handle = monsterHandle;
 	}
 
-
-	/*for (int i = 0; i < tokens.count; i++)
+	for (int i = 0; i < doors.count; i++)
 	{
-		TokenVal t = tokens[i];	
+		EntityHandle doorHandle = AddEntity(&Data->em, EntityType_Door);
+		Door* doorEntity = (Door*)GetEntity(&Data->em, doorHandle);
 
-		
+		doorEntity->position1 = doors[i].position1;
+		doorEntity->size = doors[i].size;
+		doorEntity->handle = doorHandle;
+	}
 
+	for (int i = 0; i < objects.count; i++)
+	{
+		EntityHandle objectHandle = AddEntity(&Data->em, EntityType_Object);
+		Object* objectEntity = (Object*)GetEntity(&Data->em, objectHandle);
 
-		switch (t.type)
-		{
+		objectEntity->position1 = objects[i].position1;
+		objectEntity->size = objects[i].size;
+		objectEntity->objectType = objects[i].objectType;
+		objectEntity->handle = objectHandle;
+	}
 
-			case TokenType_DollarSymb:
-			{
-				
-			}
-
-			case TokenType_Identifier:
-			{
-				if (strncmp(t.start, "room", t.length) == 0)
-				{
-					
-					break;
-				}
-				if (strncmp(t.start, "pizza", t.length) == 0)
-				{
-					break;
-				}
-			}
+}
 
 
+void WriteLevel()
+{
 
-			case TokenType_LeftParen:
-			{
-				break;
-			}
-			case TokenType_RightParen:
-			{
-				break;
-			}
-			case TokenType_AmpSymb:
-			{
-				Print("AMP");
-				break;
-			}
-			
-			case TokenType_Integer:
-			{
-				break;
-			}
-			
-			case TokenType_Count:
-			{
-				break;
-			}
+	FileHandle file;
 
-			default: 
-			{
-				break;
-			}
+	if (OpenFileForWrite("data/levelEditor/level2.txt", &file, &Game->frameMem, sizeof(Entity) * 100))
+	{
+		char c = 'b';
+		WriteChar(&file, c);
+		//WriteReal32(&file, sizeof(Entity) * 100);
+	}
+	
 
-		}
-	}*/
 
 }

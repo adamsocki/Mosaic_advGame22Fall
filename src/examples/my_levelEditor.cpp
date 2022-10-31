@@ -2,6 +2,8 @@
 MemoryArena arena = {};
 MemoryArena roomArena = {};
 MemoryArena monsterArena = {};
+MemoryArena doorArena = {};
+MemoryArena objectArena = {};
 
 #include "gameCode/structs.cpp"
 #include "gameCode/entityManager.cpp"
@@ -30,6 +32,8 @@ void MyInit()
     AllocateMemoryArena(&arena, Megabytes(64));
     AllocateMemoryArena(&roomArena, Megabytes(2));
     AllocateMemoryArena(&monsterArena, Megabytes(2));
+    AllocateMemoryArena(&doorArena, Megabytes(2));
+    AllocateMemoryArena(&objectArena, Megabytes(4));
     
     InitializeEntityManager();
     InitializeEntityBuffers(false);
@@ -78,9 +82,15 @@ void MyGameUpdate()
     //          BUFFER
     EntityTypeBuffer* roomBuffer = &Data->em.buffers[EntityType_Room];
     EntityTypeBuffer* monsterBuffer = &Data->em.buffers[EntityType_Monster];
+    EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
+    EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
+    EntityTypeBuffer* objectBuffer = &Data->em.buffers[EntityType_Object];
     //          ENTITIES
     Room* roomEntitiesInBuffer = (Room*)roomBuffer->entities;
     Monster* monsterEntitiesInBuffer = (Monster*)monsterBuffer->entities;
+    Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
+    Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
+    Object* objectEntitiesInBuffer = (Object*)objectBuffer->entities;
 
 
     //      CAMERA DATA
@@ -237,6 +247,12 @@ void MyGameUpdate()
     vec2 startingPosForLevelCanvasBottomLeft = V2(-levelMapdisplayRatio.x + 1, -levelMapdisplayRatio.y);
 
     
+
+    if (InputPressed(Mouse, Input_MouseRight))
+    {
+        WriteLevel();
+    }
+
     //**********************
     //**********************
     //      RENDER
@@ -289,7 +305,6 @@ void MyGameUpdate()
             {
                 vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(roomEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
                 vec2 sizeForEntityInIndex = convertSizeToIndexSize(roomEntity->size, sizeOfLevelCanvas);
-                
                 DrawRectBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, RGB(1.0f, 0.3f, 0.3f));
             }
         }
@@ -302,9 +317,41 @@ void MyGameUpdate()
         {
             vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(monsterEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
             vec2 sizeForEntityInIndex = convertSizeToIndexSize(monsterEntity->size, sizeOfLevelCanvas);
-
             DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.monster1Sprite);
+        }
+    }
+    //              BARRIER
+    for (int i = 0; i < barrierBuffer->count; i++)
+    {
+        Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierEntitiesInBuffer[i].handle);
+        if (barrierEntity != NULL)
+        {
+            vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(barrierEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+            vec2 sizeForEntityInIndex = convertSizeToIndexSize(barrierEntity->size, sizeOfLevelCanvas);
+          //  DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.monster1Sprite);
+        }
 
+    }
+    //              DOOR
+    for (int i = 0; i < doorBuffer->count; i++)
+    {
+        Door* doorEntity = (Door*)GetEntity(&Data->em, doorEntitiesInBuffer[i].handle);
+        if (doorEntity != NULL)
+        {
+            vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(doorEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+            vec2 sizeForEntityInIndex = convertSizeToIndexSize(doorEntity->size, sizeOfLevelCanvas);
+            DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.doorClosed1Sprite);
+        }
+    }
+    //              OBJECT
+    for (int i = 0; i < objectBuffer->count; i++)
+    {
+        Object* objectEntity = (Object*)GetEntity(&Data->em, objectEntitiesInBuffer[i].handle);
+        if (objectEntity != NULL)
+        {
+            vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(objectEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+            vec2 sizeForEntityInIndex = convertSizeToIndexSize(objectEntity->size, sizeOfLevelCanvas);
+            DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.doorClosed1Sprite);
         }
     }
 

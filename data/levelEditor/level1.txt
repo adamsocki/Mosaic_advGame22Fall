@@ -12,16 +12,34 @@ $room
 #isInitiallyVisible
 1
 
-$room
+$door
 #pos
 (13,3)
 #size
-(5,2)
+(1,3)
+#opensToRoom
+2
+
+$room
+#pos
+(14,3)
+#size
+(5,4)
 #roomNum
 2
 #isInitiallyVisible
 1
 
+
+$object
+#pos
+(4, 4)
+#size
+(2,2)
+#roomNum
+1
+#objectType
+1
 
 $monster
 #pos

@@ -17,6 +17,16 @@ enum TokenTypeForLevel
 
 };
 
+enum ObjectType
+{
+	ObjectType_Bed,			// 1
+	ObjectType_Suitcase,	// 2
+	ObjectType_Chair,		// 3
+	ObjectType_Table,		// 4
+	ObjectType_Couch,		// 5
+	ObjectType_Count,
+};
+
 struct TokenVal
 {
 	TokenTypeForLevel type;
@@ -31,6 +41,7 @@ enum EntityType {
 	EntityType_Player,
 	EntityType_Monster1,
 	EntityType_Monster,
+	EntityType_Object,
 
 	EntityType_PlayerCarry,
 
@@ -172,8 +183,6 @@ struct Entity {
 	EntityHandle handle;
 };
 
-
-
 struct Base : Entity {
 	int32 id;
 	bool activeRoom;
@@ -203,6 +212,8 @@ struct Barrier : Entity {
 	bool mouseIsOver;
 	bool isOpen;
 	bool isDoorCenter;
+	vec2 position1;
+	vec2 size;
 	EntityHandle handleForOpenDoorLeft;
 	EntityHandle handleForOpenDoorRight;
 	int32 doorNumber;
@@ -236,6 +247,12 @@ struct Room : Entity{
 	bool activeRoom;
 };
 
+struct Object : Entity
+{
+	vec2 position1;
+	vec2 size;
+	int32 objectType;
+};
 
 struct Road {
 	vec2 startingPosition;
@@ -250,6 +267,8 @@ struct LevelPortal : Entity {
 
 struct Door : Entity {
 	vec2 startingPosition;
+	vec2 position1;
+	vec2 size;
 	vec2 tileSize;
 	vec2 doorSize;
 	bool horizontal;

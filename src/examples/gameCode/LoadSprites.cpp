@@ -39,6 +39,9 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.monster1Sprite, "data/monster1Sprite.png");
 
 
+
+
+
 	Sprite monster1Sprite;
 	
 }

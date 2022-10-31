@@ -164,6 +164,14 @@ void InitializeEntityBuffers(bool levelRestart) {
 	monsterBuffer->count = 0;
 	monsterBuffer->entities = (Monster*)malloc(monsterBuffer->capacity * monsterBuffer->sizeInBytes);
 	memset(monsterBuffer->entities, 0, sizeof(Monster) * monsterBuffer->capacity);
+
+	// ObjectBuffer
+	EntityTypeBuffer* objectBuffer = &Data->em.buffers[EntityType_Object];
+	objectBuffer->capacity = 1000;
+	objectBuffer->sizeInBytes = sizeof(Object);
+	objectBuffer->count = 0;
+	objectBuffer->entities = (Object*)malloc(objectBuffer->capacity * monsterBuffer->sizeInBytes);
+	memset(objectBuffer->entities, 0, sizeof(Object) * objectBuffer->capacity);
 }
 
 void CreatePlayer() {
