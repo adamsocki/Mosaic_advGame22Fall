@@ -17,13 +17,23 @@ enum TokenTypeForLevel
 
 };
 
+
+enum ObjectComponents
+{
+	Position1,
+	Size,
+
+};
+
+
 enum ObjectType
 {
-	ObjectType_Bed,			// 1
-	ObjectType_Suitcase,	// 2
-	ObjectType_Chair,		// 3
-	ObjectType_Table,		// 4
-	ObjectType_Couch,		// 5
+	OBjectType_None,		// 1
+	ObjectType_Bed,			// 2
+	ObjectType_Suitcase,	// 3
+	ObjectType_Chair,		// 4
+	ObjectType_Table,		// 5
+	ObjectType_Couch,		
 	ObjectType_Count,
 };
 
@@ -57,9 +67,38 @@ enum EntityType {
 	EntityType_Count,
 };
 
+enum EditorState
+{
+	NotEditingWithSprite,
+	EditingWithSprite,
+};
+
+struct EditorPlacementObject
+{
+	vec2 positionStartLevelEditor;
+	vec2 positionEndLevelEditor;
+	vec2 indexPositionStart;
+	vec3 indexPositionEnd;
+	vec2 position1;
+	vec2 position2;
+	vec2 size;
+	int32 currentLevel;
+
+	bool isSizable;
+
+	EntityType entityType;
+	ObjectType objectType;
+};
+
 struct LevelEditor
 {
 	EntityType editorType;
+	EditorState editorState;
+
+	int32 objectCapacity;
+	int32 count;
+	EditorPlacementObject* levelObjects;
+
 };
 
 struct FreeList {
@@ -143,6 +182,8 @@ struct EntitySprites {
 
 	Sprite backgroundColor1Sprite;
 
+	Sprite monster1Sprite_Sel;
+
 };
 
 struct Sounds {
@@ -179,6 +220,9 @@ struct Entity {
 	bool toDelete;
 	vec2 size;
 	bool isQuad;
+
+
+	bool posEdit;
 
 	EntityHandle handle;
 };
@@ -227,6 +271,10 @@ struct Monster : Entity
 	int32 monsterType;
 	vec2 size;
 	vec2 position1;
+	char typeName[10];
+	char characterName[10];
+	int32 power;
+
 
 	int32 strength;
 	real32 speed;

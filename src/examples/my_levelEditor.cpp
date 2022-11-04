@@ -5,7 +5,10 @@ MemoryArena monsterArena = {};
 MemoryArena doorArena = {};
 MemoryArena objectArena = {};
 
+MemoryArena editorObjectsArena = {};
+
 #include "gameCode/structs.cpp"
+#include "gameCode/convertTools.cpp"
 #include "gameCode/entityManager.cpp"
 #include "gameCode/loadSprites.cpp"
 #include "gameCode/LevelManager.cpp"
@@ -21,6 +24,7 @@ MemoryArena objectArena = {};
 vec2 mousePosRender;
 
 LevelState levelState[5];
+DynamicArray<EditorPlacementObject> editorObjects;
 
 void MyInit() 
 {
@@ -29,11 +33,17 @@ void MyInit()
 
     Data = (MyData*)Game->myData;
 
+    Data->levelEditor.editorState = NotEditingWithSprite;
+
     AllocateMemoryArena(&arena, Megabytes(64));
     AllocateMemoryArena(&roomArena, Megabytes(2));
     AllocateMemoryArena(&monsterArena, Megabytes(2));
     AllocateMemoryArena(&doorArena, Megabytes(2));
     AllocateMemoryArena(&objectArena, Megabytes(4));
+
+    AllocateMemoryArena(&editorObjectsArena, Megabytes(2));
+
+    editorObjects = MakeDynamicArray<EditorPlacementObject>(&editorObjectsArena, 120);
     
     InitializeEntityManager();
     InitializeEntityBuffers(false);
@@ -50,11 +60,6 @@ void MyInit()
 
     UpdateCamera(cam, Game->cameraPosition, Game->cameraRotation);
 
-    FileHandle file;
-    if (OpenFileForRead("data/file_reading_example.txt", &file, &Game->frameMem))
-    {
-
-    }
 }
 
 bool* test = false;
@@ -77,6 +82,7 @@ void MyGameUpdate()
     vec2 realMousePosition = Input->mousePosNormSigned;
     realMousePosition.x *= 8;
     realMousePosition.y *= 4.5f;
+    EditorPlacementObject levelEntityStorage = {};
 
     //      CREATE ENTITY BUFFER REFERENCES
     //          BUFFER
@@ -118,7 +124,7 @@ void MyGameUpdate()
     }
     else
     {   
-        // TODO: make a new mosue variable ??? 
+        // : make a new mosue variable ??? 
         mousePos = V2(0, 0);
         showMouseOnMap = false;
     }
@@ -131,33 +137,136 @@ void MyGameUpdate()
         mouseIndex = V2((mousePos.x / 16) * (16 / tileSize.x), (mousePos.y / 9) * (9 / tileSize.y));
     }
     
+    // **************
+    // **************
+    // 
     //      SPRITE PALATE LOGIC
+    // 
+    // **************
+    // **************
+    // 
+    //          TODO: ALLOW PLUS/MINUS FOR SWITCHING BETWEEN ALL OBJECTS PLACED SO FAR IN LEVEL
+    //          TODO: FROM ABOVE, HAVE A CURSOR THAT RENDERS AT THE OBJECT START POSITION
+    //          TODO: FROM ABOVE, CHANGE LISTING OF ENTITY SPECIFICATIONS
+   
+    //          base sprite pallate
+    //      Collision with Mouse +/-
     //      Collission with Mouse Obj 1
-    bool overBase = false;
-    Rect spritePalellteSelectionRect;
-    spritePalellteSelectionRect.max =  V2(0.125f, 0.125f);
-    spritePalellteSelectionRect.min = -V2(0.125f, 0.125f);
-    mouseRect = spritePalellteSelectionRect;
+
+    //      MOUSE RECT & SPRITE PALETTTE SELECTION RECT
+    //mouseRect;
+    mouseRect.max =  V2(0.125f, 0.125f);
+    mouseRect.min = -V2(0.125f, 0.125f);
     realMousePosition.y += 0.125f;
     vec2 dir = V2(0);
-    if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, V2(-7.25f, 2.75f), &dir))
+    Rect spritePalellteSelectionRect;
+    spritePalellteSelectionRect = mouseRect;
+
+    //      CYCLE THROUGH ENTITIES - PALATTE
+    Rect cycleEntitiesPlusRect;
+    Rect cycleEntitiesMinusRect;
+    vec2 cycleEntitiesExtraPosition = V2(-6.275f, 4);
+    real32 cycleEntitiesplusMinusOffset = 0.25f;
+    vec2 cycleEntitiesMinusPosition = cycleEntitiesExtraPosition;
+    cycleEntitiesMinusPosition.x = cycleEntitiesMinusPosition.x - cycleEntitiesplusMinusOffset;
+    vec2 cycleEntitiesPlusPosition = cycleEntitiesExtraPosition;
+    cycleEntitiesPlusPosition.x = cycleEntitiesPlusPosition.x + cycleEntitiesplusMinusOffset;
+    vec2 cycleEntitiesPlusMinusSize = V2(0.1f, 0.1f);
+    cycleEntitiesPlusRect.max =   V2(cycleEntitiesPlusMinusSize.x / 2, cycleEntitiesPlusMinusSize.y / 2);
+    cycleEntitiesPlusRect.min =  -V2(cycleEntitiesPlusMinusSize.x / 2, cycleEntitiesPlusMinusSize.y / 2);
+    cycleEntitiesMinusRect.max =  V2(cycleEntitiesPlusMinusSize.x / 2, cycleEntitiesPlusMinusSize.y / 2);
+    cycleEntitiesMinusRect.min = -V2(cycleEntitiesPlusMinusSize.x / 2, cycleEntitiesPlusMinusSize.y / 2);
+    //      plus collission
+    bool overCycleEntitiesPlus = false;
+    if (RectTest(cycleEntitiesPlusRect, mouseRect, realMousePosition, cycleEntitiesPlusPosition, &dir))
+    {
+        overCycleEntitiesPlus = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+
+        }
+    }
+    //      MINUS collission
+    bool overCycleEntitiesMinus = false;
+    if (RectTest(cycleEntitiesMinusRect, mouseRect, realMousePosition, cycleEntitiesMinusPosition, &dir))
+    {
+        overCycleEntitiesMinus = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+
+        }
+    }
+
+    //      BASE RECT - PALATTE
+    bool overBase = false;
+    vec2 baseSpritePalattePosition = V2(-7.25f, 2.75f);
+    if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, baseSpritePalattePosition, &dir))
     {
         overBase = true;
         if (InputPressed(Mouse, Input_MouseLeft)) {
             Data->levelEditor.editorType = EntityType_Base;
+            Data->levelEditor.editorState = EditingWithSprite;
+        }
+    }
+    //      MONSTER RECT - PALATTE
+    bool overMonsterPalatte = false;
+    vec2 monsterSpritePalattePosition = V2(-6.25f, 2.75f);
+    if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, monsterSpritePalattePosition, &dir))
+    {
+        overMonsterPalatte = true;
+        if (InputPressed(Mouse, Input_MouseLeft)) 
+        {
+            Data->levelEditor.editorType = EntityType_Monster;
+            Data->levelEditor.editorState = EditingWithSprite;
         }
     }
 
+
+    //      SPRITE EDITING LOGIC
+    if (Data->levelEditor.editorState == EditingWithSprite)
+    {
+        if (showMouseOnMap)
+        {
+            bool canPlaceObject = true;
+
+            //switch()
+
+
+            if (Data->levelEditor.editorType == EntityType_Door) {
+                // TODO: MAKE SURE THAT IT WILL BE PLACED AT THE EDGE OF A WALL
+                
+                canPlaceObject = false;
+
+                // TODO: if (object is in right place) { canPlaceObject = true}
+            }
+           
+            if (InputPressed(Mouse, Input_MouseLeft && canPlaceObject))
+            {
+                // TODO start here
+                StartObjectCreation(Data->levelEditor.editorType, mouseIndex, Data->currentLevel);
+            }
+
+            while (Data->levelEditor.levelObjects[Data->levelEditor.count].isSizable)
+            {
+                ObjectSizer(mouseIndex);
+            }
+
+        }
+    }
+
+
     //      SPRITE SPECIFICS LOGIC
-    //      Collision with Mouse +/-
+
+    //  TODO:CREATE OBJECT ENTITY PLUS MINUS THING
+   
     Rect spritePlusRect;
     Rect spriteMinusRect;
-    vec2 spriteExtraPosition = V2(-6.275f, -2.5f);
+    vec2 spriteExtraPosition_edit1 = V2(-6.275f, -2.5f);
     real32 plusMinusOffset = 0.25f;
-    vec2 spriteMinusPosition = spriteExtraPosition; 
-    spriteMinusPosition.x = spriteMinusPosition.x - plusMinusOffset;
-    vec2 spritePlusPosition = spriteExtraPosition;
-    spritePlusPosition.x = spritePlusPosition.x + plusMinusOffset;
+    vec2 spriteMinusPosition_edit1 = spriteExtraPosition_edit1;
+    spriteMinusPosition_edit1.x = spriteMinusPosition_edit1.x - plusMinusOffset;
+    vec2 spritePlusPosition_edit1 = spriteExtraPosition_edit1;
+    spritePlusPosition_edit1.x = spritePlusPosition_edit1.x + plusMinusOffset;
     vec2 spritePlusMinusSize = V2(0.1f, 0.1f);
     spritePlusRect.max =   V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
     spritePlusRect.min =  -V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
@@ -166,10 +275,10 @@ void MyGameUpdate()
 
     //      plus collission
    // mouseRect = spritePlusRect;
-    bool overPlus = false;
-    if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusPosition, &dir))
+    bool overPlus_edit1 = false;
+    if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusPosition_edit1, &dir))
     {
-        overPlus = true;
+        overPlus_edit1 = true;
         if (InputPressed(Mouse, Input_MouseLeft)) 
         {
 
@@ -177,10 +286,10 @@ void MyGameUpdate()
     }
     //      plus collission
    // mouseRect = spriteMinusRect;
-    bool overMinus = false;
-    if (RectTest(spriteMinusRect, mouseRect, realMousePosition, spriteMinusPosition, &dir))
+    bool overMinus_edit1 = false;
+    if (RectTest(spriteMinusRect, mouseRect, realMousePosition, spriteMinusPosition_edit1, &dir))
     {
-        overMinus = true;
+        overMinus_edit1 = true;
         if (InputPressed(Mouse, Input_MouseLeft)) 
         {
             
@@ -198,7 +307,7 @@ void MyGameUpdate()
         overSave = true;
         if (InputPressed(Mouse, Input_MouseLeft)) 
         {
-            SaveLevel();
+            SaveAndWriteLevel();
         }
     }
     //      Testing Load Level
@@ -225,7 +334,8 @@ void MyGameUpdate()
         overLevelPlus = true;
         if (InputPressed(Mouse, Input_MouseLeft))
         {
-            LoadLevelParse(Data->currentLevel++, levelState);
+            Data->currentLevel++;
+            LoadLevelParse(Data->currentLevel, levelState);
         }
     }
     //      plus collission
@@ -236,8 +346,8 @@ void MyGameUpdate()
         overLevelMinus = true;
         if (InputPressed(Mouse, Input_MouseLeft))
         {
-            LoadLevelParse(Data->currentLevel--, levelState);
-           // LevelTransition(levelState, false);
+            Data->currentLevel--;
+            LoadLevelParse(Data->currentLevel, levelState);
         }
     }
 
@@ -250,7 +360,7 @@ void MyGameUpdate()
 
     if (InputPressed(Mouse, Input_MouseRight))
     {
-        WriteLevel();
+       // WriteLevel();
     }
 
     //**********************
@@ -263,10 +373,21 @@ void MyGameUpdate()
     ClearColor(RGB(0.3f, 0.0f, 0.0f));
 
     //      Display Game Coordinates & Index
-    DrawTextScreenPixel(&Game->monoFont, V2(530, 20), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X: %.3f", mousePos.x);
-    DrawTextScreenPixel(&Game->monoFont, V2(530, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y: %.3f", mousePos.y);
-    DrawTextScreenPixel(&Game->monoFont, V2(530, 60), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X-Index %.0f of 128", mouseIndex.x);
-    DrawTextScreenPixel(&Game->monoFont, V2(530, 80), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y-Index %.0f of 72", mouseIndex.y);
+    if (showMouseOnMap)
+    {
+        DrawTextScreenPixel(&Game->monoFont, V2(530, 20), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X: %.3f", mousePos.x);
+        DrawTextScreenPixel(&Game->monoFont, V2(530, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y: %.3f", mousePos.y);
+        DrawTextScreenPixel(&Game->monoFont, V2(530, 60), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X-Index %.0f of 128", mouseIndex.x);
+        DrawTextScreenPixel(&Game->monoFont, V2(530, 80), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y-Index %.0f of 72", mouseIndex.y);
+    }
+    else 
+    {
+        DrawTextScreenPixel(&Game->monoFont, V2(530, 20), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X: %.3f", 0.0f);
+        DrawTextScreenPixel(&Game->monoFont, V2(530, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y: %.3f", 0.0f);
+        DrawTextScreenPixel(&Game->monoFont, V2(530, 60), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X-Index %.0f of 128", 0.0f);
+        DrawTextScreenPixel(&Game->monoFont, V2(530, 80), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Y-Index %.0f of 72",  0.0f);
+    }
+    
 
     //      DISPLAY CURRENT LEVEL
     DrawTextScreenPixel(&Game->monoFont, V2(750, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Level: %d", Data->currentLevel);
@@ -295,6 +416,8 @@ void MyGameUpdate()
     DrawSprite(levelMapOffset, levelMapdisplayRatio, 0, &Data->sprites.levelEditorBG1Sprite);
     
     //          Render GameEntities
+    // 
+    // 
     //              ROOM
     for (int i = 0; i < roomBuffer->count; i++) 
     {
@@ -354,40 +477,83 @@ void MyGameUpdate()
             DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.doorClosed1Sprite);
         }
     }
-
-
-    //      RENDER SPRITE PALATTE
+    // *******************
+    // *******************
+    // *******************
+    //                         RENDER SPRITE PALATTE
+    // *******************
+    // *******************
+    // *******************
     DrawSprite(V2(-6.75f,1), V2(1,2.5f), 0, &Data->sprites.spritePalette);
-    if (Data->levelEditor.editorType == EntityType_Base || overBase)
-    { 
-        DrawSprite(V2(-7.25f, 2.75f), V2(0.25f, 0.25f), 0, &Data->sprites.floor1Sprite);
+    //          RENDER  NAME OF ACTIVE SPRITE
+    //DrawTextScreenPixel(&Game->monoFont, V2(530, 20), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X: %.3f", mousePos.x);
+    //          
+    //          RENDER CYCLE THROUGH ENTITIES - PALATTE +/-
+    if (overCycleEntitiesMinus)
+    {
+        DrawSprite(cycleEntitiesMinusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
     }
     else
     {
-        DrawSprite(V2(-7.25f, 2.75f), V2(0.25f, 0.25f), 0, &Data->sprites.wall1Sprite);
+        DrawSprite(cycleEntitiesMinusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.minusSprite);
     }
+    if (overCycleEntitiesPlus)
+    {
+        DrawSprite(cycleEntitiesPlusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
+    }
+    else
+    {
+        DrawSprite(cycleEntitiesPlusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.plusSprite);
+    }
+    //          BASE ENTITY - PALATTE
+    if (Data->levelEditor.editorType == EntityType_Base || overBase)
+    { 
+        DrawSprite(baseSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.floor1Sprite);
+    }
+    else
+    {
+        DrawSprite(baseSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.wall1Sprite);
+    }
+    //          MONSTER ENTITY - PALATTE
+    if (Data->levelEditor.editorType == EntityType_Monster || overMonsterPalatte)
+    {
+       DrawSprite(monsterSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.monster1Sprite_Sel);
+    }
+    else
+    {
+       DrawSprite(monsterSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.monster1Sprite);
+    }
+
 
     //      RENDER ENTITY SPECIFICS
     DrawSprite(V2(-6.75f, -3), V2(1, 1.2f), 0, &Data->sprites.entitySpecificsSprite);
+    
     //      for loop across entity specifics, have plus / minus buttons to change.
 
-    DrawTextScreenPixel(&Game->monoFont, V2(30, 680), 10.0f, RGB(0.0f, 0.0f, 0.10f), "Room Number:", mouseIndex.x);
-    if (overMinus)
+    //for (int i = 0; i < 4; i)
+
+    //for (int i = 0; i < )
+    // render pos edit
+
+
+    DrawTextScreenPixel(&Game->monoFont, V2(30, 680), 7.0f, RGB(0.0f, 0.0f, 0.10f), "PositionX:", mouseIndex.x);
+    if (overMinus_edit1)
     {
-        DrawSprite(spriteMinusPosition, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
+        DrawSprite(spriteMinusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
     }
     else
     {
-        DrawSprite(spriteMinusPosition, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
+        DrawSprite(spriteMinusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
     }
-    if (overPlus)
+    if (overPlus_edit1)
     {
-        DrawSprite(spritePlusPosition, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
+        DrawSprite(spritePlusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
     }
     else
     {
-        DrawSprite(spritePlusPosition, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
+        DrawSprite(spritePlusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
     }
+
     
     //      RENDER SAVE BUTTON
     if (overSave)
@@ -398,6 +564,10 @@ void MyGameUpdate()
     {
         DrawSprite(saveButtonLocation, V2(0.25f, 0.125f), 0, &Data->sprites.saveSpriteLevelEditor);
     }
+
+
+    //      RENDER DISPLAY TEXT SHOWING 'IN EDITOR MODE'
+    // TODO
 
     //      RENDER MOUSE
     if (showMouseOnMap)
@@ -410,9 +580,27 @@ void MyGameUpdate()
         }
 
         //      MOUSE WITHIN MAP
-        if (Data->levelEditor.editorType == EntityType_Base)
+        if (Data->levelEditor.editorState == EditingWithSprite)
         {
-            DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.floor1Sprite);
+
+            switch (Data->levelEditor.editorType)
+            {
+                case EntityType_Base:
+                {
+                    DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.floor1Sprite);
+                    break;
+                }
+                case EntityType_Monster:
+                {
+                    DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.monster1Sprite);
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+           
         }
         else
         {
@@ -427,6 +615,10 @@ void MyGameUpdate()
         mousePosRender.y = mousePosRender.y * (4.5f);
         DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f, 0.125f), 0, &Data->sprites.cursorHandSprite);
     }
+
+
+
+    
 
     //DrawSpriteBottomLeft(startingPosForLevelCanvasBottomLeft, V2(2, 2), 0, &Data->sprites.monster1Sprite);
     //DrawRectBottomLeft(V2(-levelMapdisplayRatio.x + 1, -levelMapdisplayRatio.y), V2(levelMapdisplayRatio.x *2, levelMapdisplayRatio.y * 2),0,  RGB(1.0f, 0.3f, 0.3f));

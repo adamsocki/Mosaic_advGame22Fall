@@ -51,9 +51,43 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 	DynamicArray<Door> doors = MakeDynamicArray<Door>(&doorArena, 40);
 	DynamicArray<Object> objects = MakeDynamicArray<Object>(&objectArena, 100);
 
+	InitializeEntityBuffers(false);
+
+
 	FileHandle file;
 
-	if (OpenFileForRead("data/levelEditor/level1.txt", &file, &Game->frameMem))
+
+	char* path[] =
+	{
+	   "data/levelEditor/level0.txt",
+	   "data/levelEditor/level1.txt",
+	   "data/levelEditor/level2.txt",
+	   "data/levelEditor/level3.txt"
+	};
+	// "data/levelEditor/level";
+	//switch (currentLevel)
+	//{
+	//	case 1:
+	//	{
+	//		char level[] = "1.txt";
+	//		strncat(path, level, 5);
+	//		break;
+	//	}
+	//	case 2:
+	//	{
+	//		char level[] = "2.txt";
+	//		strncat(path, level, 5);
+	//		break;
+	//	}
+	//	default:
+	//	{
+	//		//path = "1.txt";
+	//		//strcat(path, level);
+	//		break;
+	//	}
+	//}	
+
+	if (OpenFileForRead(path[currentLevel], &file, &Game->frameMem))
 	{
 		TokenVal t = {};
 		while (file.offset < file.size)
@@ -154,7 +188,7 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 			int32 baba = 0;
 
 		}
-
+		CloseFile(&file);
 	}
 
 	//	READ DEM TOKENS
@@ -418,7 +452,19 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 								}
 							}
 						}
+						if (strncmp(t.start, "posEdit", t.length) == 0) 
+						{
+							if (strncmp(t.start, "posEdit", t.length) == 0) {
+								tokenIndex++;
+								t = tokens[tokenIndex];
 
+								if (t.type == TokenType_Integer);
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+							}
+						}
 					}
 
 					PushBack(&monsters, m);
@@ -645,7 +691,6 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 			tokenIndex++;
 			t = tokens[tokenIndex];
 		}
-		
 	}
 
 	EntityTypeBuffer* roomBuffer = &Data->em.buffers[EntityType_Room];
@@ -709,6 +754,8 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		monsterEntity->position1 = monsters[i].position1;
 		monsterEntity->size = monsters[i].size;
 		monsterEntity->handle = monsterHandle;
+		strcpy(monsterEntity->typeName, "$monster\n");
+
 	}
 
 	for (int i = 0; i < doors.count; i++)
@@ -732,21 +779,131 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		objectEntity->handle = objectHandle;
 	}
 
+	DeallocateDynamicArray(&tokens);
+	DeallocateDynamicArray(&rooms);
+	DeallocateDynamicArray(&monsters);
+	DeallocateDynamicArray(&doors);
+	DeallocateDynamicArray(&objects);
+
+
+	
+
 }
 
 
-void WriteLevel()
-{
 
+
+int getSize(char* s) {
+	char* t; // first copy the pointer to not change the original
+	int size = 0;
+
+	for (t = s; *t != '\0'; t++) {
+		size++;
+	}
+
+	return size;
+}
+
+void WriteValues(char *val, FileHandle *file)
+{
+	for (int i = 0; i < getSize(val); i++) {
+
+		WriteByte(file, (u8)val[i]);
+	}
+}
+
+void SaveAndWriteLevel()
+{
+	int32 test;
+	test = 3;
 	FileHandle file;
 
-	if (OpenFileForWrite("data/levelEditor/level2.txt", &file, &Game->frameMem, sizeof(Entity) * 100))
+
+	EntityTypeBuffer* monsterBuffer = &Data->em.buffers[EntityType_Monster];
+	Monster* monsterEntitiesInBuffer = (Monster*)monsterBuffer->entities;
+
+	char* path[] =
 	{
-		char c = 'b';
-		WriteChar(&file, c);
-		//WriteReal32(&file, sizeof(Entity) * 100);
+	   "data/levelEditor/level0.txt",
+	   "data/levelEditor/level1.txt",
+	   "data/levelEditor/level2.txt",
+	   "data/levelEditor/level3.txt"
+	};
+
+	/*char concat(int x, int y) {
+		char str1[20];
+		char str2[20];
+
+		sprintf(str1, "%d", x);
+		sprintf(str2, "%d", y);
+
+		strcat(str1, str2);
+
+		return atoi(str1);
+	}*/
+
+	if (OpenFileForWrite(path[Data->currentLevel], &file, &Game->frameMem, sizeof(Entity) * 10000))
+	{
+
+		//char str[20] = "fjaefje";
+		//float number;
+		//number = 33;
+
+		
+		EntityTypeBuffer* monsterBuffer = &Data->em.buffers[EntityType_Monster];
+		Monster* monsterEntitiesInBuffer = (Monster*)monsterBuffer->entities;
+
+		char leftParen[2] = "(";
+		char rightParen[2] = ")";
+		char comma[2] = ",";
+		char newLine[3] = "\n";
+		char posToken[10] = "#pos\n";
+		char strengthToken[12] = "#strength\n";
+		char sizeToken[12] = "#size\n";
+
+		for (int i = 0; i < monsterBuffer->count; i++)
+		{
+			Monster* monsterEntity = (Monster*)GetEntity(&Data->em, monsterEntitiesInBuffer[i].handle);
+			char typeName[10] = "$monster\n";
+			char pos1x[5];
+			char pos1y[5];
+			char entityStrength[10];
+			char size_x[5];
+			char size_y[5];
+			
+			sprintf(entityStrength, "%d", monsterEntity->strength);
+
+			sprintf(pos1x,  "%.0f", monsterEntity->position1.x);
+			sprintf(pos1y,  "%.0f", monsterEntity->position1.y);
+			sprintf(size_x, "%.0f", monsterEntity->size.x);
+			sprintf(size_y, "%.0f", monsterEntity->size.y);
+
+			WriteValues(typeName, &file);
+			WriteValues(posToken, &file);
+			WriteValues(leftParen, &file);
+			WriteValues(pos1x, &file);
+			WriteValues(comma, &file);
+			WriteValues(pos1y, &file);
+			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
+			WriteValues(sizeToken, &file);
+
+			WriteValues(leftParen, &file);
+			WriteValues(size_x, &file);
+			WriteValues(comma, &file);
+			WriteValues(size_y, &file);
+			WriteValues(rightParen, &file);
+
+			WriteValues(strengthToken, &file);
+			WriteValues(entityStrength, &file);
+			WriteValues(newLine, &file);
+			WriteValues(newLine, &file);
+			
+		}
+		
+
 	}
 	
-
+	CloseFile(&file);
 
 }

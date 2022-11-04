@@ -107,6 +107,8 @@ bool OpenFileForWrite(char *path, FileHandle *file, MAllocator *alloc, u32 size)
         return false;
     }
 
+    file->offset = 0;
+
     file->size = size;
     file->data = (u8 *)alloc->allocate(alloc, file->size);
     

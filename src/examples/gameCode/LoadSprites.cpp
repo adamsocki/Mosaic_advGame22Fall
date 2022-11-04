@@ -36,11 +36,7 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.entitySpecificsSprite, "data/entitySpecificsSprite.png");
 	
 	
-	LoadSprite(&Data->sprites.monster1Sprite, "data/monster1Sprite.png");
-
-
-
-
+	LoadSprite(&Data->sprites.monster1Sprite_Sel, "data/monster1Sprite_Sel.png");
 
 	Sprite monster1Sprite;
 	
