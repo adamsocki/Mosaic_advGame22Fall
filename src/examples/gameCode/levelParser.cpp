@@ -64,28 +64,6 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 	   "data/levelEditor/level2.txt",
 	   "data/levelEditor/level3.txt"
 	};
-	// "data/levelEditor/level";
-	//switch (currentLevel)
-	//{
-	//	case 1:
-	//	{
-	//		char level[] = "1.txt";
-	//		strncat(path, level, 5);
-	//		break;
-	//	}
-	//	case 2:
-	//	{
-	//		char level[] = "2.txt";
-	//		strncat(path, level, 5);
-	//		break;
-	//	}
-	//	default:
-	//	{
-	//		//path = "1.txt";
-	//		//strcat(path, level);
-	//		break;
-	//	}
-	//}	
 
 	if (OpenFileForRead(path[currentLevel], &file, &Game->frameMem))
 	{
@@ -178,8 +156,6 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 				t.length = 1;
 			}
 			
-			//PushBack(&tokens, t);
-
 		
 		AddToken:
 			PushBack(&tokens, t);
@@ -191,7 +167,7 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		CloseFile(&file);
 	}
 
-	//	READ DEM TOKENS
+	//	READ DEM TOKEs
 	int32 tokenIndex = 0;
 
 	while (tokenIndex < tokens.count)
@@ -238,7 +214,6 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 									{
 										r.position1.x = strtoll(t.start, NULL, 10);
 									}
-									
 									
 									tokenIndex++;
 									t = tokens[tokenIndex];
@@ -325,7 +300,7 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 						}
 
 						// GATHER INITIAL VISIBILITY
-						if (strncmp(t.start, "isInitiallyVisible", t.length) == 0)
+						if (strncmp(t.start, "activeRoom", t.length) == 0)
 						{
 							tokenIndex++;
 							t = tokens[tokenIndex];
@@ -743,7 +718,6 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		barrierEntityBottom->position1 = V2(rooms[i].position1.x - 1, rooms[i].position1.y - 1);
 		barrierEntityBottom->size = V2(rooms[i].size.x + 2, 1);
 		barrierEntityBottom->handle = barrierHandleBottom;
-
 	}
 
 	for (int i = 0; i < monsters.count; i++)
@@ -853,6 +827,9 @@ void SaveAndWriteLevel()
 		EntityTypeBuffer* monsterBuffer = &Data->em.buffers[EntityType_Monster];
 		Monster* monsterEntitiesInBuffer = (Monster*)monsterBuffer->entities;
 
+		EntityTypeBuffer* roomBuffer = &Data->em.buffers[EntityType_Room];
+		Room* roomEntitiesInBuffer = (Room*)roomBuffer->entities;
+
 		char leftParen[2] = "(";
 		char rightParen[2] = ")";
 		char comma[2] = ",";
@@ -860,6 +837,8 @@ void SaveAndWriteLevel()
 		char posToken[10] = "#pos\n";
 		char strengthToken[12] = "#strength\n";
 		char sizeToken[12] = "#size\n";
+		char roomNumberToken[15] = "#roomNumber\n";
+		char activeRoomToken[25] = "#activeRoom\n";
 
 		for (int i = 0; i < monsterBuffer->count; i++)
 		{
@@ -901,7 +880,52 @@ void SaveAndWriteLevel()
 			
 		}
 		
+		for (int i = 0; i < roomBuffer->count; i++)
+		{
+			Room* roomEntity = (Room*)GetEntity(&Data->em, roomEntitiesInBuffer[i].handle);
+			char typeName[10] = "$room\n";
+			char pos1x[5];
+			char pos1y[5];
+			char roomNumber[5];
+			char activeRoom[5];
+			char size_x[5];
+			char size_y[5];
 
+			
+			sprintf(pos1x, "%.0f", roomEntity->position1.x);
+			sprintf(pos1y, "%.0f", roomEntity->position1.y);
+			sprintf(size_x, "%.0f", roomEntity->size.x);
+			sprintf(size_y, "%.0f", roomEntity->size.y);
+			sprintf(roomNumber, "%d", roomEntity->roomNumber);
+			sprintf(activeRoom, "%d", roomEntity->activeRoom);
+
+			WriteValues(typeName, &file);
+			WriteValues(posToken, &file);
+			WriteValues(leftParen, &file);
+			WriteValues(pos1x, &file);
+			WriteValues(comma, &file);
+			WriteValues(pos1y, &file);
+			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
+			WriteValues(sizeToken, &file);
+
+			WriteValues(leftParen, &file);
+			WriteValues(size_x, &file);
+			WriteValues(comma, &file);
+			WriteValues(size_y, &file);
+			WriteValues(rightParen, &file);
+
+			WriteValues(roomNumberToken, &file);
+			WriteValues(roomNumber, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(activeRoomToken, &file);
+			WriteValues(activeRoom, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(newLine, &file);
+			WriteValues(newLine, &file);
+		}
 	}
 	
 	CloseFile(&file);

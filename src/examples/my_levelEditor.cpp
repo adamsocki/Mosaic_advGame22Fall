@@ -23,6 +23,7 @@ MemoryArena editorObjectsArena = {};
 
 vec2 mousePosRender;
 
+
 LevelState levelState[5];
 DynamicArray<EditorPlacementObject> editorObjects;
 
@@ -84,6 +85,13 @@ void MyGameUpdate()
     realMousePosition.y *= 4.5f;
     EditorPlacementObject levelEntityStorage = {};
 
+
+    //      LEVEL MAP LOGIC Ratio
+    vec2 levelMapdisplayRatio = V2(8 / factorValue + (tileSize.x / 2), 4.5f / factorValue + (tileSize.y / 2));
+    vec2 sizeOfLevelCanvas = V2(levelMapdisplayRatio.x * 2, levelMapdisplayRatio.y * 2);
+    vec2 startingPosForLevelCanvasBottomLeft = V2(-levelMapdisplayRatio.x + 1, -levelMapdisplayRatio.y);
+
+
     //      CREATE ENTITY BUFFER REFERENCES
     //          BUFFER
     EntityTypeBuffer* roomBuffer = &Data->em.buffers[EntityType_Room];
@@ -97,7 +105,6 @@ void MyGameUpdate()
     Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
     Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
     Object* objectEntitiesInBuffer = (Object*)objectBuffer->entities;
-
 
     //      CAMERA DATA
     Camera* cam = &Game->camera;
@@ -198,13 +205,15 @@ void MyGameUpdate()
     }
 
     //      BASE RECT - PALATTE
-    bool overBase = false;
-    vec2 baseSpritePalattePosition = V2(-7.25f, 2.75f);
-    if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, baseSpritePalattePosition, &dir))
+    bool overRoom = false;
+    vec2 roomSpritePalattePosition = V2(-7.25f, 2.75f);
+    if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, roomSpritePalattePosition, &dir))
     {
-        overBase = true;
+        
+        overRoom = true;
         if (InputPressed(Mouse, Input_MouseLeft)) {
-            Data->levelEditor.editorType = EntityType_Base;
+            Data->levelEditor.arrowToObject = {};
+            Data->levelEditor.editorType = EntityType_Room;
             Data->levelEditor.editorState = EditingWithSprite;
         }
     }
@@ -216,6 +225,7 @@ void MyGameUpdate()
         overMonsterPalatte = true;
         if (InputPressed(Mouse, Input_MouseLeft)) 
         {
+            Data->levelEditor.arrowToObject = {};
             Data->levelEditor.editorType = EntityType_Monster;
             Data->levelEditor.editorState = EditingWithSprite;
         }
@@ -254,6 +264,92 @@ void MyGameUpdate()
         }
     }
 
+    //      ARROW POINTING TO CURRENT OBEJCT
+    switch (Data->levelEditor.editorType)
+    {
+        case EntityType_Monster:
+        {
+            if (monsterBuffer->count != 0)
+            {
+                InputForEntityArrowMovement(InputPressed(Keyboard, Input_Q), InputPressed(Keyboard, Input_W), monsterBuffer->count);
+                
+                int32 arrowCount = Data->levelEditor.arrowToObject.counter;
+                Monster* monsterEntity = (Monster*)GetEntity(&Data->em, monsterEntitiesInBuffer[arrowCount].handle);
+                vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(monsterEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+                vec2 sizeForEntityInIndex = convertSizeToIndexSize(monsterEntity->size, sizeOfLevelCanvas);
+                vec2 offsetForArrow = V2(sizeForEntityInIndex.x / 2, -0.125f);
+
+                Data->levelEditor.arrowToObject.position = startPositionForEntityInIndex + offsetForArrow;
+                Data->levelEditor.arrowToObject.indexPosition = monsterEntity->position1;
+                Data->levelEditor.arrowToObject.objectSizeIndex = monsterEntity->size;
+                
+                if (Data->levelEditor.arrowToObject.editEntityPos)
+                {
+                    monsterEntity->position1.x += Data->levelEditor.arrowToObject.posEdit.x;
+                    monsterEntity->position1.y += Data->levelEditor.arrowToObject.posEdit.y;
+                    Data->levelEditor.arrowToObject.posEdit = V2(0, 0);
+                    Data->levelEditor.arrowToObject.editEntityPos = false;
+                }
+                if (Data->levelEditor.arrowToObject.editEntitySize)
+                {
+                    monsterEntity->size.x += Data->levelEditor.arrowToObject.sizeEdit.x;
+                    monsterEntity->size.y += Data->levelEditor.arrowToObject.sizeEdit.y;
+                    Data->levelEditor.arrowToObject.sizeEdit = V2(0, 0);
+                    Data->levelEditor.arrowToObject.editEntitySize = false;
+                }
+            }
+            else
+            {
+                // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
+                Data->levelEditor.arrowToObject.showArrow = false;
+            }
+            break;
+        }
+
+        case EntityType_Room:
+        {
+            if (roomBuffer->count != 0) {
+                InputForEntityArrowMovement(InputPressed(Keyboard, Input_Q), InputPressed(Keyboard, Input_W), roomBuffer->count);
+                int32 arrowCount = Data->levelEditor.arrowToObject.counter;
+                Room* roomEntity = (Room*)GetEntity(&Data->em, roomEntitiesInBuffer[arrowCount].handle);
+                vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(roomEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+                vec2 sizeForEntityInIndex = convertSizeToIndexSize(roomEntity->size, sizeOfLevelCanvas);
+                vec2 offsetForArrow = V2(sizeForEntityInIndex.x / 2, -0.125f);
+
+                Data->levelEditor.arrowToObject.position = startPositionForEntityInIndex + offsetForArrow;
+                Data->levelEditor.arrowToObject.indexPosition = roomEntity->position1;
+                Data->levelEditor.arrowToObject.objectSizeIndex = roomEntity->size;
+
+                if (Data->levelEditor.arrowToObject.editEntityPos)
+                {
+                    roomEntity->position1.x += Data->levelEditor.arrowToObject.posEdit.x;
+                    roomEntity->position1.y += Data->levelEditor.arrowToObject.posEdit.y;
+                    Data->levelEditor.arrowToObject.posEdit = V2(0, 0);
+                    Data->levelEditor.arrowToObject.editEntityPos = false;
+                }
+                if (Data->levelEditor.arrowToObject.editEntitySize)
+                {
+                    roomEntity->size.x += Data->levelEditor.arrowToObject.sizeEdit.x;
+                    roomEntity->size.y += Data->levelEditor.arrowToObject.sizeEdit.y;
+                    Data->levelEditor.arrowToObject.sizeEdit = V2(0, 0);
+                    Data->levelEditor.arrowToObject.editEntitySize = false;
+                }
+            }
+            else
+            {
+                // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
+                Data->levelEditor.arrowToObject.showArrow = false;
+            }
+            break;
+        }
+
+
+        default:
+        {
+            break;
+        }
+    }
+
 
     //      SPRITE SPECIFICS LOGIC
 
@@ -261,40 +357,154 @@ void MyGameUpdate()
    
     Rect spritePlusRect;
     Rect spriteMinusRect;
-    vec2 spriteExtraPosition_edit1 = V2(-6.275f, -2.5f);
-    real32 plusMinusOffset = 0.25f;
-    vec2 spriteMinusPosition_edit1 = spriteExtraPosition_edit1;
-    spriteMinusPosition_edit1.x = spriteMinusPosition_edit1.x - plusMinusOffset;
-    vec2 spritePlusPosition_edit1 = spriteExtraPosition_edit1;
-    spritePlusPosition_edit1.x = spritePlusPosition_edit1.x + plusMinusOffset;
     vec2 spritePlusMinusSize = V2(0.1f, 0.1f);
-    spritePlusRect.max =   V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
-    spritePlusRect.min =  -V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
-    spriteMinusRect.max =  V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
+    spritePlusRect.max = V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
+    spritePlusRect.min = -V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
+    spriteMinusRect.max = V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
     spriteMinusRect.min = -V2(spritePlusMinusSize.x / 2, spritePlusMinusSize.y / 2);
+    vec2 spriteExtra_edit1 = V2(-6.25f, -2.25f);
+    real32 plusMinusOffset = 0.25f;
+    real32 spriteModOffsetY = 0.5f;
+    int32 rowNumber;
 
-    //      plus collission
-   // mouseRect = spritePlusRect;
-    bool overPlus_edit1 = false;
+
+
+    //      CHANGING SPRITE POSITION.X
+    rowNumber = 0;
+
+    //          plus collission
+    //              ==> POSITION.X SPECIFIC CODE
+    vec2 spriteMinusPosition_edit1 = spriteExtra_edit1;
+    spriteMinusPosition_edit1.x = spriteMinusPosition_edit1.x - plusMinusOffset;
+    vec2 spritePlusPosition_edit1 = spriteExtra_edit1;
+    spritePlusPosition_edit1.x = spritePlusPosition_edit1.x + plusMinusOffset;
+  
+ 
+    spritePlusPosition_edit1.y = spritePlusPosition_edit1.y - (rowNumber * spriteModOffsetY);
+    bool overPlusPosition_edit1 = false;
     if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusPosition_edit1, &dir))
     {
-        overPlus_edit1 = true;
+        overPlusPosition_edit1 = true;
         if (InputPressed(Mouse, Input_MouseLeft)) 
         {
-
+            Data->levelEditor.arrowToObject.editEntityPos = true;
+            Data->levelEditor.arrowToObject.posEdit.x = 1;
         }
     }
-    //      plus collission
-   // mouseRect = spriteMinusRect;
-    bool overMinus_edit1 = false;
+    //          minus collission
+    bool overMinusPosition_edit1 = false;
+    spriteMinusPosition_edit1.y = spriteMinusPosition_edit1.y - (rowNumber * spriteModOffsetY);
     if (RectTest(spriteMinusRect, mouseRect, realMousePosition, spriteMinusPosition_edit1, &dir))
     {
-        overMinus_edit1 = true;
+        overMinusPosition_edit1 = true;
         if (InputPressed(Mouse, Input_MouseLeft)) 
         {
-            
+            Data->levelEditor.arrowToObject.editEntityPos = true;
+            Data->levelEditor.arrowToObject.posEdit.x = -1;
         }
     }
+    //      CHANGING SPRITE POSITION.Y
+    rowNumber = 1;
+    //          plus collission
+    //              ==> POSITION.Y SPECIFIC CODE
+    vec2 spriteMinusPosition_edit2 = spriteExtra_edit1;
+    spriteMinusPosition_edit2.x = spriteMinusPosition_edit2.x - plusMinusOffset;
+    vec2 spritePlusPosition_edit2 = spriteExtra_edit1;
+    spritePlusPosition_edit2.x = spritePlusPosition_edit2.x + plusMinusOffset;
+
+    spritePlusPosition_edit2.y = spritePlusPosition_edit2.y - (rowNumber * spriteModOffsetY);
+    bool overPlusPosition_edit2 = false;
+
+    if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusPosition_edit2, &dir))
+    {
+        overPlusPosition_edit2 = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.editEntityPos = true;
+            Data->levelEditor.arrowToObject.posEdit.y = 1;
+        }
+    }
+    //          minus collission
+    bool overMinusPosition_edit2 = false;
+    spriteMinusPosition_edit2.y = spriteMinusPosition_edit2.y - (rowNumber * spriteModOffsetY);
+    if (RectTest(spriteMinusRect, mouseRect, realMousePosition, spriteMinusPosition_edit2, &dir))
+    {
+        overMinusPosition_edit2 = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.editEntityPos = true;
+            Data->levelEditor.arrowToObject.posEdit.y = -1;
+        }
+    }
+
+    //      CHANGING SPRITE SIZE.X
+    rowNumber = 2;
+
+    //          plus collission
+    //              ==> SIZE.X SPECIFIC CODE
+    vec2 spriteMinusSize_edit1 = spriteExtra_edit1;
+    spriteMinusSize_edit1.x = spriteMinusSize_edit1.x - plusMinusOffset;
+    vec2 spritePlusSize_edit1 = spriteExtra_edit1;
+    spritePlusSize_edit1.x = spritePlusSize_edit1.x + plusMinusOffset;
+    
+    spritePlusSize_edit1.y = spritePlusSize_edit1.y - (rowNumber * spriteModOffsetY);
+    bool overPlusSize_edit1 = false;
+    if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusSize_edit1, &dir))
+    {
+        overPlusSize_edit1 = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.editEntitySize = true;
+            Data->levelEditor.arrowToObject.sizeEdit.x = 1;
+        }
+    }
+    //          minus collission
+    bool overMinusSize_edit1 = false;
+    spriteMinusSize_edit1.y = spriteMinusSize_edit1.y - (rowNumber * spriteModOffsetY);
+    if (RectTest(spriteMinusRect, mouseRect, realMousePosition, spriteMinusSize_edit1, &dir))
+    {
+        overMinusSize_edit1 = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.editEntitySize = true;
+            Data->levelEditor.arrowToObject.sizeEdit.x = -1;
+        }
+    }
+    //      CHANGING SPRITE SIZE.Y
+    rowNumber = 3;
+    //          plus collission
+    //              ==> SIZE.Y SPECIFIC CODE
+    vec2 spriteMinusSize_edit2 = spriteExtra_edit1;
+    spriteMinusSize_edit2.x = spriteMinusSize_edit2.x - plusMinusOffset;
+    vec2 spritePlusSize_edit2 = spriteExtra_edit1;
+    spritePlusSize_edit2.x = spritePlusSize_edit2.x + plusMinusOffset;
+
+    spritePlusSize_edit2.y = spritePlusSize_edit2.y - (rowNumber * spriteModOffsetY);
+    bool overPlusSize_edit2 = false;
+
+    if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusSize_edit2, &dir))
+    {
+        overPlusSize_edit2 = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.editEntitySize = true;
+            Data->levelEditor.arrowToObject.sizeEdit.y = 1;
+        }
+    }
+    //          minus collission
+    bool overMinusSize_edit2 = false;
+    spriteMinusSize_edit2.y = spriteMinusSize_edit2.y - (rowNumber * spriteModOffsetY);
+    if (RectTest(spriteMinusRect, mouseRect, realMousePosition, spriteMinusSize_edit2, &dir))
+    {
+        overMinusSize_edit2 = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.editEntitySize = true;
+            Data->levelEditor.arrowToObject.sizeEdit.y = -1;
+        }
+    }
+
+
 
     //      SAVE GAME LOGIC
     bool overSave = false;
@@ -351,11 +561,7 @@ void MyGameUpdate()
         }
     }
 
-    //      LEVEL MAP LOGIC
-    vec2 levelMapdisplayRatio = V2(8 / factorValue + (tileSize.x / 2), 4.5f / factorValue + (tileSize.y / 2));
-    vec2 sizeOfLevelCanvas = V2(levelMapdisplayRatio.x * 2, levelMapdisplayRatio.y * 2);
-    vec2 startingPosForLevelCanvasBottomLeft = V2(-levelMapdisplayRatio.x + 1, -levelMapdisplayRatio.y);
-
+    
     
 
     if (InputPressed(Mouse, Input_MouseRight))
@@ -424,7 +630,7 @@ void MyGameUpdate()
         Room* roomEntity = (Room*)GetEntity(&Data->em, roomEntitiesInBuffer[i].handle);
         if (roomEntity != NULL)
         {
-            if (roomEntity->activeRoom)
+            if (!roomEntity->activeRoom)
             {
                 vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(roomEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
                 vec2 sizeForEntityInIndex = convertSizeToIndexSize(roomEntity->size, sizeOfLevelCanvas);
@@ -480,7 +686,7 @@ void MyGameUpdate()
     // *******************
     // *******************
     // *******************
-    //                         RENDER SPRITE PALATTE
+    //                         RENDER SPRITE PALATTE #1
     // *******************
     // *******************
     // *******************
@@ -506,13 +712,13 @@ void MyGameUpdate()
         DrawSprite(cycleEntitiesPlusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.plusSprite);
     }
     //          BASE ENTITY - PALATTE
-    if (Data->levelEditor.editorType == EntityType_Base || overBase)
+    if (Data->levelEditor.editorType == EntityType_Room || overRoom)
     { 
-        DrawSprite(baseSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.floor1Sprite);
+        DrawSprite(roomSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.floor1Sprite);
     }
     else
     {
-        DrawSprite(baseSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.wall1Sprite);
+        DrawSprite(roomSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.wall1Sprite);
     }
     //          MONSTER ENTITY - PALATTE
     if (Data->levelEditor.editorType == EntityType_Monster || overMonsterPalatte)
@@ -524,20 +730,15 @@ void MyGameUpdate()
        DrawSprite(monsterSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.monster1Sprite);
     }
 
-
-    //      RENDER ENTITY SPECIFICS
+    //******
+    //      RENDER ENTITY SPECIFICS EDITOR #1
+    //******
     DrawSprite(V2(-6.75f, -3), V2(1, 1.2f), 0, &Data->sprites.entitySpecificsSprite);
     
-    //      for loop across entity specifics, have plus / minus buttons to change.
-
-    //for (int i = 0; i < 4; i)
-
-    //for (int i = 0; i < )
-    // render pos edit
-
-
-    DrawTextScreenPixel(&Game->monoFont, V2(30, 680), 7.0f, RGB(0.0f, 0.0f, 0.10f), "PositionX:", mouseIndex.x);
-    if (overMinus_edit1)
+    //          RENDER POS EDIT.X
+    vec2 posToWrite = Data->levelEditor.arrowToObject.indexPosition;
+    DrawTextScreenPixel(&Game->monoFont, V2(30, 680), 8.0f, RGB(0.0f, 0.0f, 0.10f), "PositionX: %.0f", posToWrite.x);
+    if (overMinusPosition_edit1)
     {
         DrawSprite(spriteMinusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
     }
@@ -545,7 +746,7 @@ void MyGameUpdate()
     {
         DrawSprite(spriteMinusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
     }
-    if (overPlus_edit1)
+    if (overPlusPosition_edit1)
     {
         DrawSprite(spritePlusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
     }
@@ -553,6 +754,79 @@ void MyGameUpdate()
     {
         DrawSprite(spritePlusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
     }
+    //          RENDER POS EDIT.Y
+    DrawTextScreenPixel(&Game->monoFont, V2(30, 720), 8.0f, RGB(0.0f, 0.0f, 0.10f), "PositionY: %.0f", posToWrite.y);
+    if (overMinusPosition_edit2)
+    {
+        DrawSprite(spriteMinusPosition_edit2, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
+    }
+    else
+    {
+        DrawSprite(spriteMinusPosition_edit2, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
+    }
+    if (overPlusPosition_edit2)
+    {
+        DrawSprite(spritePlusPosition_edit2, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
+    }
+    else
+    {
+        DrawSprite(spritePlusPosition_edit2, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
+    }
+    //          RENDER SIZE EDIT.X
+    vec2 sizeToWrite = Data->levelEditor.arrowToObject.objectSizeIndex;
+    DrawTextScreenPixel(&Game->monoFont, V2(30, 760), 8.0f, RGB(0.0f, 0.0f, 0.10f), "SizeX: %.0f", sizeToWrite.x);
+    if (overMinusSize_edit1)
+    {
+        DrawSprite(spriteMinusSize_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
+    }
+    else
+    {
+        DrawSprite(spriteMinusSize_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
+    }
+    if (overPlusSize_edit1)
+    {
+        DrawSprite(spritePlusSize_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
+    }
+    else
+    {
+        DrawSprite(spritePlusSize_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
+    }
+
+    //          RENDER SIZE EDIT.Y
+    DrawTextScreenPixel(&Game->monoFont, V2(30, 800), 8.0f, RGB(0.0f, 0.0f, 0.10f), "SizeY: %.0f", sizeToWrite.y);
+    if (overMinusSize_edit2)
+    {
+        DrawSprite(spriteMinusSize_edit2, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
+    }
+    else
+    {
+        DrawSprite(spriteMinusSize_edit2, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
+    }
+    if (overPlusSize_edit2)
+    {
+        DrawSprite(spritePlusSize_edit2, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
+    }
+    else
+    {
+        DrawSprite(spritePlusSize_edit2, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
+    }
+
+    //******
+    //      RENDER ENTITY SPECIFICS EDITOR #2
+    //******
+    DrawSpriteBottomLeft(V2(-5.5f, -4.4f), V2(13, 0.65f), 0, &Data->sprites.entitySpecificsSprite);
+
+
+
+
+
+
+
+
+
+
+
+
 
     
     //      RENDER SAVE BUTTON
@@ -566,9 +840,13 @@ void MyGameUpdate()
     }
 
 
-    //      RENDER DISPLAY TEXT SHOWING 'IN EDITOR MODE'
-    // TODO
-
+    
+    //      RENDER ARROW POINTING TO CURRENT OBEJCT
+    if (Data->levelEditor.editorState == EditingWithSprite && Data->levelEditor.arrowToObject.showArrow) 
+    {
+        DrawSprite(Data->levelEditor.arrowToObject.position, V2(0.125f, 0.125f), 0, &Data->sprites.arrowToObjectSprite);
+    }
+    
     //      RENDER MOUSE
     if (showMouseOnMap)
     {
@@ -585,7 +863,7 @@ void MyGameUpdate()
 
             switch (Data->levelEditor.editorType)
             {
-                case EntityType_Base:
+                case EntityType_Room:
                 {
                     DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.floor1Sprite);
                     break;

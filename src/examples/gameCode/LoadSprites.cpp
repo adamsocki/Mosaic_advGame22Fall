@@ -37,6 +37,7 @@ void LoadSprites() {
 	
 	
 	LoadSprite(&Data->sprites.monster1Sprite_Sel, "data/monster1Sprite_Sel.png");
+	LoadSprite(&Data->sprites.arrowToObjectSprite, "data/arrowToObjectSprite.png");
 
 	Sprite monster1Sprite;
 	

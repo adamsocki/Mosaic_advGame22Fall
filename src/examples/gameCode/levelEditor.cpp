@@ -1,6 +1,25 @@
 
 
-
+void InputForEntityArrowMovement(bool q, bool w, int32 entityCount)
+{
+	Data->levelEditor.arrowToObject.showArrow = true;
+	if (q)
+	{
+		Data->levelEditor.arrowToObject.counter--;
+	}
+	if (w)
+	{
+		Data->levelEditor.arrowToObject.counter++;
+	}
+	if (Data->levelEditor.arrowToObject.counter < 0)
+	{
+		Data->levelEditor.arrowToObject.counter = entityCount - 1;
+	}
+	if (Data->levelEditor.arrowToObject.counter >= entityCount)
+	{
+		Data->levelEditor.arrowToObject.counter = 0;
+	}
+}
 
 
 
@@ -11,6 +30,10 @@ void InitializeLevelEditor()
 	Data->levelEditor.objectCapacity = 100;
 	Data->levelEditor.count = 0;
 	Data->levelEditor.levelObjects = (EditorPlacementObject*)malloc(sizeof(EditorPlacementObject) * Data->levelEditor.objectCapacity);
+	Data->levelEditor.arrowToObject = {};
+	Data->levelEditor.arrowToObject.editEntitySize = false;
+	Data->levelEditor.arrowToObject.editEntityPos = false;
+	
 	memset(Data->levelEditor.levelObjects, 0, sizeof(EditorPlacementObject) * Data->levelEditor.objectCapacity);
 }
 
@@ -39,9 +62,15 @@ void StartObjectCreation(EntityType entityType, vec2 startIndexPosition, int32 c
 			monsterEntity->position1 = startIndexPosition;
 			monsterEntity->size = V2(1,1);
 			monsterEntity->power = 6;
-			monsterEntity->size = V2(1, 1);
+			//monsterEntity->size = V2(1, 1);
 			//monsterEntity->posEdit = 1;
 		}
+		case EntityType_Room:
+			Room* roomEntity = (Room*)GetEntity(&Data->em, entityHandle);
+			roomEntity->handle = entityHandle;
+			roomEntity->position1 = startIndexPosition;
+			roomEntity->size =V2 (1, 1);
+			
 
 
 
@@ -83,7 +112,7 @@ void LoadLevel()
 			{
 				c = ReadChar(&file);
 			}
-			//if(c)
+			
 		}
 
 	}

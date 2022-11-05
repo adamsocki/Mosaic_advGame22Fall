@@ -1,8 +1,8 @@
 $monster
 #pos
-(40,10)
+(65,10)
 #size
-(2,2)#strength
+(4,4)#strength
 0
 
 $monster
@@ -28,8 +28,18 @@ $monster
 
 $monster
 #pos
-(65,46)
+(80,46)
 #size
-(1,1)#strength
+(4,4)#strength
 0
+
+$room
+#pos
+(30,35)
+#size
+(15,24)#roomNumber
+0
+#activeRoom
+0
+
 

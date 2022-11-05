@@ -90,15 +90,37 @@ struct EditorPlacementObject
 	ObjectType objectType;
 };
 
+struct ArrowToObject
+{
+	vec2 position;
+	int32 counter;
+
+	bool showArrow;
+
+	EntityType currentType;
+
+	vec2 indexPosition;
+	vec2 objectSizeIndex;
+
+	bool editEntityPos;
+	bool editEntitySize;
+
+	vec2 posEdit;
+	vec2 sizeEdit;
+};
+
+
 struct LevelEditor
 {
 	EntityType editorType;
 	EditorState editorState;
 
+	ArrowToObject arrowToObject;
+
 	int32 objectCapacity;
 	int32 count;
-	EditorPlacementObject* levelObjects;
 
+	EditorPlacementObject* levelObjects;
 };
 
 struct FreeList {
@@ -184,11 +206,15 @@ struct EntitySprites {
 
 	Sprite monster1Sprite_Sel;
 
+	Sprite arrowToObjectSprite;
+
 };
 
 struct Sounds {
 	SoundClip crosshairSound1;
 };
+
+
 
 struct MouseCrosshair {
 	bool isLocked;
@@ -291,6 +317,8 @@ struct Room : Entity{
 	int32 levelNumber;
 	vec2 position1;
 	vec2 position2;
+
+
 
 	bool activeRoom;
 };
