@@ -970,6 +970,7 @@ void SaveAndWriteLevel()
 			WriteValues(comma, &file);
 			WriteValues(size_y, &file);
 			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
 
 			WriteValues(strengthToken, &file);
 			WriteValues(entityStrength, &file);
@@ -1022,6 +1023,7 @@ void SaveAndWriteLevel()
 			WriteValues(comma, &file);
 			WriteValues(size_y, &file);
 			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
 
 			WriteValues(roomNumberToken, &file);
 			WriteValues(roomNum, &file);
@@ -1073,6 +1075,7 @@ void SaveAndWriteLevel()
 			WriteValues(comma, &file);
 			WriteValues(size_y, &file);
 			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
 
 			WriteValues(roomFromToken, &file);
 			WriteValues(roomFrom, &file);
