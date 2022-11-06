@@ -39,6 +39,15 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.monster1Sprite_Sel, "data/monster1Sprite_Sel.png");
 	LoadSprite(&Data->sprites.arrowToObjectSprite, "data/arrowToObjectSprite.png");
 
+	LoadSprite(&Data->sprites.noCheckYesMouseSprite, "data/noCheckYesMouseSprite.png");
+	LoadSprite(&Data->sprites.yesCheckYesMouseSprite, "data/yesCheckYesMouseSprite.png");
+	LoadSprite(&Data->sprites.noCheckNoMouseSprite, "data/noCheckNoMouseSprite.png");
+	LoadSprite(&Data->sprites.yesCheckNoMouseSprite, "data/yesCheckNoMouseSprite.png");
+
+	LoadSprite(&Data->sprites.doorClosed1PalSprite, "data/doorClosed1PalSprite.png");
+	LoadSprite(&Data->sprites.doorClosed1PalSprite_Sel, "data/doorClosed1PalSprite_Sel.png");
+
+
 	Sprite monster1Sprite;
 	
 }

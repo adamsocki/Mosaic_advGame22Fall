@@ -104,9 +104,25 @@ struct ArrowToObject
 
 	bool editEntityPos;
 	bool editEntitySize;
+	bool activeEdit;
+	bool editRoomNum;
 
 	vec2 posEdit;
 	vec2 sizeEdit;
+	int32 roomNumEditInt;
+
+	int32 entityRoomNum;
+
+	bool editRoomFrom;
+	bool editRoomTo;
+	bool editRoomType;
+	int32 roomFromEditInt;
+	int32 roomToEditInt;
+	int32 roomTypeEditInt;
+
+
+
+	bool activeRoom;
 };
 
 
@@ -208,6 +224,14 @@ struct EntitySprites {
 
 	Sprite arrowToObjectSprite;
 
+	Sprite noCheckYesMouseSprite;
+	Sprite yesCheckYesMouseSprite;
+	Sprite noCheckNoMouseSprite;
+	Sprite yesCheckNoMouseSprite;
+
+	Sprite doorClosed1PalSprite;
+	Sprite doorClosed1PalSprite_Sel;
+
 };
 
 struct Sounds {
@@ -249,6 +273,9 @@ struct Entity {
 
 
 	bool posEdit;
+	bool activeRoom;
+
+	int32 roomNum;
 
 	EntityHandle handle;
 };
@@ -320,7 +347,7 @@ struct Room : Entity{
 
 
 
-	bool activeRoom;
+	//
 };
 
 struct Object : Entity
@@ -360,6 +387,10 @@ struct Door : Entity {
 	int32 doorCenterSeq;
 	bool doorActivatesRoom;
 	int32 roomDoorActivates;
+
+	int32 roomTo;
+	int32 roomFrom;
+	int32 roomType;
 	//DynamicArray<vec2> doorPositions;
 };
 

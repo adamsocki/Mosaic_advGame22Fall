@@ -19,6 +19,9 @@ MemoryArena editorObjectsArena = {};
 #include "gameCode/levelEditor.cpp"
 #include "gameCode/levelParser.cpp"
 
+#include "gameCode/RenderLE.cpp"
+
+
 //TODO: properly set up entity Manager and all input files
 
 vec2 mousePosRender;
@@ -230,7 +233,19 @@ void MyGameUpdate()
             Data->levelEditor.editorState = EditingWithSprite;
         }
     }
-
+    //      DOOR RECT - PALATTE
+    bool overDoorPalatte = false;
+    vec2 doorSpritePalattePosition = V2(-7.25f, 2.25f);
+    if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, doorSpritePalattePosition, &dir))
+    {
+        overDoorPalatte = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject = {};
+            Data->levelEditor.editorType = EntityType_Door;
+            Data->levelEditor.editorState = EditingWithSprite;  
+        }
+    }
 
     //      SPRITE EDITING LOGIC
     if (Data->levelEditor.editorState == EditingWithSprite)
@@ -263,8 +278,9 @@ void MyGameUpdate()
 
         }
     }
-
+    //      ***********
     //      ARROW POINTING TO CURRENT OBEJCT
+    //      ***********
     switch (Data->levelEditor.editorType)
     {
         case EntityType_Monster:
@@ -282,25 +298,37 @@ void MyGameUpdate()
                 Data->levelEditor.arrowToObject.position = startPositionForEntityInIndex + offsetForArrow;
                 Data->levelEditor.arrowToObject.indexPosition = monsterEntity->position1;
                 Data->levelEditor.arrowToObject.objectSizeIndex = monsterEntity->size;
+                Data->levelEditor.arrowToObject.entityRoomNum = monsterEntity->roomNum;
+                Data->levelEditor.arrowToObject.activeRoom = monsterEntity->activeRoom;
                 
                 if (Data->levelEditor.arrowToObject.editEntityPos)
-                {
+                {   // edit entity position,
                     monsterEntity->position1.x += Data->levelEditor.arrowToObject.posEdit.x;
                     monsterEntity->position1.y += Data->levelEditor.arrowToObject.posEdit.y;
                     Data->levelEditor.arrowToObject.posEdit = V2(0, 0);
                     Data->levelEditor.arrowToObject.editEntityPos = false;
                 }
                 if (Data->levelEditor.arrowToObject.editEntitySize)
-                {
+                {   // edit entity size;
                     monsterEntity->size.x += Data->levelEditor.arrowToObject.sizeEdit.x;
                     monsterEntity->size.y += Data->levelEditor.arrowToObject.sizeEdit.y;
                     Data->levelEditor.arrowToObject.sizeEdit = V2(0, 0);
                     Data->levelEditor.arrowToObject.editEntitySize = false;
                 }
+                if (Data->levelEditor.arrowToObject.activeEdit)
+                {   // edit entity active
+                    monsterEntity->activeRoom = !monsterEntity->activeRoom;
+                    Data->levelEditor.arrowToObject.activeEdit = false;
+                }
+                if (Data->levelEditor.arrowToObject.editRoomNum)
+                {   // edit room Num;
+                    monsterEntity->roomNum += Data->levelEditor.arrowToObject.roomNumEditInt;
+                    Data->levelEditor.arrowToObject.roomNumEditInt = 0;
+                    Data->levelEditor.arrowToObject.editRoomNum = false;
+                }
             }
             else
-            {
-                // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
+            {   // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
                 Data->levelEditor.arrowToObject.showArrow = false;
             }
             break;
@@ -319,20 +347,34 @@ void MyGameUpdate()
                 Data->levelEditor.arrowToObject.position = startPositionForEntityInIndex + offsetForArrow;
                 Data->levelEditor.arrowToObject.indexPosition = roomEntity->position1;
                 Data->levelEditor.arrowToObject.objectSizeIndex = roomEntity->size;
+                Data->levelEditor.arrowToObject.entityRoomNum = roomEntity->roomNum;
+                Data->levelEditor.arrowToObject.activeRoom = roomEntity->activeRoom;
+
 
                 if (Data->levelEditor.arrowToObject.editEntityPos)
-                {
+                {   // edit entity position
                     roomEntity->position1.x += Data->levelEditor.arrowToObject.posEdit.x;
                     roomEntity->position1.y += Data->levelEditor.arrowToObject.posEdit.y;
                     Data->levelEditor.arrowToObject.posEdit = V2(0, 0);
                     Data->levelEditor.arrowToObject.editEntityPos = false;
                 }
                 if (Data->levelEditor.arrowToObject.editEntitySize)
-                {
+                {   // edit entity size;
                     roomEntity->size.x += Data->levelEditor.arrowToObject.sizeEdit.x;
                     roomEntity->size.y += Data->levelEditor.arrowToObject.sizeEdit.y;
                     Data->levelEditor.arrowToObject.sizeEdit = V2(0, 0);
                     Data->levelEditor.arrowToObject.editEntitySize = false;
+                }
+                if (Data->levelEditor.arrowToObject.activeEdit)
+                {   // edit room active;
+                    roomEntity->activeRoom = !roomEntity->activeRoom;
+                    Data->levelEditor.arrowToObject.activeEdit = false;
+                }
+                if (Data->levelEditor.arrowToObject.editRoomNum)
+                {   // edit room Num;
+                    roomEntity->roomNum += Data->levelEditor.arrowToObject.roomNumEditInt;
+                    Data->levelEditor.arrowToObject.roomNumEditInt = 0;
+                    Data->levelEditor.arrowToObject.editRoomNum = false;
                 }
             }
             else
@@ -343,6 +385,70 @@ void MyGameUpdate()
             break;
         }
 
+        case EntityType_Door:
+        {
+            if (doorBuffer->count != 0)
+            {
+                InputForEntityArrowMovement(InputPressed(Keyboard, Input_Q), InputPressed(Keyboard, Input_W), doorBuffer->count);
+                int32 arrowCount = Data->levelEditor.arrowToObject.counter;
+                Door* doorEntity = (Door*)GetEntity(&Data->em, doorEntitiesInBuffer[arrowCount].handle);
+                vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(doorEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+                vec2 sizeForEntityInIndex = convertSizeToIndexSize(doorEntity->size, sizeOfLevelCanvas);
+                vec2 offsetForArrow = V2(sizeForEntityInIndex.x / 2, -0.125f);
+
+                Data->levelEditor.arrowToObject.position = startPositionForEntityInIndex + offsetForArrow;
+                Data->levelEditor.arrowToObject.indexPosition = doorEntity->position1;
+                Data->levelEditor.arrowToObject.objectSizeIndex = doorEntity->size;
+                Data->levelEditor.arrowToObject.entityRoomNum = doorEntity->roomTo;
+                Data->levelEditor.arrowToObject.entityRoomNum = doorEntity->roomFrom;
+                Data->levelEditor.arrowToObject.entityRoomNum = doorEntity->roomType;
+                Data->levelEditor.arrowToObject.activeRoom = doorEntity->activeRoom;
+
+
+                if (Data->levelEditor.arrowToObject.editEntityPos)
+                {   // edit entity position
+                    doorEntity->position1.x += Data->levelEditor.arrowToObject.posEdit.x;
+                    doorEntity->position1.y += Data->levelEditor.arrowToObject.posEdit.y;
+                    Data->levelEditor.arrowToObject.posEdit = V2(0, 0);
+                    Data->levelEditor.arrowToObject.editEntityPos = false;
+                }
+                if (Data->levelEditor.arrowToObject.editEntitySize)
+                {   // edit entity size;
+                    doorEntity->size.x += Data->levelEditor.arrowToObject.sizeEdit.x;
+                    doorEntity->size.y += Data->levelEditor.arrowToObject.sizeEdit.y;
+                    Data->levelEditor.arrowToObject.sizeEdit = V2(0, 0);
+                    Data->levelEditor.arrowToObject.editEntitySize = false;
+                }
+                if (Data->levelEditor.arrowToObject.activeEdit)
+                {   // edit room active;
+                    doorEntity->activeRoom = !doorEntity->activeRoom;
+                    Data->levelEditor.arrowToObject.activeEdit = false;
+                }
+                if (Data->levelEditor.arrowToObject.editRoomFrom)
+                {   // edit room From;
+                    doorEntity->roomFrom += Data->levelEditor.arrowToObject.roomFromEditInt;
+                    Data->levelEditor.arrowToObject.roomFromEditInt = 0;
+                    Data->levelEditor.arrowToObject.editRoomFrom = false;
+                }
+                if (Data->levelEditor.arrowToObject.editRoomTo)
+                {   // edit room To;
+                    doorEntity->roomTo += Data->levelEditor.arrowToObject.roomToEditInt;
+                    Data->levelEditor.arrowToObject.roomToEditInt = 0;
+                    Data->levelEditor.arrowToObject.editRoomTo = false;
+                }
+                if (Data->levelEditor.arrowToObject.editRoomFrom)
+                {   // edit room From;
+                    doorEntity->roomType += Data->levelEditor.arrowToObject.roomTypeEditInt;
+                    Data->levelEditor.arrowToObject.roomTypeEditInt = 0;
+                    Data->levelEditor.arrowToObject.editRoomType = false;
+                }
+            }
+            else
+            {   // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
+                Data->levelEditor.arrowToObject.showArrow = false;
+            }
+            break;
+        }
 
         default:
         {
@@ -366,7 +472,6 @@ void MyGameUpdate()
     real32 plusMinusOffset = 0.25f;
     real32 spriteModOffsetY = 0.5f;
     int32 rowNumber;
-
 
 
     //      CHANGING SPRITE POSITION.X
@@ -504,14 +609,192 @@ void MyGameUpdate()
         }
     }
 
+    //*******
+    //*******
+    //      RENDER ENTITY SPECIFICS EDITOR #2
+    //*******
+    //*******
+    Rect checkBoxRect = spritePlusRect;
+    vec2 columnSpriteEditLocationStart = V2(-5.0f, -4.0f);
+    vec2 spriteCheckBoxPos = columnSpriteEditLocationStart;
+    int32 columnNumber = 0;
+    real32 columnSpriteOffset = 1.4f;
+    spriteCheckBoxPos.x = columnSpriteEditLocationStart.x + (columnNumber * columnSpriteOffset);
+    spriteCheckBoxPos.y = spriteCheckBoxPos.y;
 
+    //vec2 spriteMinusSize_edit2
+    bool overCheckBox1 = false;
+
+
+    // CHECKBOX LOGIC - ACTIVEROOM
+    //****
+    columnNumber = 0;
+
+    if (RectTest(checkBoxRect, mouseRect, realMousePosition, spriteCheckBoxPos, &dir)) 
+    {
+        overCheckBox1 = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.activeRoom = !Data->levelEditor.arrowToObject.activeRoom;
+            Data->levelEditor.arrowToObject.activeEdit = true;
+        }
+    }
+
+
+    //  ROOM NUMBER CHANGE LOGIC
+    //****
+    vec2 spriteMinusRoomNumPos_edit2 = columnSpriteEditLocationStart;
+    spriteMinusRoomNumPos_edit2.x = spriteMinusRoomNumPos_edit2.x - plusMinusOffset;
+    vec2 spritePlusRoomNumPos_edit2 = columnSpriteEditLocationStart;
+    spritePlusRoomNumPos_edit2.x = spritePlusRoomNumPos_edit2.x + plusMinusOffset;
+    columnNumber = 1;
+
+    //  minus collission
+    spriteMinusRoomNumPos_edit2.x = spriteMinusRoomNumPos_edit2.x + (columnNumber * columnSpriteOffset);
+    bool overMinusRoomNum = false;
+    if (RectTest(spriteMinusRect, mouseRect, realMousePosition, spriteMinusRoomNumPos_edit2, &dir))
+    {
+        overMinusRoomNum = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.editRoomNum = true;
+            Data->levelEditor.arrowToObject.roomNumEditInt = -1;
+        }
+    }
+    //  plus collission
+    bool overPlusRoomNum = false;
+    spritePlusRoomNumPos_edit2.x = spritePlusRoomNumPos_edit2.x + (columnNumber * columnSpriteOffset);
+    if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusRoomNumPos_edit2, &dir))
+    {
+        overPlusRoomNum = true;
+        if (InputPressed(Mouse, Input_MouseLeft))
+        {
+            Data->levelEditor.arrowToObject.editRoomNum = true;
+            Data->levelEditor.arrowToObject.roomNumEditInt = 1;
+        }
+    }
+
+    //  DOOR EDIT LOGIC
+    // **********
+    // **********
+    //  DOOR FROM EDIT LOGIC
+
+
+    bool overPlusFromRoom = false;
+    bool overMinusFromRoom = false;
+    bool overPlusToRoom = false;
+    bool overMinusToRoom = false;
+    bool overPlusDoorType = false;
+    bool overMinusDoorType = false;
+
+    vec2 spriteMinusFromDoorPos = columnSpriteEditLocationStart;
+    vec2 spritePlusFromDoorPos = columnSpriteEditLocationStart;
+    vec2 spriteMinusToDoorPos = columnSpriteEditLocationStart;
+    vec2 spritePlusToDoorPos = columnSpriteEditLocationStart;
+    vec2 spriteMinusDoorTypePos = columnSpriteEditLocationStart;
+    vec2 spritePlusDoorTypePos = columnSpriteEditLocationStart;
+
+
+
+    if (Data->levelEditor.editorType == EntityType_Door)
+    {
+        spriteMinusFromDoorPos.x = spriteMinusFromDoorPos.x - plusMinusOffset;
+        spritePlusFromDoorPos.x = spritePlusFromDoorPos.x + plusMinusOffset;
+        columnNumber = 2;
+        spritePlusFromDoorPos.x = spritePlusFromDoorPos.x + (columnNumber * columnSpriteOffset);
+
+    
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusFromDoorPos, &dir))
+        {
+            overPlusFromRoom = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                //Data->levelEditor.arrowToObject.
+                //Data->levelEditor.arrowToObject.
+            }
+        }
+
+        spriteMinusFromDoorPos.x = spriteMinusFromDoorPos.x + (columnNumber * columnSpriteOffset);
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spriteMinusFromDoorPos, &dir))
+        {
+            overMinusFromRoom = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                //Data->levelEditor.arrowToObject.
+                //Data->levelEditor.arrowToObject.
+            }
+        }
+    
+
+        columnNumber = 3;
+
+
+
+        spritePlusToDoorPos.x = spritePlusToDoorPos.x + (columnNumber * columnSpriteOffset);
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusToDoorPos, &dir))
+        {
+            overPlusToRoom = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                //Data->levelEditor.arrowToObject.
+                //Data->levelEditor.arrowToObject.
+            }
+        }
+        spriteMinusToDoorPos.x = spriteMinusToDoorPos.x + (columnNumber * columnSpriteOffset);
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spriteMinusToDoorPos, &dir))
+        {
+            overMinusToRoom = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                //Data->levelEditor.arrowToObject.
+                //Data->levelEditor.arrowToObject.
+            }
+        }
+        //  DOOR TYPE EDIT LOGIC
+        spriteMinusDoorTypePos.x = spriteMinusDoorTypePos.x - plusMinusOffset;
+        spritePlusDoorTypePos.x = spritePlusDoorTypePos.x + plusMinusOffset;
+        columnNumber = 4;
+        spritePlusDoorTypePos.x = spritePlusDoorTypePos.x + (columnNumber * columnSpriteOffset);
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusDoorTypePos, &dir))
+        {
+            overPlusDoorType = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                //Data->levelEditor.arrowToObject.
+                //Data->levelEditor.arrowToObject.
+            }
+        }
+        spriteMinusDoorTypePos.x = spriteMinusDoorTypePos.x + (columnNumber * columnSpriteOffset);
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spriteMinusDoorTypePos, &dir))
+        {
+
+
+            //  DOOR TO EDIT LOGIC
+            overMinusDoorType = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                //Data->levelEditor.arrowToObject.
+                //Data->levelEditor.arrowToObject.
+            }
+        }
+
+    }
+    
+    
+    
+    
+   
+
+
+
+ 
 
     //      SAVE GAME LOGIC
-    bool overSave = false;
     Rect saveButtonRect;
     vec2 saveButtonLocation = V2(4, 4);
     saveButtonRect.max =  V2(0.125f, 0.125f / 2);
     saveButtonRect.min = -V2(0.125f, 0.125f / 2);
+    bool overSave = false;
     if (RectTest(saveButtonRect, mouseRect, realMousePosition, saveButtonLocation, &dir))
     {
         overSave = true;
@@ -599,23 +882,7 @@ void MyGameUpdate()
     DrawTextScreenPixel(&Game->monoFont, V2(750, 40), 10.0f, RGB(1.0f, 1.0f, 1.0f), "Level: %d", Data->currentLevel);
     
     //      RENDER LEVEL CHANGE BUTTONS
-    if (overLevelMinus)
-    {
-        DrawSprite(spriteLevelMinusPosition, spriteLevelPlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
-    }
-    else
-    {
-        DrawSprite(spriteLevelMinusPosition, spriteLevelPlusMinusSize, 0, &Data->sprites.minusSprite);
-    }
-    if (overLevelPlus)
-    {
-        DrawSprite(spriteLevelPlusPosition, spriteLevelPlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
-    }
-    else
-    {
-        DrawSprite(spriteLevelPlusPosition, spriteLevelPlusMinusSize, 0, &Data->sprites.plusSprite);
-    }
-
+    RenderPlusMinus(spriteLevelPlusPosition, spriteLevelMinusPosition, spriteLevelPlusMinusSize, overLevelPlus, overLevelMinus);
 
     //      RENDER LEVEL MAP
     //          Render Map Canvas
@@ -630,11 +897,16 @@ void MyGameUpdate()
         Room* roomEntity = (Room*)GetEntity(&Data->em, roomEntitiesInBuffer[i].handle);
         if (roomEntity != NULL)
         {
+            vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(roomEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+            vec2 sizeForEntityInIndex = convertSizeToIndexSize(roomEntity->size, sizeOfLevelCanvas);
+
             if (!roomEntity->activeRoom)
             {
-                vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(roomEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
-                vec2 sizeForEntityInIndex = convertSizeToIndexSize(roomEntity->size, sizeOfLevelCanvas);
-                DrawRectBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, RGB(1.0f, 0.3f, 0.3f));
+                DrawRectBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, RGB(1.0f, 0.5f, 0.5f));
+            }
+            else
+            {
+                DrawRectBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, RGB(1.0f, 0.8f, 0.8f));
             }
         }
     }
@@ -659,7 +931,6 @@ void MyGameUpdate()
             vec2 sizeForEntityInIndex = convertSizeToIndexSize(barrierEntity->size, sizeOfLevelCanvas);
           //  DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.monster1Sprite);
         }
-
     }
     //              DOOR
     for (int i = 0; i < doorBuffer->count; i++)
@@ -695,22 +966,8 @@ void MyGameUpdate()
     //DrawTextScreenPixel(&Game->monoFont, V2(530, 20), 10.0f, RGB(1.0f, 1.0f, 1.0f), "X: %.3f", mousePos.x);
     //          
     //          RENDER CYCLE THROUGH ENTITIES - PALATTE +/-
-    if (overCycleEntitiesMinus)
-    {
-        DrawSprite(cycleEntitiesMinusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
-    }
-    else
-    {
-        DrawSprite(cycleEntitiesMinusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.minusSprite);
-    }
-    if (overCycleEntitiesPlus)
-    {
-        DrawSprite(cycleEntitiesPlusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
-    }
-    else
-    {
-        DrawSprite(cycleEntitiesPlusPosition, cycleEntitiesPlusMinusSize, 0, &Data->sprites.plusSprite);
-    }
+    RenderPlusMinus(cycleEntitiesPlusPosition, cycleEntitiesMinusPosition, cycleEntitiesPlusMinusSize, overCycleEntitiesPlus, overCycleEntitiesMinus);
+
     //          BASE ENTITY - PALATTE
     if (Data->levelEditor.editorType == EntityType_Room || overRoom)
     { 
@@ -729,6 +986,15 @@ void MyGameUpdate()
     {
        DrawSprite(monsterSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.monster1Sprite);
     }
+    //          DOOR ENTITY - PALATTE
+    if (Data->levelEditor.editorType == EntityType_Door || overDoorPalatte)
+    {
+        DrawSprite(doorSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.doorClosed1PalSprite_Sel);
+    }
+    else
+    {
+        DrawSprite(doorSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.doorClosed1PalSprite);
+    }
 
     //******
     //      RENDER ENTITY SPECIFICS EDITOR #1
@@ -738,88 +1004,51 @@ void MyGameUpdate()
     //          RENDER POS EDIT.X
     vec2 posToWrite = Data->levelEditor.arrowToObject.indexPosition;
     DrawTextScreenPixel(&Game->monoFont, V2(30, 680), 8.0f, RGB(0.0f, 0.0f, 0.10f), "PositionX: %.0f", posToWrite.x);
-    if (overMinusPosition_edit1)
-    {
-        DrawSprite(spriteMinusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
-    }
-    else
-    {
-        DrawSprite(spriteMinusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
-    }
-    if (overPlusPosition_edit1)
-    {
-        DrawSprite(spritePlusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
-    }
-    else
-    {
-        DrawSprite(spritePlusPosition_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
-    }
+    RenderPlusMinus(spritePlusPosition_edit1, spriteMinusPosition_edit1, spritePlusMinusSize, overPlusPosition_edit1, overMinusPosition_edit1);
+    
     //          RENDER POS EDIT.Y
     DrawTextScreenPixel(&Game->monoFont, V2(30, 720), 8.0f, RGB(0.0f, 0.0f, 0.10f), "PositionY: %.0f", posToWrite.y);
-    if (overMinusPosition_edit2)
-    {
-        DrawSprite(spriteMinusPosition_edit2, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
-    }
-    else
-    {
-        DrawSprite(spriteMinusPosition_edit2, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
-    }
-    if (overPlusPosition_edit2)
-    {
-        DrawSprite(spritePlusPosition_edit2, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
-    }
-    else
-    {
-        DrawSprite(spritePlusPosition_edit2, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
-    }
+    RenderPlusMinus(spritePlusPosition_edit2, spriteMinusPosition_edit2, spritePlusMinusSize, overPlusPosition_edit2, overMinusPosition_edit2);
+    
     //          RENDER SIZE EDIT.X
     vec2 sizeToWrite = Data->levelEditor.arrowToObject.objectSizeIndex;
     DrawTextScreenPixel(&Game->monoFont, V2(30, 760), 8.0f, RGB(0.0f, 0.0f, 0.10f), "SizeX: %.0f", sizeToWrite.x);
-    if (overMinusSize_edit1)
-    {
-        DrawSprite(spriteMinusSize_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
-    }
-    else
-    {
-        DrawSprite(spriteMinusSize_edit1, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
-    }
-    if (overPlusSize_edit1)
-    {
-        DrawSprite(spritePlusSize_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
-    }
-    else
-    {
-        DrawSprite(spritePlusSize_edit1, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
-    }
+    RenderPlusMinus(spritePlusSize_edit1, spriteMinusSize_edit1, spritePlusMinusSize, overPlusSize_edit1, overMinusSize_edit1);
 
     //          RENDER SIZE EDIT.Y
     DrawTextScreenPixel(&Game->monoFont, V2(30, 800), 8.0f, RGB(0.0f, 0.0f, 0.10f), "SizeY: %.0f", sizeToWrite.y);
-    if (overMinusSize_edit2)
-    {
-        DrawSprite(spriteMinusSize_edit2, spritePlusMinusSize, 0, &Data->sprites.minusSprite_mouse);
-    }
-    else
-    {
-        DrawSprite(spriteMinusSize_edit2, spritePlusMinusSize, 0, &Data->sprites.minusSprite);
-    }
-    if (overPlusSize_edit2)
-    {
-        DrawSprite(spritePlusSize_edit2, spritePlusMinusSize, 0, &Data->sprites.plusSprite_mosue);
-    }
-    else
-    {
-        DrawSprite(spritePlusSize_edit2, spritePlusMinusSize, 0, &Data->sprites.plusSprite);
-    }
+    RenderPlusMinus(spritePlusSize_edit2, spriteMinusSize_edit2, spritePlusMinusSize, overPlusSize_edit2, overMinusSize_edit2);
 
+    //******
     //******
     //      RENDER ENTITY SPECIFICS EDITOR #2
     //******
+    //******
+
     DrawSpriteBottomLeft(V2(-5.5f, -4.4f), V2(13, 0.65f), 0, &Data->sprites.entitySpecificsSprite);
+    //      RENDER CHECKBOX FOR ACTIVE ROOM
+    DrawTextScreenPixel(&Game->monoFont, V2(258, 880), 8.0f, RGB(0.0f, 0.0f, 0.10f), "Active Room?", sizeToWrite.x);
+    RenderCheckBox(Data->levelEditor.arrowToObject.activeRoom, spriteCheckBoxPos, spritePlusMinusSize, overCheckBox1);
+
+    //      RENDER PLUS MINUS FOR ROOM NUM
+
+    DrawTextScreenPixel(&Game->monoFont, V2(400, 880), 8.0f, RGB(0.0f, 0.0f, 0.10f), "Room Num: %d", Data->levelEditor.arrowToObject.entityRoomNum);
+    RenderPlusMinus(spritePlusRoomNumPos_edit2, spriteMinusRoomNumPos_edit2, spritePlusMinusSize, overPlusRoomNum, overMinusRoomNum);
+    
+    if (Data->levelEditor.editorType == EntityType_Door)
+    {   
+        //      RENDER PLUS/MINUS FOR DOOR-->FROM
+        RenderPlusMinus(spritePlusFromDoorPos, spriteMinusFromDoorPos, spritePlusMinusSize, overPlusFromRoom, overMinusFromRoom);
+
+        //      RENDER PLUS/MINUS FOR DOOR-->TO
+        RenderPlusMinus(spritePlusToDoorPos, spriteMinusToDoorPos, spritePlusMinusSize, overPlusToRoom, overMinusToRoom);
+
+        //      RENDER DOOR TYPE PLUS/MINUS
+        RenderPlusMinus(spritePlusDoorTypePos, spriteMinusDoorTypePos, spritePlusMinusSize, overPlusDoorType, overMinusDoorType);
+    }
 
 
-
-
-
+  
 
 
 
@@ -860,17 +1089,22 @@ void MyGameUpdate()
         //      MOUSE WITHIN MAP
         if (Data->levelEditor.editorState == EditingWithSprite)
         {
-
+            //RenderMouseWithinMapWithSprite(Data->levelEditor.editorType, mousePosRender);
             switch (Data->levelEditor.editorType)
             {
                 case EntityType_Room:
                 {
-                    DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.floor1Sprite);
+                    DrawSprite(mousePosRender, V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.floor1Sprite);
                     break;
                 }
                 case EntityType_Monster:
                 {
-                    DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.monster1Sprite);
+                    DrawSprite(mousePosRender, V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.monster1Sprite);
+                    break;
+                }
+                case EntityType_Door:
+                {
+                    DrawSprite(mousePosRender, V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.doorClosed1PalSprite);
                     break;
                 }
                 default:
@@ -878,7 +1112,6 @@ void MyGameUpdate()
                     break;
                 }
             }
-           
         }
         else
         {
@@ -893,10 +1126,6 @@ void MyGameUpdate()
         mousePosRender.y = mousePosRender.y * (4.5f);
         DrawSprite(V2(mousePosRender.x, mousePosRender.y), V2(0.125f, 0.125f), 0, &Data->sprites.cursorHandSprite);
     }
-
-
-
-    
 
     //DrawSpriteBottomLeft(startingPosForLevelCanvasBottomLeft, V2(2, 2), 0, &Data->sprites.monster1Sprite);
     //DrawRectBottomLeft(V2(-levelMapdisplayRatio.x + 1, -levelMapdisplayRatio.y), V2(levelMapdisplayRatio.x *2, levelMapdisplayRatio.y * 2),0,  RGB(1.0f, 0.3f, 0.3f));

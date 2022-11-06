@@ -4,6 +4,11 @@ $monster
 #size
 (4,4)#strength
 0
+#roomNum
+0
+#activeRoom
+0
+
 
 $monster
 #pos
@@ -11,6 +16,11 @@ $monster
 #size
 (1,1)#strength
 0
+#roomNum
+0
+#activeRoom
+0
+
 
 $monster
 #pos
@@ -18,6 +28,11 @@ $monster
 #size
 (1,1)#strength
 0
+#roomNum
+0
+#activeRoom
+0
+
 
 $monster
 #pos
@@ -25,6 +40,11 @@ $monster
 #size
 (1,1)#strength
 0
+#roomNum
+0
+#activeRoom
+0
+
 
 $monster
 #pos
@@ -32,14 +52,65 @@ $monster
 #size
 (4,4)#strength
 0
+#roomNum
+0
+#activeRoom
+0
+
+
+$monster
+#pos
+(0,0)
+#size
+(0,0)#strength
+0
+#roomNum
+0
+#activeRoom
+0
+
 
 $room
 #pos
-(30,35)
+(26,35)
 #size
-(15,24)#roomNumber
+(15,24)#roomNum
 0
 #activeRoom
+0
+
+
+$room
+#pos
+(18,21)
+#size
+(1,1)#roomNum
+0
+#activeRoom
+0
+
+
+$door
+#pos
+(0,0)
+#size
+(0,0)#roomFrom
+0
+#roomTo
+0
+#roomType
+0
+
+
+$door
+#pos
+(33,35)
+#size
+(2,1)#roomFrom
+0
+#roomTo
+0
+#roomType
 0
 
 

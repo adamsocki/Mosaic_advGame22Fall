@@ -57,21 +57,44 @@ void StartObjectCreation(EntityType entityType, vec2 startIndexPosition, int32 c
 	switch (entityType) {
 		case EntityType_Monster:
 		{
-			Monster* monsterEntity = (Monster*)GetEntity(&Data->em, entityHandle);
-			monsterEntity->handle = entityHandle;
-			monsterEntity->position1 = startIndexPosition;
-			monsterEntity->size = V2(1,1);
-			monsterEntity->power = 6;
-			//monsterEntity->size = V2(1, 1);
-			//monsterEntity->posEdit = 1;
+			{
+				Monster* monsterEntity = (Monster*)GetEntity(&Data->em, entityHandle);
+				monsterEntity->handle = entityHandle;
+				monsterEntity->position1 = startIndexPosition;
+				monsterEntity->size = V2(1, 1);
+				monsterEntity->power = 6;
+				//monsterEntity->size = V2(1, 1);
+				//monsterEntity->posEdit = 1;
+				break;
+			}
+			
 		}
 		case EntityType_Room:
+		{
 			Room* roomEntity = (Room*)GetEntity(&Data->em, entityHandle);
 			roomEntity->handle = entityHandle;
 			roomEntity->position1 = startIndexPosition;
-			roomEntity->size =V2 (1, 1);
-			
+			roomEntity->size = V2(1, 1);
 
+			break;
+		}
+		case EntityType_Door:
+		{
+			Door* doorEntity = (Door*)GetEntity(&Data->em, entityHandle);
+			doorEntity->handle = entityHandle;
+			doorEntity->position1 = startIndexPosition;
+			// if vert
+			// if horiz
+			doorEntity->size = V2(2, 1);
+
+
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
 
 
 	}
