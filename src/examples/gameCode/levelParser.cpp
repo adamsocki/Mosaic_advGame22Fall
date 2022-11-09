@@ -1146,7 +1146,7 @@ void SaveAndWriteLevel()
 			WriteValues(newLine, &file);
 
 			WriteValues(roomNumberToken, &file);
-			WriteValues(roomNum, &file);
+			WriteValues(roomNumber, &file);
 			WriteValues(newLine, &file);
 
 			WriteValues(activeRoomToken, &file);
