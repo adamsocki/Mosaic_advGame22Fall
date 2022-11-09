@@ -90,6 +90,14 @@ void StartObjectCreation(EntityType entityType, vec2 startIndexPosition, int32 c
 
 			break;
 		}
+		case EntityType_Object:
+		{
+			Object* objectEntity = (Object*)GetEntity(&Data->em, entityHandle);
+			objectEntity->handle = entityHandle;
+			objectEntity->position1 = startIndexPosition;
+			objectEntity->size = V2(1, 1);
+			break;
+		}
 
 		default:
 		{

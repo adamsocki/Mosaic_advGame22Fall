@@ -34,7 +34,7 @@ void RenderCheckBox(bool entityRoomActive, vec2 pos, vec2 size, bool overBox)
 		}
 		else
 		{
-			DrawSprite(pos, size, 0, &Data->sprites.yesCheckYesMouseSprite);
+			DrawSprite(pos, size, 0, &Data->sprites.noCheckYesMouseSprite);
 		}
 	}
 	else
@@ -45,7 +45,7 @@ void RenderCheckBox(bool entityRoomActive, vec2 pos, vec2 size, bool overBox)
 		}
 		else
 		{
-			DrawSprite(pos, size, 0, &Data->sprites.noCheckNoMouseSprite);
+			DrawSprite(pos, size, 0, &Data->sprites.yesCheckNoMouseSprite);
 		}
 	}
 }

@@ -46,6 +46,11 @@ void LoadSprites() {
 
 	LoadSprite(&Data->sprites.doorClosed1PalSprite, "data/doorClosed1PalSprite.png");
 	LoadSprite(&Data->sprites.doorClosed1PalSprite_Sel, "data/doorClosed1PalSprite_Sel.png");
+	LoadSprite(&Data->sprites.objectPalSprite, "data/objectPalSprite.png");
+	LoadSprite(&Data->sprites.objectPalSprite_Sel, "data/objectPalSprite_Sel.png");
+		
+	
+
 
 
 	Sprite monster1Sprite;

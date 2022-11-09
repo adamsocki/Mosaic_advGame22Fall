@@ -62,7 +62,11 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 	   "data/levelEditor/level0.txt",
 	   "data/levelEditor/level1.txt",
 	   "data/levelEditor/level2.txt",
-	   "data/levelEditor/level3.txt"
+	   "data/levelEditor/level3.txt",
+	   "data/levelEditor/level4.txt",
+	   "data/levelEditor/level5.txt",
+	   "data/levelEditor/level6.txt",
+	   "data/levelEditor/level7.txt"
 	};
 
 	if (OpenFileForRead(path[currentLevel], &file, &Game->frameMem))
@@ -287,13 +291,13 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 						}
 
 						// GATHER ROOM NUMBER
-						if (strncmp(t.start, "roomNum", t.length) == 0)
+						if (strncmp(t.start, "roomNumber", t.length) == 0)
 						{
 							tokenIndex++;
 							t = tokens[tokenIndex];
 							if (t.type == TokenType_Integer)
 							{
-								r.roomNum = strtoll(t.start, NULL, 10);
+								r.roomNumber = strtoll(t.start, NULL, 10);
 								tokenIndex++;
 								t = tokens[tokenIndex];
 							}
@@ -439,13 +443,13 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 								}
 							}
 						}
-						if (strncmp(t.start, "roomNum", t.length) == 0)
+						if (strncmp(t.start, "roomNumber", t.length) == 0)
 						{
 							tokenIndex++;
 							t = tokens[tokenIndex];
 							if (t.type == TokenType_Integer)
 							{
-								m.roomNum = strtoll(t.start, NULL, 10);
+								m.roomNumber = strtoll(t.start, NULL, 10);
 								tokenIndex++;
 								t = tokens[tokenIndex];
 							}
@@ -588,37 +592,79 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 							}
 						}
 
-						if (strncmp(t.start, "roomFrom", t.length) == 0)
+						if (strncmp(t.start, "doorFrom", t.length) == 0)
 						{
 							tokenIndex++;
 							t = tokens[tokenIndex];
 							if (t.type == TokenType_Integer)
 							{
-								d.roomFrom = strtoll(t.start, NULL, 10);
+								d.doorFrom = strtoll(t.start, NULL, 10);
 								tokenIndex++;
 								t = tokens[tokenIndex];
 							}
 						}
 
-						if (strncmp(t.start, "roomTo", t.length) == 0)
+						if (strncmp(t.start, "doorTo", t.length) == 0)
 						{
 							tokenIndex++;
 							t = tokens[tokenIndex];
 							if (t.type == TokenType_Integer)
 							{
-								d.roomTo = strtoll(t.start, NULL, 10);
+								d.doorTo = strtoll(t.start, NULL, 10);
 								tokenIndex++;
 								t = tokens[tokenIndex];
 							}
 						}
 
-						if (strncmp(t.start, "roomType", t.length) == 0)
+						if (strncmp(t.start, "doorType", t.length) == 0)
 						{
 							tokenIndex++;
 							t = tokens[tokenIndex];
 							if (t.type == TokenType_Integer)
 							{
-								d.roomType = strtoll(t.start, NULL, 10);
+								d.doorType = strtoll(t.start, NULL, 10);
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+
+						if (strncmp(t.start, "levelChanger", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								int32 levelChange = strtoll(t.start, NULL, 10);
+								if (levelChange == 0)
+								{
+									d.levelChanger = false;
+								}
+								else if (levelChange == 1) {
+									d.levelChanger = true;
+								}
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+						
+						if (strncmp(t.start, "levelTo", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								d.levelTo = strtoll(t.start, NULL, 10);
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+						if (strncmp(t.start, "roomNumber", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								d.roomNumber = strtoll(t.start, NULL, 10);
 								tokenIndex++;
 								t = tokens[tokenIndex];
 							}
@@ -735,6 +781,60 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 								t = tokens[tokenIndex];
 							}
 						}
+						if (strncmp(t.start, "canPickUp", t.length) == 0)
+						{
+							int32 canPickUpObject = strtoll(t.start, NULL, 10);
+							if (canPickUpObject == 0)
+							{
+								o.canPickUp = false;
+							}
+							else if (canPickUpObject == 1) {
+								o.canPickUp = true;
+							}
+							tokenIndex++;
+							t = tokens[tokenIndex];
+						}
+						if (strncmp(t.start, "spriteNumber", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+
+							if (t.type == TokenType_Integer)
+							{
+								o.spriteNumber = strtoll(t.start, NULL, 10);
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+						if (strncmp(t.start, "roomNumber", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								o.roomNumber = strtoll(t.start, NULL, 10);
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+						if (strncmp(t.start, "activeRoom", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								int32 visibleRoom = strtoll(t.start, NULL, 10);
+								if (visibleRoom == 0)
+								{
+									o.activeRoom = false;
+								}
+								else if (visibleRoom == 1) {
+									o.activeRoom = true;
+								}
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
 					}
 
 					PushBack(&objects, o);
@@ -762,6 +862,9 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 
 	EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
 	Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
+
+	EntityTypeBuffer* objectBuffer = &Data->em.buffers[EntityType_Object];
+	Object* objectEntitiesInBuffer = (Object*)objectBuffer->entities;
 
 	for (int i = 0; i < rooms.count; i++)
 	{
@@ -810,6 +913,8 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 
 		monsterEntity->position1 = monsters[i].position1;
 		monsterEntity->size = monsters[i].size;
+		monsterEntity->activeRoom = monsters[i].activeRoom;
+		monsterEntity->roomNumber = monsters[i].roomNumber;
 		monsterEntity->handle = monsterHandle;
 		strcpy(monsterEntity->typeName, "$monster\n");
 
@@ -822,10 +927,13 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 
 		doorEntity->position1 = doors[i].position1;
 		doorEntity->size = doors[i].size;
-		doorEntity->roomTo = doors[i].roomTo;
-		doorEntity->roomFrom = doors[i].roomFrom;
-		doorEntity->roomType = doors[i].roomType;
-
+		doorEntity->doorTo = doors[i].doorTo;
+		doorEntity->doorFrom = doors[i].doorFrom;
+		doorEntity->doorType = doors[i].doorType;
+		doorEntity->levelTo = doors[i].levelTo;
+		doorEntity->levelChanger = doors[i].levelChanger;
+		doorEntity->activeRoom = doors[i].activeRoom;
+		doorEntity->roomNumber = doors[i].roomNumber;
 		doorEntity->handle = doorHandle;
 	}
 
@@ -836,7 +944,11 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 
 		objectEntity->position1 = objects[i].position1;
 		objectEntity->size = objects[i].size;
+		objectEntity->activeRoom = objects[i].activeRoom;
 		objectEntity->objectType = objects[i].objectType;
+		objectEntity->canPickUp = objects[i].canPickUp;
+		objectEntity->spriteNumber = objects[i].spriteNumber;
+		objectEntity->roomNumber = objects[i].roomNumber;
 		objectEntity->handle = objectHandle;
 	}
 
@@ -845,9 +957,6 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 	DeallocateDynamicArray(&monsters);
 	DeallocateDynamicArray(&doors);
 	DeallocateDynamicArray(&objects);
-
-
-	
 
 }
 
@@ -888,7 +997,11 @@ void SaveAndWriteLevel()
 	   "data/levelEditor/level0.txt",
 	   "data/levelEditor/level1.txt",
 	   "data/levelEditor/level2.txt",
-	   "data/levelEditor/level3.txt"
+	   "data/levelEditor/level3.txt",
+	   "data/levelEditor/level4.txt",
+	   "data/levelEditor/level5.txt",
+	   "data/levelEditor/level6.txt",
+	   "data/levelEditor/level7.txt"
 	};
 
 	/*char concat(int x, int y) {
@@ -920,6 +1033,9 @@ void SaveAndWriteLevel()
 		EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
 		Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
 
+		EntityTypeBuffer* objectBuffer = &Data->em.buffers[EntityType_Object];
+		Object* objectEntitiesInBuffer = (Object*)objectBuffer->entities;
+
 		char leftParen[2] = "(";
 		char rightParen[2] = ")";
 		char comma[2] = ",";
@@ -927,13 +1043,17 @@ void SaveAndWriteLevel()
 		char posToken[10] = "#pos\n";
 		char strengthToken[12] = "#strength\n";
 		char sizeToken[12] = "#size\n";
-		char roomNumberToken[15] = "#roomNum\n";
+		char roomNumberToken[15] = "#roomNumber\n";
 		char activeRoomToken[25] = "#activeRoom\n";
-		char roomFromToken[12] = "#roomFrom\n";
-		char roomToToken[12] = "#roomTo\n";
-		char roomTypeToken[12] = "#roomType\n";
+		char doorFromToken[12] = "#doorFrom\n";
+		char doorToToken[12] = "#doorTo\n";
+		char doorTypeToken[12] = "#doorType\n";
+		char levelToToken[12] = "#levelTo\n";
+		char levelChangerToken[15] = "#levelChanger\n";
+		char spriteNumberToken[20] = "#spriteNumber\n";
+		char canPickUpToken[20] = "#canPickUp\n";
 
-		for (int i = 0; i < monsterBuffer->count; i++)
+ 		for (int i = 0; i < monsterBuffer->count; i++)
 		{
 			Monster* monsterEntity = (Monster*)GetEntity(&Data->em, monsterEntitiesInBuffer[i].handle);
 			char typeName[10] = "$monster\n";
@@ -942,7 +1062,7 @@ void SaveAndWriteLevel()
 			char entityStrength[10];
 			char size_x[5];
 			char size_y[5];
-			char roomNum[5];
+			char roomNumber[5];
 			char activeRoom[5];
 			
 			sprintf(entityStrength, "%d", monsterEntity->strength);
@@ -951,7 +1071,7 @@ void SaveAndWriteLevel()
 			sprintf(pos1y,  "%.0f", monsterEntity->position1.y);
 			sprintf(size_x, "%.0f", monsterEntity->size.x);
 			sprintf(size_y, "%.0f", monsterEntity->size.y);
-			sprintf(roomNum, "%d", monsterEntity->roomNum);
+			sprintf(roomNumber, "%d", monsterEntity->roomNumber);
 			sprintf(activeRoom, "%d", monsterEntity->activeRoom);
 
 
@@ -977,7 +1097,7 @@ void SaveAndWriteLevel()
 			WriteValues(newLine, &file);
 
 			WriteValues(roomNumberToken, &file);
-			WriteValues(roomNum, &file);
+			WriteValues(roomNumber, &file);
 			WriteValues(newLine, &file);
 
 			WriteValues(activeRoomToken, &file);
@@ -995,7 +1115,7 @@ void SaveAndWriteLevel()
 			char typeName[10] = "$room\n";
 			char pos1x[5];
 			char pos1y[5];
-			char roomNum[5];
+			char roomNumber[5];
 			char activeRoom[5];
 			char size_x[5];
 			char size_y[5];
@@ -1005,7 +1125,7 @@ void SaveAndWriteLevel()
 			sprintf(pos1y, "%.0f", roomEntity->position1.y);
 			sprintf(size_x, "%.0f", roomEntity->size.x);
 			sprintf(size_y, "%.0f", roomEntity->size.y);
-			sprintf(roomNum, "%d", roomEntity->roomNum);
+			sprintf(roomNumber, "%d", roomEntity->roomNumber);
 			sprintf(activeRoom, "%d", roomEntity->activeRoom);
 
 			WriteValues(typeName, &file);
@@ -1043,12 +1163,15 @@ void SaveAndWriteLevel()
 			char typeName[10] = "$door\n";
 			char pos1x[5];
 			char pos1y[5];
-			char roomFrom[5];
-			char roomTo[5];
-			char roomType[5];
+			char doorFrom[5];
+			char doorTo[5];
+			char doorType[5];
 			char activeRoom[5];
 			char size_x[5];
 			char size_y[5];
+			char levelChanger[5];
+			char levelTo[5];
+			char roomNumber[5];
 
 
 			sprintf(pos1x, "%.0f", doorEntity->position1.x);
@@ -1056,9 +1179,12 @@ void SaveAndWriteLevel()
 			sprintf(size_x, "%.0f", doorEntity->size.x);
 			sprintf(size_y, "%.0f", doorEntity->size.y);
 			sprintf(activeRoom, "%d", doorEntity->activeRoom);
-			sprintf(roomFrom, "%d", doorEntity->roomFrom);
-			sprintf(roomTo, "%d", doorEntity->roomTo);
-			sprintf(roomType, "%d", doorEntity->roomType);
+			sprintf(doorFrom, "%d", doorEntity->doorFrom);
+			sprintf(doorTo, "%d", doorEntity->doorTo);
+			sprintf(doorType, "%d", doorEntity->doorType);
+			sprintf(levelTo, "%d", doorEntity->levelTo);
+			sprintf(levelChanger, "%d", doorEntity->levelChanger);
+			sprintf(roomNumber, "%d", doorEntity->roomNumber);
 
 			WriteValues(typeName, &file);
 			WriteValues(posToken, &file);
@@ -1077,16 +1203,94 @@ void SaveAndWriteLevel()
 			WriteValues(rightParen, &file);
 			WriteValues(newLine, &file);
 
-			WriteValues(roomFromToken, &file);
-			WriteValues(roomFrom, &file);
+			WriteValues(doorFromToken, &file);
+			WriteValues(doorFrom, &file);
 			WriteValues(newLine, &file);
 
-			WriteValues(roomToToken, &file);
-			WriteValues(roomTo, &file);
+			WriteValues(doorToToken, &file);
+			WriteValues(doorTo, &file);
 			WriteValues(newLine, &file);
 
-			WriteValues(roomTypeToken, &file);
-			WriteValues(roomType, &file);
+			WriteValues(doorTypeToken, &file);
+			WriteValues(doorType, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(levelChangerToken, &file);
+			WriteValues(levelChanger, &file);
+			WriteValues(newLine, &file);
+			
+			WriteValues(levelToToken, &file);
+			WriteValues(levelTo, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(activeRoomToken, &file);
+			WriteValues(activeRoom, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(roomNumberToken, &file);
+			WriteValues(roomNumber, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(newLine, &file);
+			WriteValues(newLine, &file);
+		}
+	
+		for (int i = 0; i < objectBuffer->count; i++)
+		{
+			Object* objectEntity = (Object*)GetEntity(&Data->em, objectEntitiesInBuffer[i].handle);
+			char typeName[10] = "$object\n";
+			char pos1x[5];
+			char pos1y[5];
+			char objectType[5];
+			char canPickUp[5];
+			char activeRoom[5];
+			char roomNumber[5];
+
+			char size_x[5];
+			char size_y[5];
+			char spriteNumber[5];
+
+
+			sprintf(pos1x, "%.0f", objectEntity->position1.x);
+			sprintf(pos1y, "%.0f", objectEntity->position1.y);
+			sprintf(size_x, "%.0f", objectEntity->size.x);
+			sprintf(size_y, "%.0f", objectEntity->size.y);
+			sprintf(activeRoom, "%d", objectEntity->activeRoom);
+			sprintf(spriteNumber, "%d", objectEntity->spriteNumber);
+			sprintf(roomNumber, "%d", objectEntity->roomNumber);
+			sprintf(canPickUp, "%d", objectEntity->canPickUp);
+
+			WriteValues(typeName, &file);
+			WriteValues(posToken, &file);
+			WriteValues(leftParen, &file);
+			WriteValues(pos1x, &file);
+			WriteValues(comma, &file);
+			WriteValues(pos1y, &file);
+			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
+			WriteValues(sizeToken, &file);
+
+			WriteValues(leftParen, &file);
+			WriteValues(size_x, &file);
+			WriteValues(comma, &file);
+			WriteValues(size_y, &file);
+			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(activeRoomToken, &file);
+			WriteValues(activeRoom, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(spriteNumberToken, &file);
+			WriteValues(spriteNumber, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(roomNumberToken, &file);
+			WriteValues(roomNumber, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(canPickUpToken, &file);
+			WriteValues(canPickUp, &file);
 			WriteValues(newLine, &file);
 
 			WriteValues(newLine, &file);

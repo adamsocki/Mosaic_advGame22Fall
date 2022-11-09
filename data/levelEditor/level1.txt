@@ -100,27 +100,22 @@ $room
 
 $door
 #pos
-(0,0)
-#size
-(0,0)
-#roomFrom
-0
-#roomTo
-0
-#roomType
-0
-
-
-$door
-#pos
 (33,35)
 #size
 (2,1)
-#roomFrom
+#doorFrom
+3
+#doorTo
+4
+#doorType
+2
+#levelChanger
 0
-#roomTo
+#levelTo
 0
-#roomType
+#activeRoom
+1
+#roomNum
 0
 
 
@@ -129,11 +124,34 @@ $door
 (31,47)
 #size
 (2,1)
-#roomFrom
+#doorFrom
 0
-#roomTo
+#doorTo
 0
-#roomType
+#doorType
 0
+#levelChanger
+0
+#levelTo
+0
+#activeRoom
+0
+#roomNum
+0
+
+
+$object
+#pos
+(35,51)
+#size
+(1,1)
+#activeRoom
+1
+#spriteNumber
+3
+#roomNum
+0
+#canPickUp
+1
 
 

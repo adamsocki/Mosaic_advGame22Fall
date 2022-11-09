@@ -113,16 +113,35 @@ struct ArrowToObject
 
 	int32 entityRoomNum;
 
-	bool editRoomFrom;
-	bool editRoomTo;
-	bool editRoomType;
-	int32 roomFromEditInt;
-	int32 roomToEditInt;
-	int32 roomTypeEditInt;
+	bool editDoorFrom;
+	bool editDoorTo;
+	bool editDoorType;
+	int32 doorFromEditInt;
+	int32 doorToEditInt;
+	int32 doorTypeEditInt;
 
-
+	int32 doorFrom;
+	int32 doorTo;
+	int32 doorType;
 
 	bool activeRoom;
+
+	int32 objectType;
+
+	int32 levelToEditInt;
+	int32 levelTo;
+	bool editLevelTo;
+	bool levelChanger;
+	bool levelChangerEdit;
+
+	int32 spriteNumber;
+	int32 editSpriteNumberInt;
+	bool editSpriteNumber;
+
+	bool canPickUpThisObject;
+	bool canPickUpThisObjectEdit;
+
+
 };
 
 
@@ -232,6 +251,9 @@ struct EntitySprites {
 	Sprite doorClosed1PalSprite;
 	Sprite doorClosed1PalSprite_Sel;
 
+	Sprite objectPalSprite;
+	Sprite objectPalSprite_Sel;
+
 };
 
 struct Sounds {
@@ -328,6 +350,7 @@ struct Monster : Entity
 	char characterName[10];
 	int32 power;
 
+	int32 roomNumber;
 
 	int32 strength;
 	real32 speed;
@@ -355,6 +378,11 @@ struct Object : Entity
 	vec2 position1;
 	vec2 size;
 	int32 objectType;
+
+	int32 roomNumber;
+
+	bool canPickUp;
+	int32 spriteNumber;
 };
 
 struct Road {
@@ -388,9 +416,15 @@ struct Door : Entity {
 	bool doorActivatesRoom;
 	int32 roomDoorActivates;
 
-	int32 roomTo;
-	int32 roomFrom;
-	int32 roomType;
+	int32 doorTo;
+	int32 doorFrom;
+	int32 doorType;
+
+	bool levelChanger;
+	int32 levelTo;
+
+
+	//bool doorLocked;
 	//DynamicArray<vec2> doorPositions;
 };
 
