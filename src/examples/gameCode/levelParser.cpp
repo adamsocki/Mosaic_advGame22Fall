@@ -53,9 +53,7 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 
 	InitializeEntityBuffers(false);
 
-
 	FileHandle file;
-
 
 	char* path[] =
 	{
