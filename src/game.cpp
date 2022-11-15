@@ -236,6 +236,9 @@ void GameInit(GameMemory *gameMem) {
     AllocateQuadTopLeft(&gameMem->quadTopLeft);
     InitMesh(&gameMem->quadTopLeft);
 
+    AllocateQuadBottomLeft(&gameMem->quadBottomLeft);
+    InitMesh(&gameMem->quadBottomLeft);
+
     AllocateCube(&gameMem->cube);
     InitMesh(&gameMem->cube);
 

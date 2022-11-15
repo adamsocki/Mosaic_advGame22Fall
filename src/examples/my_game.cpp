@@ -82,9 +82,6 @@ void MyGameUpdate()
     //      Handle Player Input for Movement
     InputPlayerController(&playerEntitiesInBuffer[0]);
 
-
-
-
     //      CONTROL LEVEL CHANGE Test
     
 

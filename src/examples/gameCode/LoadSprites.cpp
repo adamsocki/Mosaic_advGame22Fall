@@ -12,7 +12,8 @@ void LoadSprites() {
 
 	LoadSprite(&Data->sprites.backgroundColor1Sprite, "data/backgroundColor1.png");
 	LoadSprite(&Data->sprites.crosshairUnlocked1Sprite, "data/crosshairUnlocked1.png");
-
+	
+	LoadSprite(&Data->sprites.monster1Sprite, "data/monster1Sprite.png");
 
 	LoadSprite(&Data->sprites.floor1Sprite, "data/floor1.png");
 	LoadSprite(&Data->sprites.blankSprite, "data/blank.png");
@@ -20,6 +21,40 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.doorClosed1hSprite, "data/doorClosed1h.png");
 	LoadSprite(&Data->sprites.doorClosed1vSprite, "data/doorClosed1v.png");
 
+	// LEVEL EDITOR
+	LoadSprite(&Data->sprites.levelEditorBG1Sprite, "data/levelEditorBG1.png");
+	LoadSprite(&Data->sprites.cursorForLevelEditorSprite, "data/cursorLE1.png");
+	LoadSprite(&Data->sprites.cursorHandSprite, "data/mouseHand.png");
+	LoadSprite(&Data->sprites.spritePalette, "data/spritePalette.png");
+	LoadSprite(&Data->sprites.xSprite, "data/xSprite.png");
+	LoadSprite(&Data->sprites.saveSpriteLevelEditor, "data/saveSpriteLevelEditor.png");
+	LoadSprite(&Data->sprites.saveButtonLevelEditor_mouse, "data/saveButtonLevelEditor_mouse.png");
+	LoadSprite(&Data->sprites.minusSprite, "data/minusSprite.png");
+	LoadSprite(&Data->sprites.plusSprite, "data/plusSprite.png");
+	LoadSprite(&Data->sprites.minusSprite_mouse, "data/minusSprite_mouse.png");
+	LoadSprite(&Data->sprites.plusSprite_mosue, "data/plusSprite_mosue.png");
+	LoadSprite(&Data->sprites.entitySpecificsSprite, "data/entitySpecificsSprite.png");
+	
+	
+	LoadSprite(&Data->sprites.monster1Sprite_Sel, "data/monster1Sprite_Sel.png");
+	LoadSprite(&Data->sprites.arrowToObjectSprite, "data/arrowToObjectSprite.png");
+
+	LoadSprite(&Data->sprites.noCheckYesMouseSprite, "data/noCheckYesMouseSprite.png");
+	LoadSprite(&Data->sprites.yesCheckYesMouseSprite, "data/yesCheckYesMouseSprite.png");
+	LoadSprite(&Data->sprites.noCheckNoMouseSprite, "data/noCheckNoMouseSprite.png");
+	LoadSprite(&Data->sprites.yesCheckNoMouseSprite, "data/yesCheckNoMouseSprite.png");
+
+	LoadSprite(&Data->sprites.doorClosed1PalSprite, "data/doorClosed1PalSprite.png");
+	LoadSprite(&Data->sprites.doorClosed1PalSprite_Sel, "data/doorClosed1PalSprite_Sel.png");
+	LoadSprite(&Data->sprites.objectPalSprite, "data/objectPalSprite.png");
+	LoadSprite(&Data->sprites.objectPalSprite_Sel, "data/objectPalSprite_Sel.png");
+		
+	
+
+
+
+	Sprite monster1Sprite;
+	
 }
 
 void LoadSFX() {

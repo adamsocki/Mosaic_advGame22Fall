@@ -141,6 +141,37 @@ void InitializeEntityBuffers(bool levelRestart) {
 	roomTriggerBuffer->entities = (RoomTrigger*)malloc(roomTriggerBuffer->capacity * roomTriggerBuffer->sizeInBytes);
 	memset(roomTriggerBuffer->entities, 0, sizeof(RoomTrigger) * roomTriggerBuffer->capacity);
 
+	// Monster1Buffer
+	EntityTypeBuffer* monster1Buffer = &Data->em.buffers[EntityType_Monster1];
+	monster1Buffer->capacity = 1000;
+	monster1Buffer->sizeInBytes = sizeof(Monster);
+	monster1Buffer->count = 0;
+	monster1Buffer->entities = (Monster*)malloc(monster1Buffer->capacity * monster1Buffer->sizeInBytes);
+	memset(monster1Buffer->entities, 0, sizeof(Monster) * monster1Buffer->capacity);
+
+	// RoomBuffer
+	EntityTypeBuffer* roomBuffer = &Data->em.buffers[EntityType_Room];
+	roomBuffer->capacity = 1000;
+	roomBuffer->sizeInBytes = sizeof(Room);
+	roomBuffer->count = 0;
+	roomBuffer->entities = (Room*)malloc(roomBuffer->capacity * roomBuffer->sizeInBytes);
+	memset(roomBuffer->entities, 0, sizeof(Room) * roomBuffer->capacity);
+
+	// MonsterBuffer
+	EntityTypeBuffer* monsterBuffer = &Data->em.buffers[EntityType_Monster];
+	monsterBuffer->capacity = 1000;
+	monsterBuffer->sizeInBytes = sizeof(Monster);
+	monsterBuffer->count = 0;
+	monsterBuffer->entities = (Monster*)malloc(monsterBuffer->capacity * monsterBuffer->sizeInBytes);
+	memset(monsterBuffer->entities, 0, sizeof(Monster) * monsterBuffer->capacity);
+
+	// ObjectBuffer
+	EntityTypeBuffer* objectBuffer = &Data->em.buffers[EntityType_Object];
+	objectBuffer->capacity = 1000;
+	objectBuffer->sizeInBytes = sizeof(Object);
+	objectBuffer->count = 0;
+	objectBuffer->entities = (Object*)malloc(objectBuffer->capacity * monsterBuffer->sizeInBytes);
+	memset(objectBuffer->entities, 0, sizeof(Object) * objectBuffer->capacity);
 }
 
 void CreatePlayer() {
@@ -159,3 +190,4 @@ void InitializeEntityBuffersForLevelTransition()
 {
 
 }
+
