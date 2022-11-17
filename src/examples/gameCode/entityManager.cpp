@@ -102,7 +102,7 @@ void InitializeEntityBuffers(bool levelRestart) {
 
 	// LevelPortalBuffer
 	EntityTypeBuffer* levelPortalBuffer = &Data->em.buffers[EntityType_LevelPortal];
-	levelPortalBuffer->capacity = 50;
+	levelPortalBuffer->capacity = 1000;
 	levelPortalBuffer->sizeInBytes = sizeof(LevelPortal);
 	levelPortalBuffer->count = 0;
 	levelPortalBuffer->entities = (LevelPortal*)malloc(levelPortalBuffer->capacity * levelPortalBuffer->sizeInBytes);
@@ -110,7 +110,7 @@ void InitializeEntityBuffers(bool levelRestart) {
 
 	// PlayerCarryBuffer
 	EntityTypeBuffer* playerCarryBuffer = &Data->em.buffers[EntityType_PlayerCarry];
-	playerCarryBuffer->capacity = 100;
+	playerCarryBuffer->capacity = 1000;
 	playerCarryBuffer->sizeInBytes = sizeof(PlayerCarry);
 	playerCarryBuffer->count = 0;
 	playerCarryBuffer->entities = (PlayerCarry*)malloc(playerCarryBuffer->capacity * playerCarryBuffer->sizeInBytes);
@@ -127,7 +127,7 @@ void InitializeEntityBuffers(bool levelRestart) {
 
 	// DoorBuffer
 	EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
-	doorBuffer->capacity = 1000;
+	doorBuffer->capacity = 10000;
 	doorBuffer->sizeInBytes = sizeof(Door);
 	doorBuffer->count = 0;
 	doorBuffer->entities = (Door*)malloc(doorBuffer->capacity * doorBuffer->sizeInBytes);

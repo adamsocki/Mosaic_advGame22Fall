@@ -45,11 +45,11 @@ vec2 convertSizeToIndexSize(vec2 sizeOfObject, vec2 canvasSize)
 
 void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 {
-	DynamicArray<TokenVal> tokens = MakeDynamicArray<TokenVal>(&arena, 100);
-	DynamicArray<Room> rooms = MakeDynamicArray<Room>(&roomArena, 12);
-	DynamicArray<Monster> monsters = MakeDynamicArray<Monster>(&monsterArena, 40);
-	DynamicArray<Door> doors = MakeDynamicArray<Door>(&doorArena, 40);
-	DynamicArray<Object> objects = MakeDynamicArray<Object>(&objectArena, 100);
+	DynamicArray<TokenVal> tokens = MakeDynamicArray<TokenVal>(&arena, 10000);
+	DynamicArray<Room> rooms = MakeDynamicArray<Room>(&roomArena, 1000);
+	DynamicArray<Monster> monsters = MakeDynamicArray<Monster>(&monsterArena, 1000);
+	DynamicArray<Door> doors = MakeDynamicArray<Door>(&doorArena, 1000);
+	DynamicArray<Object> objects = MakeDynamicArray<Object>(&objectArena, 1000);
 	DynamicArray<Player> players = MakeDynamicArray<Player>(&playerArena, 10);
 
 	InitializeEntityBuffers(false);
@@ -931,8 +931,8 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 								}
 							}
 						}
-						PushBack(&players, p);
 					}
+					PushBack(&players, p);
 				}
 			}
 		}
@@ -1045,10 +1045,8 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 	for (int i = 0; i < players.count; i++) {
 		EntityHandle playerHandle = AddEntity(&Data->em, EntityType_Player);
 		Player* playerEntity = (Player*)GetEntity(&Data->em, playerHandle);
-
 		playerEntity->position1 = players[i].position1;
 		playerEntity->size = players[i].size;
-
 		playerEntity->handle = playerHandle;
 	}
 
