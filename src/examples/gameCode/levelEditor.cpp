@@ -40,7 +40,7 @@ void InitializeLevelEditor()
 
 
 void StartObjectCreation(EntityType entityType, vec2 startIndexPosition, int32 currentLevel)
-{
+{ // this palces the obejct when created
 
 	EditorPlacementObject object = {};
 
@@ -48,9 +48,7 @@ void StartObjectCreation(EntityType entityType, vec2 startIndexPosition, int32 c
 	object.indexPositionStart = startIndexPosition;
 	object.currentLevel = currentLevel;
 
-
 	vec2 levelPosition = ConvertIndexToPositionInEditor( startIndexPosition);
-
 
 	EntityHandle entityHandle = AddEntity(&Data->em, entityType);
 
@@ -67,7 +65,6 @@ void StartObjectCreation(EntityType entityType, vec2 startIndexPosition, int32 c
 				//monsterEntity->posEdit = 1;
 				break;
 			}
-			
 		}
 		case EntityType_Room:
 		{
@@ -96,6 +93,15 @@ void StartObjectCreation(EntityType entityType, vec2 startIndexPosition, int32 c
 			objectEntity->handle = entityHandle;
 			objectEntity->position1 = startIndexPosition;
 			objectEntity->size = V2(1, 1);
+			break;
+		}
+
+		case EntityType_Player:
+		{
+			Player* playerEntity = (Player*)GetEntity(&Data->em, entityHandle);
+			playerEntity->handle = entityHandle;
+			playerEntity->position1 = startIndexPosition;
+			playerEntity->size = V2(1, 1);
 			break;
 		}
 

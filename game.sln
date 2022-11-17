@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.3.32901.215
+VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "game", "build\game.exe", "{6846ED42-975C-4E80-90F3-A2C7AFABE1E4}"
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "game", "build\game.exe", "{C11E173F-E089-453A-82BA-995EA58D6366}"
 	ProjectSection(DebuggerProjectSystem) = preProject
 		PortSupplier = 00000000-0000-0000-0000-000000000000
-		Executable = C:\Users\adamsocki\Desktop\School\Mosaic_advGame22Fall\build\game.exe
-		RemoteMachine = ADAMSOCKI0964
-		StartingDirectory = C:\Users\adamsocki\Desktop\School\Mosaic_advGame22Fall\build
+		Executable = C:\Users\socki\Desktop\school\Mosaic_advGame22Fall\build\game.exe
+		RemoteMachine = DESKTOP-Q6VPSRO
+		StartingDirectory = C:\Users\socki\Desktop\school\Mosaic_advGame22Fall\build
 		Environment = Default
 		LaunchingEngine = 00000000-0000-0000-0000-000000000000
 		UseLegacyDebugEngines = No
@@ -17,21 +17,17 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "game", "build\game.exe", "{
 		IORedirection = Auto
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{341FD251-F17E-4B93-A5C6-F91E59811313}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder2", "NewFolder2", "{9BA32270-D26C-44F4-B63C-2D12D2A1E6DB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6846ED42-975C-4E80-90F3-A2C7AFABE1E4}.Release|x64.ActiveCfg = Release|x64
+		{C11E173F-E089-453A-82BA-995EA58D6366}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {1C0AB793-1B03-4C7F-A651-491DA636A248}
+		SolutionGuid = {7C731E84-F0C5-47E3-9AD3-262E8AC0B31A}
 	EndGlobalSection
 EndGlobal

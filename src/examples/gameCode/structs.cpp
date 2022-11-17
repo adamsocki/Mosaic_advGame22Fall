@@ -95,7 +95,11 @@ struct ArrowToObject
 	vec2 position;
 	int32 counter;
 
+	int32 roomNumber;
+
 	bool showArrow;
+
+
 
 	EntityType currentType;
 
@@ -119,6 +123,10 @@ struct ArrowToObject
 	int32 doorFromEditInt;
 	int32 doorToEditInt;
 	int32 doorTypeEditInt;
+
+	bool editDeleteEntity;
+	bool changeDelete;
+	bool isEntityDeleted;
 
 	int32 doorFrom;
 	int32 doorTo;
@@ -254,6 +262,11 @@ struct EntitySprites {
 	Sprite objectPalSprite;
 	Sprite objectPalSprite_Sel;
 
+	Sprite trashCanSprite;
+	Sprite trashCanMouseSprite;
+
+	Sprite playerSprite_Sel;
+
 };
 
 struct Sounds {
@@ -319,6 +332,8 @@ struct RoomTrigger : Entity {
 struct Player : Entity {
 	real32 speed;
 	vec2 previousPosition;
+	vec2 position1;
+
 };
 
 struct PlayerCarry : Entity {

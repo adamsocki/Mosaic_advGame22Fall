@@ -35,7 +35,6 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.plusSprite_mosue, "data/plusSprite_mosue.png");
 	LoadSprite(&Data->sprites.entitySpecificsSprite, "data/entitySpecificsSprite.png");
 	
-	
 	LoadSprite(&Data->sprites.monster1Sprite_Sel, "data/monster1Sprite_Sel.png");
 	LoadSprite(&Data->sprites.arrowToObjectSprite, "data/arrowToObjectSprite.png");
 
@@ -50,8 +49,9 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.objectPalSprite_Sel, "data/objectPalSprite_Sel.png");
 		
 	
-
-
+	LoadSprite(&Data->sprites.trashCanSprite, "data/trashCanSprite.png");
+	LoadSprite(&Data->sprites.trashCanMouseSprite, "data/trashCanMouseSprite.png");
+	LoadSprite(&Data->sprites.playerSprite_Sel, "data/playerSprite_Sel.png");
 
 	Sprite monster1Sprite;
 	
