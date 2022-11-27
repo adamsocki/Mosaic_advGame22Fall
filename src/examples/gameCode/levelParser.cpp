@@ -51,6 +51,7 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 	DynamicArray<Door> doors = MakeDynamicArray<Door>(&doorArena, 1000);
 	DynamicArray<Object> objects = MakeDynamicArray<Object>(&objectArena, 1000);
 	DynamicArray<Player> players = MakeDynamicArray<Player>(&playerArena, 10);
+	DynamicArray<Barrier> barriers = MakeDynamicArray<Barrier>(&barrierArena, 1000);
 
 	InitializeEntityBuffers(false);
 
@@ -466,6 +467,17 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 								else if (visibleRoom == 1) {
 									m.activeRoom = true;
 								}
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+						if (strncmp(t.start, "speed", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								m.roomNumber = strtoll(t.start, NULL, 10);
 								tokenIndex++;
 								t = tokens[tokenIndex];
 							}
@@ -931,8 +943,155 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 								}
 							}
 						}
+						if (strncmp(t.start, "speed", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								p.speed = strtoll(t.start, NULL, 10);
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+						
 					}
 					PushBack(&players, p);
+				}
+				if (strncmp(t.start, "barrier", t.length) == 0)
+				{
+					tokenIndex++;
+					t = tokens[tokenIndex];
+					
+					Barrier b = {};
+					while (t.type == TokenType_PoundSymb)
+					{
+						tokenIndex++;
+						t = tokens[tokenIndex];
+						
+						if (strncmp(t.start, "pos", t.length) == 0)
+						{
+ 
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							
+							while (t.type == TokenType_LeftParen)
+							{
+								tokenIndex++;
+								t = tokens[tokenIndex];
+								vec2 position;
+								if (t.type == TokenType_Integer)
+								{
+									if (b.position1.x == NULL)
+									{
+										b.position1.x = strtoll(t.start, NULL, 10);
+									}
+									
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Comma)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Integer)
+								{
+									if (b.position1.y == NULL)
+									{
+										b.position1.y = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+	
+								if (t.type == TokenType_RightParen)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								
+							}
+						}
+						
+						if (strncmp(t.start, "size", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+
+							// LOOP OVER UNTIL DONE WITH POSITIONS
+							while (t.type == TokenType_LeftParen)
+							{
+								tokenIndex++;
+								t = tokens[tokenIndex];
+								vec2 position;
+								if (t.type == TokenType_Integer)
+								{
+									if (b.size.x == NULL)
+									{
+										b.size.x = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Comma)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+								if (t.type == TokenType_Integer)
+								{
+									if (b.size.y == NULL)
+									{
+										b.size.y = strtoll(t.start, NULL, 10);
+									}
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+
+								if (t.type == TokenType_RightParen)
+								{
+									tokenIndex++;
+									t = tokens[tokenIndex];
+								}
+							}
+						}
+						
+						// GATHER ROOM NUMBER
+						if (strncmp(t.start, "roomNumber", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								b.roomNumber = strtoll(t.start, NULL, 10);
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+
+						// GATHER INITIAL VISIBILITY
+						if (strncmp(t.start, "activeRoom", t.length) == 0)
+						{
+							tokenIndex++;
+							t = tokens[tokenIndex];
+							if (t.type == TokenType_Integer)
+							{
+								int32 visibleRoom = strtoll(t.start, NULL, 10);
+								if (visibleRoom == 0)
+								{
+									b.activeRoom = false;
+								}
+								else if (visibleRoom == 1) {
+									b.activeRoom = true;
+								}
+								tokenIndex++;
+								t = tokens[tokenIndex];
+							}
+						}
+					}
+					
+					PushBack(&barriers, b);
 				}
 			}
 		}
@@ -973,7 +1132,7 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		roomEntity->handle = roomHandle;
 
 		//levelState[currentLevel].room[roomEntity->roomNumber].position1 = roomEntity;
-		
+		/*
 		//	LEFT WALL
 		EntityHandle barrierHandleLeft = AddEntity(&Data->em, EntityType_Barrier);
 		Barrier* barrierEntityLeft = (Barrier*)GetEntity(&Data->em, barrierHandleLeft);
@@ -998,6 +1157,7 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		barrierEntityBottom->position1 = V2(rooms[i].position1.x - 1, rooms[i].position1.y - 1);
 		barrierEntityBottom->size = V2(rooms[i].size.x + 2, 1);
 		barrierEntityBottom->handle = barrierHandleBottom;
+		*/
 	}
 	for (int i = 0; i < monsters.count; i++)
 	{
@@ -1047,15 +1207,27 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		Player* playerEntity = (Player*)GetEntity(&Data->em, playerHandle);
 		playerEntity->position1 = players[i].position1;
 		playerEntity->size = players[i].size;
+		playerEntity->speed = players[i].speed;
 		playerEntity->handle = playerHandle;
 	}
 
+	for (int i = 0; i < barriers.count; i++)
+	{
+		EntityHandle barrierHandle = AddEntity(&Data->em, EntityType_Barrier);
+		Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierHandle);
+		barrierEntity->position1 = barriers[i].position1;
+		barrierEntity->size = barriers[i].size;
+		barrierEntity->handle = barrierHandle;
+	}
+	
+	
 	DeallocateDynamicArray(&tokens);
 	DeallocateDynamicArray(&rooms);
 	DeallocateDynamicArray(&monsters);
 	DeallocateDynamicArray(&doors);
 	DeallocateDynamicArray(&objects);
 	DeallocateDynamicArray(&players);
+	DeallocateDynamicArray(&barriers);
 }
 
 
@@ -1136,6 +1308,10 @@ void SaveAndWriteLevel()
 
 		EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
 		Player* playerEntitiesInBuffer = (Player*)playerBuffer->entities;
+		
+		EntityTypeBuffer* barrierBuffer = &Data->em.buffers[EntityType_Barrier];
+		Barrier* barrierEntitiesInBuffer = (Barrier*)barrierBuffer->entities;
+
 
 		char leftParen[2] = "(";
 		char rightParen[2] = ")";
@@ -1144,6 +1320,7 @@ void SaveAndWriteLevel()
 		char posToken[10] = "#pos\n";
 		char strengthToken[12] = "#strength\n";
 		char sizeToken[12] = "#size\n";
+		char speedToken[10] = "#speed\n";
 		char roomNumberToken[15] = "#roomNumber\n";
 		char activeRoomToken[25] = "#activeRoom\n";
 		char doorFromToken[12] = "#doorFrom\n";
@@ -1160,6 +1337,7 @@ void SaveAndWriteLevel()
 			char typeName[10] = "$monster\n";
 			char pos1x[5];
 			char pos1y[5];
+			char speed[5];
 			char entityStrength[10];
 			char size_x[5];
 			char size_y[5];
@@ -1173,6 +1351,7 @@ void SaveAndWriteLevel()
 			sprintf(size_y, "%.0f", monsterEntity->size.y);
 			sprintf(roomNumber, "%d", monsterEntity->roomNumber);
 			sprintf(activeRoom, "%d", monsterEntity->activeRoom);
+			sprintf(speed, "%.0f", monsterEntity->speed);
 
 
 			WriteValues(typeName, &file);
@@ -1202,6 +1381,10 @@ void SaveAndWriteLevel()
 
 			WriteValues(activeRoomToken, &file);
 			WriteValues(activeRoom, &file);
+			WriteValues(newLine, &file);
+			
+			WriteValues(speedToken, &file);
+			WriteValues(speed, &file);
 			WriteValues(newLine, &file);
 
 			WriteValues(newLine, &file);
@@ -1400,11 +1583,13 @@ void SaveAndWriteLevel()
 			char pos1y[5];
 			char size_x[5];
 			char size_y[5];
+			char speed[5];
 
 			sprintf(pos1x, "%.0f", playerEntity->position1.x);
 			sprintf(pos1y, "%.0f", playerEntity->position1.y);
 			sprintf(size_x, "%.0f", playerEntity->size.x);
 			sprintf(size_y, "%.0f", playerEntity->size.y);
+			sprintf(speed, "%.0f", playerEntity->speed);
 
 			WriteValues(typeName, &file);
 			WriteValues(posToken, &file);
@@ -1421,6 +1606,57 @@ void SaveAndWriteLevel()
 			WriteValues(comma, &file);
 			WriteValues(size_y, &file);
 			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
+			
+			WriteValues(speedToken, &file);
+			WriteValues(speed, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(newLine, &file);
+			WriteValues(newLine, &file);
+		}
+		for (int i = 0; i < barrierBuffer->count; i++)
+		{
+			Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierEntitiesInBuffer[i].handle);
+			char typeName[10] = "$barrier\n";
+			
+			char pos1x[5];
+			char pos1y[5];
+			char size_x[5];
+			char size_y[5];
+			char roomNumber[5];
+			char activeRoom[5];
+			
+			sprintf(pos1x,  "%.0f", barrierEntity->position1.x);
+			sprintf(pos1y,  "%.0f", barrierEntity->position1.y);
+			sprintf(size_x, "%.0f", barrierEntity->size.x);
+			sprintf(size_y, "%.0f", barrierEntity->size.y);
+			sprintf(roomNumber, "%d", barrierEntity->roomNumber);
+			sprintf(activeRoom, "%d", barrierEntity->activeRoom);
+		
+			WriteValues(typeName, &file);
+			WriteValues(posToken, &file);
+			WriteValues(leftParen, &file);
+			WriteValues(pos1x, &file);
+			WriteValues(comma, &file);
+			WriteValues(pos1y, &file);
+			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
+			WriteValues(sizeToken, &file);
+
+			WriteValues(leftParen, &file);
+			WriteValues(size_x, &file);
+			WriteValues(comma, &file);
+			WriteValues(size_y, &file);
+			WriteValues(rightParen, &file);
+			WriteValues(newLine, &file);
+			
+			WriteValues(roomNumberToken, &file);
+			WriteValues(roomNumber, &file);
+			WriteValues(newLine, &file);
+
+			WriteValues(activeRoomToken, &file);
+			WriteValues(activeRoom, &file);
 			WriteValues(newLine, &file);
 
 			WriteValues(newLine, &file);

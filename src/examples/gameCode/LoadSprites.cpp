@@ -52,6 +52,9 @@ void LoadSprites() {
 	LoadSprite(&Data->sprites.trashCanSprite, "data/trashCanSprite.png");
 	LoadSprite(&Data->sprites.trashCanMouseSprite, "data/trashCanMouseSprite.png");
 	LoadSprite(&Data->sprites.playerSprite_Sel, "data/playerSprite_Sel.png");
+	
+	LoadSprite(&Data->sprites.barrierPalSprite_Sel, "data/barrierPalSprite_Sel.png");
+	LoadSprite(&Data->sprites.barrierPalSprite, "data/barrierPalSprite.png");
 
 	Sprite monster1Sprite;
 	

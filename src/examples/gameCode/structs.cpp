@@ -99,7 +99,7 @@ struct ArrowToObject
 
 	bool showArrow;
 
-
+	
 
 	EntityType currentType;
 
@@ -110,6 +110,7 @@ struct ArrowToObject
 	bool editEntitySize;
 	bool activeEdit;
 	bool editRoomNum;
+	bool editSpeed;
 
 	vec2 posEdit;
 	vec2 sizeEdit;
@@ -149,7 +150,8 @@ struct ArrowToObject
 	bool canPickUpThisObject;
 	bool canPickUpThisObjectEdit;
 
-
+	int32 speedEditInt;
+	int32 speed;
 };
 
 
@@ -266,7 +268,8 @@ struct EntitySprites {
 	Sprite trashCanMouseSprite;
 
 	Sprite playerSprite_Sel;
-
+	Sprite barrierPalSprite;
+	Sprite barrierPalSprite_Sel;
 };
 
 struct Sounds {
@@ -398,6 +401,7 @@ struct Object : Entity
 
 	bool canPickUp;
 	int32 spriteNumber;
+	bool mouseOverobject;
 };
 
 struct Road {

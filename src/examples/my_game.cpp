@@ -1,5 +1,15 @@
 
 
+MemoryArena arena = {};
+MemoryArena roomArena = {};
+MemoryArena monsterArena = {};
+MemoryArena doorArena = {};
+MemoryArena objectArena = {};
+
+MemoryArena editorObjectsArena = {};
+MemoryArena playerArena = {};
+MemoryArena barrierArena = {};
+
 #include "gameCode/structs.cpp"
 #include "gameCode/entityManager.cpp"
 #include "gameCode/loadSprites.cpp"
@@ -8,6 +18,8 @@
 #include "gameCode/input.cpp"
 #include "gameCode/collision.cpp"
 
+#include "gameCode/levelParser.cpp"
+
 LevelState levelState[5];
 
 void MyInit() 
@@ -15,6 +27,14 @@ void MyInit()
     Game->myData = malloc(sizeof(MyData));
     memset(Game->myData, 0, sizeof(MyData));
 
+
+	AllocateMemoryArena(&arena, Megabytes(64));
+    AllocateMemoryArena(&roomArena, Megabytes(2));
+    AllocateMemoryArena(&monsterArena, Megabytes(2));
+    AllocateMemoryArena(&doorArena, Megabytes(2));
+    AllocateMemoryArena(&objectArena, Megabytes(4));
+	AllocateMemoryArena(&barrierArena, Megabytes(4));
+	
     Data = (MyData*)Game->myData;
     
     InitializeEntityManager();
@@ -25,9 +45,11 @@ void MyInit()
 
     CreatePlayer();
 
-    CreateLevel(0, levelState[0]);
+   // CreateLevel(0, levelState[0]);
+    LevelState levelState[5];
     Data->currentLevel = 0;
-
+	LoadLevelParse(Data->currentLevel, levelState);
+	
     InitializeMouse();
 
     Data->mouseCrosshair.isLocked = false;

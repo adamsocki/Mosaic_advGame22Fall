@@ -7,6 +7,7 @@ MemoryArena objectArena = {};
 
 MemoryArena editorObjectsArena = {};
 MemoryArena playerArena = {};
+MemoryArena barrierArena = {};
 
 #include "gameCode/structs.cpp"
 #include "gameCode/convertTools.cpp"
@@ -45,6 +46,7 @@ void MyInit()
     AllocateMemoryArena(&monsterArena, Megabytes(2));
     AllocateMemoryArena(&doorArena, Megabytes(2));
     AllocateMemoryArena(&objectArena, Megabytes(4));
+	AllocateMemoryArena(&barrierArena, Megabytes(4));
 
     AllocateMemoryArena(&editorObjectsArena, Megabytes(2));
     AllocateMemoryArena(&playerArena, Megabytes(2));
@@ -276,6 +278,19 @@ void MyGameUpdate()
             Data->levelEditor.editorState = EditingWithSprite;
         }
     }
+	//		BARRIER RECT - PALATTE
+	bool overBarrierPalatte = false;
+	vec2 barrierSpritePalattePosition = V2(-6.25f, 1.75f);
+	if (RectTest(spritePalellteSelectionRect, mouseRect, realMousePosition, barrierSpritePalattePosition, &dir))
+	{
+		overBarrierPalatte = true;
+		if (InputPressed(Mouse, Input_MouseLeft))
+		{
+			Data->levelEditor.arrowToObject = {};
+			Data->levelEditor.editorType = EntityType_Barrier;
+			Data->levelEditor.editorState = EditingWithSprite;
+		}
+	}
 
 
     //      ****
@@ -347,7 +362,8 @@ void MyGameUpdate()
                 Data->levelEditor.arrowToObject.entityRoomNum = monsterEntity->roomNumber;
                 Data->levelEditor.arrowToObject.activeRoom = monsterEntity->activeRoom;
                 Data->levelEditor.arrowToObject.isEntityDeleted = monsterEntity->toDelete;
-                
+                Data->levelEditor.arrowToObject.speed = monsterEntity->speed;
+			
                 if (Data->levelEditor.arrowToObject.editEntityPos)
                 {   // edit entity position,
                     monsterEntity->position1.x += Data->levelEditor.arrowToObject.posEdit.x;
@@ -378,6 +394,12 @@ void MyGameUpdate()
                     DeleteEntity(&Data->em, monsterEntitiesInBuffer[arrowCount].handle);
                     Data->levelEditor.arrowToObject.editDeleteEntity = false;
                 }
+				if (Data->levelEditor.arrowToObject.editSpeed)
+				{
+					monsterEntity->speed += Data->levelEditor.arrowToObject.speedEditInt;
+					Data->levelEditor.arrowToObject.speedEditInt = 0;
+					Data->levelEditor.arrowToObject.editSpeed = false;
+				}
             }
             else
             {   // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
@@ -588,6 +610,10 @@ void MyGameUpdate()
                 }
 
             }
+			else
+            {   // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
+                Data->levelEditor.arrowToObject.showArrow = false;
+            }
             break;
         }
         case EntityType_Player:
@@ -605,7 +631,8 @@ void MyGameUpdate()
                 Data->levelEditor.arrowToObject.indexPosition = playerEntity->position1;
                 Data->levelEditor.arrowToObject.objectSizeIndex = playerEntity->size;
                 Data->levelEditor.arrowToObject.isEntityDeleted = playerEntity->toDelete;
-            
+				Data->levelEditor.arrowToObject.speed = playerEntity->speed;
+			
                 if (Data->levelEditor.arrowToObject.editEntityPos)
                 {   // edit entity position
                     playerEntity->position1.x += Data->levelEditor.arrowToObject.posEdit.x;
@@ -626,13 +653,62 @@ void MyGameUpdate()
                     Data->levelEditor.arrowToObject.changeDelete = false;
                     Data->levelEditor.arrowToObject.editDeleteEntity = false;
                 }
+				if (Data->levelEditor.arrowToObject.editSpeed)
+				{
+					playerEntity->speed += Data->levelEditor.arrowToObject.speedEditInt;
+					Data->levelEditor.arrowToObject.speedEditInt = 0;
+					Data->levelEditor.arrowToObject.editSpeed = false;
+				}
             }
             else
             {   // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
                 Data->levelEditor.arrowToObject.showArrow = false;
             }
+			break;
         }
-
+		case EntityType_Barrier:
+		{
+			if (barrierBuffer->count != 0)
+			{
+				InputForEntityArrowMovement(InputPressed(Keyboard, Input_Q), InputPressed(Keyboard, Input_W), playerBuffer->count);
+                int32 arrowCount = Data->levelEditor.arrowToObject.counter;
+                Barrier* barrierEntity = (Barrier*)GetEntity(&Data->em, barrierEntitiesInBuffer[arrowCount].handle);
+                vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(barrierEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+                vec2 sizeForEntityInIndex = convertSizeToIndexSize(barrierEntity->size, sizeOfLevelCanvas);
+                vec2 offsetForArrow = V2(sizeForEntityInIndex.x / 2, -0.125f);
+                
+				Data->levelEditor.arrowToObject.position = startPositionForEntityInIndex + offsetForArrow;
+                Data->levelEditor.arrowToObject.indexPosition = barrierEntity->position1;
+                Data->levelEditor.arrowToObject.objectSizeIndex = barrierEntity->size;
+                Data->levelEditor.arrowToObject.isEntityDeleted = barrierEntity->toDelete;
+            
+                if (Data->levelEditor.arrowToObject.editEntityPos)
+                {   // edit entity position
+                    barrierEntity->position1.x += Data->levelEditor.arrowToObject.posEdit.x;
+                    barrierEntity->position1.y += Data->levelEditor.arrowToObject.posEdit.y;
+                    Data->levelEditor.arrowToObject.posEdit = V2(0, 0);
+                    Data->levelEditor.arrowToObject.editEntityPos = false;
+                }
+                if (Data->levelEditor.arrowToObject.editEntitySize)
+                {   // edit entity size;
+                    barrierEntity->size.x += Data->levelEditor.arrowToObject.sizeEdit.x;
+                    barrierEntity->size.y += Data->levelEditor.arrowToObject.sizeEdit.y;
+                    Data->levelEditor.arrowToObject.sizeEdit = V2(0, 0);
+                    Data->levelEditor.arrowToObject.editEntitySize = false;
+                }
+                if (Data->levelEditor.arrowToObject.editDeleteEntity)
+                {
+                    DeleteEntity(&Data->em, barrierEntitiesInBuffer[arrowCount].handle);
+                    Data->levelEditor.arrowToObject.changeDelete = false;
+                    Data->levelEditor.arrowToObject.editDeleteEntity = false;
+                }
+			}
+			else
+            {   // DON'T SHOW THE ARROW IF THERE ARE NO ENTITIES
+                Data->levelEditor.arrowToObject.showArrow = false;
+            }
+			break;
+		}
         default:
         {
             break;
@@ -1063,9 +1139,82 @@ void MyGameUpdate()
 
     }
     
+	//			MONSTER SPECIFIC EDITS PALATTE #2
+	bool overPlusSpeedNumber = false;
+    bool overMinusSpeedNumber = false;
+
+    vec2 spriteMinusSpeedPos = columnSpriteEditLocationStart;
+    vec2 spritePlusSpeedPos = columnSpriteEditLocationStart;
     
+    if (Data->levelEditor.editorType == EntityType_Monster)
+	{
+		columnNumber = 2;
+		spritePlusSpeedPos.x = spritePlusSpeedPos.x + (columnNumber * columnSpriteOffset);
+        spritePlusSpeedPos.x = spritePlusSpeedPos.x + plusMinusOffset;
+       
+       // spriteMinusFromDoorPos.x = spritePlusFromDoorPos.x - plusMinusOffset;
+
+        // speed LOGIC PRESS 
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusSpeedPos, &dir))
+        {
+            overPlusSpeedNumber = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                Data->levelEditor.arrowToObject.speedEditInt += 1;
+                Data->levelEditor.arrowToObject.editSpeed = true;
+            }
+        }
+
+        spriteMinusSpeedPos.x = spriteMinusSpeedPos.x + (columnNumber * columnSpriteOffset);
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spriteMinusSpeedPos, &dir))
+        {
+            overMinusSpeedNumber = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                Data->levelEditor.arrowToObject.speedEditInt -= 1;
+                Data->levelEditor.arrowToObject.editSpeed = true;
+            }
+        }
+	}
     
-   
+	//			PLAYER SPECIFIC EDITS PALATTE #2
+	//bool overPlusSpeedNumber = false;
+    //bool overMinusSpeedNumber = false;
+
+    //vec2 spriteMinusSpeedPos = columnSpriteEditLocationStart;
+    //vec2 spritePlusSpeedPos = columnSpriteEditLocationStart;
+    
+    if (Data->levelEditor.editorType == EntityType_Player)
+	{
+		columnNumber = 2;
+		spritePlusSpeedPos.x = spritePlusSpeedPos.x + (columnNumber * columnSpriteOffset);
+        spritePlusSpeedPos.x = spritePlusSpeedPos.x + plusMinusOffset;
+       
+       // spriteMinusFromDoorPos.x = spritePlusFromDoorPos.x - plusMinusOffset;
+
+        // speed LOGIC PRESS 
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spritePlusSpeedPos, &dir))
+        {
+            overPlusSpeedNumber = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                Data->levelEditor.arrowToObject.speedEditInt += 1;
+                Data->levelEditor.arrowToObject.editSpeed = true;
+            }
+        }
+
+        spriteMinusSpeedPos.x = spriteMinusSpeedPos.x + (columnNumber * columnSpriteOffset);
+        if (RectTest(spritePlusRect, mouseRect, realMousePosition, spriteMinusSpeedPos, &dir))
+        {
+            overMinusSpeedNumber = true;
+            if (InputPressed(Mouse, Input_MouseLeft))
+            {
+                Data->levelEditor.arrowToObject.speedEditInt -= 1;
+                Data->levelEditor.arrowToObject.editSpeed = true;
+            }
+        }
+	}
+	
 
 
 
@@ -1210,7 +1359,7 @@ void MyGameUpdate()
         {
             vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(barrierEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
             vec2 sizeForEntityInIndex = convertSizeToIndexSize(barrierEntity->size, sizeOfLevelCanvas);
-          //  DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.monster1Sprite);
+            DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.barrierPalSprite);
         }
     }
     //              DOOR
@@ -1246,6 +1395,7 @@ void MyGameUpdate()
             DrawSpriteBottomLeft(startPositionForEntityInIndex, sizeForEntityInIndex, 0, &Data->sprites.playerSprite);
         }
     }
+	
     // *******************
     // *******************
     // *******************
@@ -1305,7 +1455,15 @@ void MyGameUpdate()
     {
         DrawSprite(playerSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.playerSprite);
     }
-
+	//			BARRIER ENTITY - PALATTE
+	if (Data->levelEditor.editorType == EntityType_Barrier || overBarrierPalatte)
+	{
+		DrawSprite(barrierSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.barrierPalSprite_Sel);
+	}
+	else
+	{
+		DrawSprite(barrierSpritePalattePosition, V2(0.25f, 0.25f), 0, &Data->sprites.barrierPalSprite);
+	}
     //       RENDER DELETE SPRITE
     if (overDeleteSprite)
     {
@@ -1396,6 +1554,14 @@ void MyGameUpdate()
         RenderCheckBox(Data->levelEditor.arrowToObject.canPickUpThisObject, spriteCheckBoxPos3, spritePlusMinusSize, overCheckBox3);
 
     }
+	
+	if (Data->levelEditor.editorType == EntityType_Monster || Data->levelEditor.editorType == EntityType_Player)
+	{
+		//      RENDER PLUS/MINUS FOR speed
+		DrawTextScreenPixel(&Game->monoFont, V2(535, 880), 8.0f, RGB(0.0f, 0.0f, 0.10f), "Speed: %d", Data->levelEditor.arrowToObject.speed);
+        RenderPlusMinus(spritePlusSpeedPos, spriteMinusSpeedPos, spritePlusMinusSize, overPlusSpriteNumber, overMinusSpriteNumber);
+
+	}
 
 
     
@@ -1458,6 +1624,11 @@ void MyGameUpdate()
                     DrawSprite(mousePosRender, V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.playerSprite);
                     break;
                 }
+				case EntityType_Barrier:
+				{
+					DrawSprite(mousePosRender, V2(0.125f / 2, 0.125f / 2), 0, &Data->sprites.barrierPalSprite);
+                    break; 
+				}
                 default:
                 {
                     break;

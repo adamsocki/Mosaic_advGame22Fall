@@ -1,6 +1,6 @@
 void InputPlayerController(Player* p) {
 
-	p->previousPosition = p->position;
+	p->previousPosition = p->position1;
 
 	vec2 speedController = V2(0, 0);
 
@@ -28,8 +28,8 @@ void InputPlayerController(Player* p) {
 	if (InputHeld(Keyboard, Input_LeftArrow)) {
 		speedController.x = -1;
 	}
-	p->position.x += p->speed * speedController.x * Game->deltaTime;
-	p->position.y += p->speed * speedController.y * Game->deltaTime;
+	p->position1.x += p->speed * speedController.x * Game->deltaTime;
+	p->position1.y += p->speed * speedController.y * Game->deltaTime;
 }
 
 
