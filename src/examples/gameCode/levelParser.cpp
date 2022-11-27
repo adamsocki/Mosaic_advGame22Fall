@@ -1187,6 +1187,25 @@ void LoadLevelParse(int32 currentLevel, LevelState* levelState)
 		doorEntity->activeRoom = doors[i].activeRoom;
 		doorEntity->roomNumber = doors[i].roomNumber;
 		doorEntity->handle = doorHandle;
+
+		EntityTypeBuffer* roomBuffer = &Data->em.buffers[EntityType_Room];
+		Room* roomEntitiesInBuffer = (Room*)roomBuffer->entities;
+
+
+		for (int i = 0; i < roomBuffer->count; i++)
+		{
+			Room* roomEntity = (Room*)GetEntity(&Data->em, roomEntitiesInBuffer[i].handle);
+			if (roomEntity->roomNumber == doorEntity->doorTo)
+			{
+				doorEntity->doorToHandle = roomEntity->handle;
+			}
+			if (roomEntity->roomNumber == doorEntity->doorFrom)
+			{
+				doorEntity->doorFromHandle = roomEntity->handle;
+			}
+			
+		}
+
 	}
 	for (int i = 0; i < objects.count; i++)
 	{

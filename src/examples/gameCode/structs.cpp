@@ -64,8 +64,12 @@ enum EntityType {
 
 	EntityType_LevelPortal,
 
+
+	EntityType_Event,
+
 	EntityType_Count,
 };
+
 
 enum EditorState
 {
@@ -288,6 +292,8 @@ struct MouseCrosshair {
 	Sprite* crosshairLockSprite;
 };
 
+
+
 struct MyData {
 
 	EntitySprites sprites;
@@ -300,6 +306,9 @@ struct MyData {
 
 	EntityManager em;
 	int32 currentLevel;
+	
+	//EventManager eventManager;
+
 };
 
 struct Entity {
@@ -337,6 +346,21 @@ struct Player : Entity {
 	vec2 previousPosition;
 	vec2 position1;
 
+};
+
+enum EventType
+{
+	EventType_OpenDoor,
+
+	
+};
+
+struct Event : Entity
+{
+	vec2 position1;
+
+	EntityHandle entityHandleForEvent;
+	EventType eventType;
 };
 
 struct PlayerCarry : Entity {
@@ -436,7 +460,9 @@ struct Door : Entity {
 	int32 roomDoorActivates;
 
 	int32 doorTo;
+	EntityHandle doorToHandle;
 	int32 doorFrom;
+	EntityHandle doorFromHandle;
 	int32 doorType;
 
 	bool levelChanger;

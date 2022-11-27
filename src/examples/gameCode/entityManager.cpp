@@ -172,6 +172,15 @@ void InitializeEntityBuffers(bool levelRestart) {
 	objectBuffer->count = 0;
 	objectBuffer->entities = (Object*)malloc(objectBuffer->capacity * monsterBuffer->sizeInBytes);
 	memset(objectBuffer->entities, 0, sizeof(Object) * objectBuffer->capacity);
+
+	// EventBuffer
+	EntityTypeBuffer* eventBuffer = &Data->em.buffers[EntityType_Event];
+	eventBuffer->capacity = 1000;
+	eventBuffer->sizeInBytes = sizeof(Event);
+	eventBuffer->count = 0;
+	eventBuffer->entities = (Event*)malloc(eventBuffer->capacity * eventBuffer->sizeInBytes);
+	memset(eventBuffer->entities, 0, sizeof(Event) * eventBuffer->capacity);
+
 }
 
 void CreatePlayer() {
@@ -190,4 +199,7 @@ void InitializeEntityBuffersForLevelTransition()
 {
 
 }
+
+
+
 
