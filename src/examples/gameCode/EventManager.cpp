@@ -1,11 +1,9 @@
 
 
-
 void ExecuteEvents()
 {
 	EntityTypeBuffer* eventBuffer = &Data->em.buffers[EntityType_Event];
 	Event* eventEntitiesInBuffer = (Event*)eventBuffer->entities;
-
 
 	for (int i = 0; i < eventBuffer->count; i++)
 	{
@@ -24,9 +22,6 @@ void ExecuteEvents()
 					Room* roomEntity = (Room*)GetEntity(&Data->em, doorEntity->doorToHandle);
 					roomEntity->activeRoom = true;
 				}
-
-
-
 
 				break;
 			}
