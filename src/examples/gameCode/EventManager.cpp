@@ -17,11 +17,10 @@ void ExecuteEvents()
 				doorEntity->isDoorOpen = true;
 				eventEntity->toDelete = true;
 
-				if (doorEntity->doorActivatesRoom)
-				{
-					Room* roomEntity = (Room*)GetEntity(&Data->em, doorEntity->doorToHandle);
-					roomEntity->activeRoom = true;
-				}
+
+				Room* roomEntity = (Room*)GetEntity(&Data->em, doorEntity->doorToHandle);
+				roomEntity->activeRoom = true;
+				
 
 				break;
 			}

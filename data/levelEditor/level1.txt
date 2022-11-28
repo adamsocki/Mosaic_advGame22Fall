@@ -59,9 +59,9 @@ $door
 #size
 (3,1)
 #doorFrom
-3
+1
 #doorTo
-4
+2
 #doorType
 2
 #levelChanger

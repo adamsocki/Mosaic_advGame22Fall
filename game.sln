@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "game", "build\game.exe", "{1D2AC0E7-014A-4C4E-9331-E7DE189BFB6F}"
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "game", "build\game.exe", "{77E32C5C-2EFE-4C9C-A9C7-AB7A8D9253C9}"
 	ProjectSection(DebuggerProjectSystem) = preProject
 		PortSupplier = 00000000-0000-0000-0000-000000000000
-		Executable = D:\School\Mosaic_advGame22Fall\build\game.exe
-		RemoteMachine = DESKTOP-3H4KGUK
-		StartingDirectory = D:\School\Mosaic_advGame22Fall\build
+		Executable = C:\Users\socki\Desktop\School\Mosaic_advGame22Fall\build\game.exe
+		RemoteMachine = LAPTOP-DGI9IL02
+		StartingDirectory = C:\Users\socki\Desktop\School\Mosaic_advGame22Fall\build
 		Environment = Default
 		LaunchingEngine = 00000000-0000-0000-0000-000000000000
 		UseLegacyDebugEngines = No
@@ -22,12 +22,12 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1D2AC0E7-014A-4C4E-9331-E7DE189BFB6F}.Release|x64.ActiveCfg = Release|x64
+		{77E32C5C-2EFE-4C9C-A9C7-AB7A8D9253C9}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {150691B4-04E9-4517-9EF0-77C72554EC23}
+		SolutionGuid = {C2B891A2-16F8-4949-BBCA-0F152E578106}
 	EndGlobalSection
 EndGlobal
