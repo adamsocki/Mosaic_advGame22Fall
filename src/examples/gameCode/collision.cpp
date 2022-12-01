@@ -36,9 +36,10 @@ void AssignCurrentRoom()
 	Player* p = (Player*)GetEntity(&Data->em,playerEntitiesInBuffer[0].handle);
 	// what room the player is in
 	Rect playerRect;
-	playerRect.min = -V2(p->size.x / 2, p->size.y / 2);
+	playerRect.min = -V2(0);
 	//playerRect.min.y = -p->size.y;
-	playerRect.max = V2(p->size.x / 2, p->size.y / 2);
+	playerRect.max = V2(0);
+	//playerRect.max = V2(p->size.x * 2, p->size.y * 2);
 	//playerRect.max.y = p->size.y;
 	vec2 dir = V2(0);
 	Rect roomRect;
@@ -47,7 +48,7 @@ void AssignCurrentRoom()
 	for (int i = 0; i < roomBuffer->count; i++)
 	{
 		Room* roomEntity = (Room*)GetEntity(&Data->em, roomEntitiesInBuffer[i].handle);
-		roomRect.max = V2(roomEntity->size.x, roomEntity->size.y);
+		roomRect.max = V2(roomEntity->size.x - 1, roomEntity->size.y - 1);
 		//roomRect.min = -V2(roomEntity->size.x / 2, roomEntity->size.y / 2);
 		roomRect.min = V2(0);
 		// // assign to player
