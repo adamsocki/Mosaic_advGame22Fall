@@ -106,8 +106,11 @@ void MyGameUpdate()
 	//  Crosshair Collission Check
     CrosshairCheck();
    
+	AssignCurrentRoom();
+    BarrierCheck();
 	
-	
+
+
 	
     ExecuteEvents();
 
