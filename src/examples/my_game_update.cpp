@@ -42,7 +42,7 @@ void MyInit()
 	
 	//CreatePlayer();
 
-    Data->currentLevel = 1;
+    Data->currentLevel = 0;
 	LevelState levelState[5];
 	LoadLevelParse(Data->currentLevel, levelState);
 	
@@ -92,6 +92,7 @@ void MyGameUpdate()
     EntityTypeBuffer* objectBuffer = &Data->em.buffers[EntityType_Object];
     EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
 	EntityTypeBuffer* eventBuffer = &Data->em.buffers[EntityType_Event];
+    EntityTypeBuffer* overlayBuffer = &Data->em.buffers[EntityType_Overlay];
 
     //          ENTITIES
     Room* roomEntitiesInBuffer = (Room*)roomBuffer->entities;
@@ -101,6 +102,7 @@ void MyGameUpdate()
     Object* objectEntitiesInBuffer = (Object*)objectBuffer->entities;
     Player* playerEntitiesInBuffer = (Player*)playerBuffer->entities;
 	Event* eventEntitiesInBuffer = (Event*)eventBuffer->entities;
+    Overlay* overlayEntitiesInBuffer = (Overlay*)overlayBuffer->entities;
 
 	//      Handle Player Input for Movement
     InputPlayerController(&playerEntitiesInBuffer[0]);
@@ -153,6 +155,10 @@ void MyGameUpdate()
             if (objectEntity->activeRoom) {
                 DrawSpriteBottomLeft(objectEntity->position1, objectEntity->size, 0, &Data->sprites.crosshairUnlocked1Sprite);
             }
+            if (objectEntity->isTriggered)
+            {
+
+            }
         }
     }
     //              RENDER DOOR
@@ -181,6 +187,20 @@ void MyGameUpdate()
             //vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(playerEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
             //vec2 sizeForEntityInIndex = convertSizeToIndexSize(playerEntity->size, sizeOfLevelCanvas);
             DrawSpriteBottomLeft(playerEntity->position1, playerEntity->size, 0, &Data->sprites.playerSprite);
+        }
+    }
+
+    //      Render Overlay
+    //              OVERLAY
+    for (int i = 0; i < overlayBuffer->count; i++)
+    {
+        Overlay* overlayEntity = (Overlay*)GetEntity(&Data->em, overlayEntitiesInBuffer[i].handle);
+        if (overlayEntity != NULL)
+        {
+
+            //vec2 startPositionForEntityInIndex = IndexForLevelCanvasObjectStartingPosition(playerEntity->position1, sizeOfLevelCanvas, startingPosForLevelCanvasBottomLeft);
+            //vec2 sizeForEntityInIndex = convertSizeToIndexSize(playerEntity->size, sizeOfLevelCanvas);
+            //DrawSpriteBottomLeft(playerEntity->position1, playerEntity->size, 0, &Data->sprites.playerSprite);
         }
     }
 

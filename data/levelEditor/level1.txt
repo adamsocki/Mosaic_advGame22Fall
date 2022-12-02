@@ -103,11 +103,11 @@ $door
 #doorFrom
 3
 #doorTo
-1
+4
 #doorType
-0
+2
 #levelChanger
-0
+
 #levelTo
 2
 #activeRoom
@@ -124,7 +124,7 @@ $door
 #doorFrom
 3
 #doorTo
-0
+4
 #doorType
 2
 #levelChanger
@@ -143,19 +143,19 @@ $door
 #size
 (1,3)
 #doorFrom
-0
+3
 #doorTo
-0
+4
 #doorType
 2
 #levelChanger
 0
 #levelTo
-4
+0
 #activeRoom
 0
 #roomNumber
-0
+3
 
 
 $door
@@ -185,9 +185,9 @@ $door
 #size
 (4,1)
 #doorFrom
-0
+3
 #doorTo
-0
+5
 #doorType
 0
 #levelChanger
@@ -197,7 +197,7 @@ $door
 #activeRoom
 0
 #roomNumber
-0
+3
 
 
 $object

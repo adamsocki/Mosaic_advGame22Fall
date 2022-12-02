@@ -63,7 +63,7 @@ enum EntityType {
 	EntityType_MouseCrosshair,
 
 	EntityType_LevelPortal,
-
+	EntityType_Overlay,
 
 	EntityType_Event,
 
@@ -354,8 +354,8 @@ struct Player : Entity {
 enum EventType
 {
 	EventType_OpenDoor,
-
-	
+	EventType_LevelChange,
+	EventType_ObjectTrigger,
 };
 
 struct Event : Entity
@@ -364,6 +364,11 @@ struct Event : Entity
 
 	EntityHandle entityHandleForEvent;
 	EventType eventType;
+
+	int32 levelTo;
+	int32 levelFrom;
+	
+	int32 objectType;
 };
 
 struct PlayerCarry : Entity {
@@ -402,7 +407,15 @@ struct Monster : Entity
 	vec2 previousPosition;
 };
 
+struct Overlay : Entity
+{
+	vec2 position1;
+	vec2 size;
 
+	bool sound;
+	
+	char text[50];
+};
 struct Room : Entity{
 	vec2 size;
 	vec2 startingPosition;
@@ -429,6 +442,11 @@ struct Object : Entity
 	bool canPickUp;
 	int32 spriteNumber;
 	bool mouseOverobject;
+	
+	
+	
+	
+	
 };
 
 struct Road {

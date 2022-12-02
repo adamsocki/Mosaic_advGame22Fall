@@ -90,6 +90,7 @@ void CrosshairCheck()
             //      DOOR OPEN LOGIC
             if (doorCanOpen && InputPressed(Mouse, Input_MouseLeft))
             {
+           
                 EntityHandle eventHandle = AddEntity(&Data->em, EntityType_Event);
                 Event* eventEntity = (Event*)GetEntity(&Data->em, eventHandle);
 
@@ -97,6 +98,15 @@ void CrosshairCheck()
                 eventEntity->eventType = EventType_OpenDoor;
                 eventEntity->handle = eventHandle;
 
+                if (doorEntity->levelChanger)
+                {
+                    EntityHandle eventHandleLevChng = AddEntity(&Data->em, EntityType_Event);
+                    Event* eventEntityLevChng = (Event*)GetEntity(&Data->em, eventHandleLevChng);
+
+                    eventEntityLevChng->handle = eventHandleLevChng;
+                    eventEntity->eventType = EventType_LevelChange;
+                    eventEntity->levelTo = doorEntity->levelTo;
+                }
 
 
 

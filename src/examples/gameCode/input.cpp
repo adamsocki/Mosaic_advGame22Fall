@@ -3,35 +3,35 @@ void InputPlayerController(Player* p)
 	p->previousPosition = p->position1;
 	vec2 speedController = V2(0, 0);
 
-	if (InputHeld(Keyboard, Input_UpArrow)) 
+	if (InputHeld(Keyboard, Input_UpArrow) || InputHeld(Keyboard, Input_W))
 	{
 		speedController.y = 1;
-		if (InputHeld(Keyboard, Input_RightArrow)) 
+		if (InputHeld(Keyboard, Input_RightArrow) || InputHeld(Keyboard, Input_D))
 		{
 			speedController.x = 1;
 		}
-		if (InputHeld(Keyboard, Input_LeftArrow)) 
+		if (InputHeld(Keyboard, Input_LeftArrow) || InputHeld(Keyboard, Input_A))
 		{
 			speedController.x = -1;
 		}
 	}
-	if (InputHeld(Keyboard, Input_DownArrow)) 
+	if (InputHeld(Keyboard, Input_DownArrow) || InputHeld(Keyboard, Input_S))
 	{
 		speedController.y = -1;
-		if (InputHeld(Keyboard, Input_RightArrow)) 
+		if (InputHeld(Keyboard, Input_RightArrow) || InputHeld(Keyboard, Input_D)) 
 		{
 			speedController.x = 1;
 		}
-		if (InputHeld(Keyboard, Input_LeftArrow)) 
+		if (InputHeld(Keyboard, Input_LeftArrow) || InputHeld(Keyboard, Input_A))
 		{
 			speedController.x = -1;
 		}
 	}
-	if (InputHeld(Keyboard, Input_RightArrow)) 
+	if (InputHeld(Keyboard, Input_RightArrow) || InputHeld(Keyboard, Input_D))
 	{
 		speedController.x = 1;
 	}
-	if (InputHeld(Keyboard, Input_LeftArrow)) 
+	if (InputHeld(Keyboard, Input_LeftArrow) || InputHeld(Keyboard, Input_A))
 	{
 		speedController.x = -1;
 	}

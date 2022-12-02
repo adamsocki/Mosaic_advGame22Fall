@@ -46,6 +46,7 @@ void AssignCurrentRoom()
 	p->currentRoom = false;
 	p->inDoorway = false;
 	// set the current Room for the player
+	
 	for (int i = 0; i < roomBuffer->count; i++)
 	{
 		Room* roomEntity = (Room*)GetEntity(&Data->em, roomEntitiesInBuffer[i].handle);
@@ -58,7 +59,25 @@ void AssignCurrentRoom()
 		if (RectTest(roomRect, playerRect, roomEntity->position1, p->position1, &dir))
 		{
 			p->currentRoom = roomEntity->roomNumber;
-			break;
+			
+			// DETECT OBJECT COLLISSION
+			for (int i = 0; i < objectBuffer->count; i++)
+			{
+				Object* objectEntity = (Object*)GetEntity(&Data->em,objectEntitiesInBuffer[i].handle);
+				Rect objectRect;
+				objectRect.min = V2(0);
+				objectRect.max = V2(objectEntity->size.x, objectEntity->size.y);
+				if (RectTest(objectRect, playerRect, objectEntity->position1, p->position1, &dir))
+				{	// create event for specific object
+					EntityHandle eventHandle = AddEntity(&Data->em, EntityType_Event);
+                    Event* eventEntity = (Event*)GetEntity(&Data->em, eventHandle);
+					eventEntity->handle = eventHandle;
+					eventEntity->eventType = EventType_ObjectTrigger;
+					eventEntity->objectType = objectEntity->objectType;
+				}											
+				break;
+				
+			}
 		}
 		else 
 		{
@@ -70,12 +89,12 @@ void AssignCurrentRoom()
 			{
 				Door* doorEntity = (Door*)GetEntity(&Data->em, doorEntitiesInBuffer[i].handle);
 				
-				if (doorEntity->size.y > doorEntity->size.x)
+				if (doorEntity->size.x > doorEntity->size.y)
 				{	// if door horizontal ...
 					doorRect.min = V2(-0.1f, -1.0f);
 					doorRect.max = V2(doorEntity->size.x + 1.25f, doorEntity->size.y);
 				}
-				else if (doorEntity->size.y < doorEntity->size.x)
+				else if (doorEntity->size.x < doorEntity->size.y)
 				{	// if door vertical ...
 					doorRect.min = V2(-1.0f, -0.1f);
 					doorRect.max = V2(doorEntity->size.x , doorEntity->size.y + 1.25f);

@@ -181,6 +181,14 @@ void InitializeEntityBuffers(bool levelRestart) {
 	eventBuffer->entities = (Event*)malloc(eventBuffer->capacity * eventBuffer->sizeInBytes);
 	memset(eventBuffer->entities, 0, sizeof(Event) * eventBuffer->capacity);
 
+	// OverlayBuffer
+	EntityTypeBuffer* overlayBuffer = &Data->em.buffers[EntityType_Overlay];
+	overlayBuffer->capacity = 1000;
+	overlayBuffer->sizeInBytes = sizeof(Overlay);
+	overlayBuffer->count = 0;
+	overlayBuffer->entities = (Overlay*)malloc(overlayBuffer->capacity * overlayBuffer->sizeInBytes);
+	memset(overlayBuffer->entities, 0, sizeof(Overlay) * overlayBuffer->capacity);
+
 }
 
 void CreatePlayer() {

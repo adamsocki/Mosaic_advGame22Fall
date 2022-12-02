@@ -72,6 +72,36 @@ void ExecuteEvents()
 
 				break;
 			}
+			case EventType_LevelChange:
+			{
+				
+				// find previous logic to save level
+				
+				// start level chnage frame buffer animation
+				
+				// load next level
+				
+				
+			}
+			case EventType_ObjectTrigger:
+			{
+				
+				switch (eventEntity->objectType)
+				{
+					case 1001:
+					{
+						
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+
+
+
+			}
 			default:
 			{
 				break;
