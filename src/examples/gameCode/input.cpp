@@ -1,40 +1,48 @@
-void InputPlayerController(Player* p) {
-
+void InputPlayerController(Player* p) 
+{
 	p->previousPosition = p->position1;
-
 	vec2 speedController = V2(0, 0);
 
-	if (InputHeld(Keyboard, Input_UpArrow)) {
+	if (InputHeld(Keyboard, Input_UpArrow)) 
+	{
 		speedController.y = 1;
-		if (InputHeld(Keyboard, Input_RightArrow)) {
+		if (InputHeld(Keyboard, Input_RightArrow)) 
+		{
 			speedController.x = 1;
 		}
-		if (InputHeld(Keyboard, Input_LeftArrow)) {
+		if (InputHeld(Keyboard, Input_LeftArrow)) 
+		{
 			speedController.x = -1;
 		}
 	}
-	if (InputHeld(Keyboard, Input_DownArrow)) {
+	if (InputHeld(Keyboard, Input_DownArrow)) 
+	{
 		speedController.y = -1;
-		if (InputHeld(Keyboard, Input_RightArrow)) {
+		if (InputHeld(Keyboard, Input_RightArrow)) 
+		{
 			speedController.x = 1;
 		}
-		if (InputHeld(Keyboard, Input_LeftArrow)) {
+		if (InputHeld(Keyboard, Input_LeftArrow)) 
+		{
 			speedController.x = -1;
 		}
 	}
-	if (InputHeld(Keyboard, Input_RightArrow)) {
+	if (InputHeld(Keyboard, Input_RightArrow)) 
+	{
 		speedController.x = 1;
 	}
-	if (InputHeld(Keyboard, Input_LeftArrow)) {
+	if (InputHeld(Keyboard, Input_LeftArrow)) 
+	{
 		speedController.x = -1;
 	}
-	p->position1.x += p->speed * speedController.x * Game->deltaTime;
-	p->position1.y += p->speed * speedController.y * Game->deltaTime;
+	p->position1.x += p->speed * speedController.x * Game->deltaTime * 4;
+	p->position1.y += p->speed * speedController.y * Game->deltaTime * 4;
 }
 
 
 
-void InitializeMouse() {
+void InitializeMouse() 
+{
 
 	Data->mouseCrosshair.isLocked = false;
 	Data->mouseCrosshair.playInitialSound = true;
@@ -48,9 +56,8 @@ void InitializeMouse() {
 
 void MouseInputClick(Barrier* barrierEntity, int32 barrierBufferCount, EntityTypeBuffer* barrierEntitiesInBuffer) {
 
-	if (InputPressed(Mouse, Input_MouseLeft)) {
-
-
+	if (InputPressed(Mouse, Input_MouseLeft)) 
+	{
 		/*int32 doorNumberToOpen = barrierEntity->doorNumber;
 		barrierEntity->isOpen = true;
 		barrierEntity->sprite = &Data->sprites.blankSprite;

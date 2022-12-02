@@ -325,6 +325,7 @@ struct Entity {
 	int32 roomNum;
 
 	int32 currentRoom;
+	bool inDoorway;
 
 	EntityHandle handle;
 };

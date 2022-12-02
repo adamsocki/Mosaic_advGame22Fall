@@ -91,6 +91,8 @@ void MyGameUpdate()
     EntityTypeBuffer* doorBuffer = &Data->em.buffers[EntityType_Door];
     EntityTypeBuffer* objectBuffer = &Data->em.buffers[EntityType_Object];
     EntityTypeBuffer* playerBuffer = &Data->em.buffers[EntityType_Player];
+	EntityTypeBuffer* eventBuffer = &Data->em.buffers[EntityType_Event];
+
     //          ENTITIES
     Room* roomEntitiesInBuffer = (Room*)roomBuffer->entities;
     Monster* monsterEntitiesInBuffer = (Monster*)monsterBuffer->entities;
@@ -98,7 +100,8 @@ void MyGameUpdate()
     Door* doorEntitiesInBuffer = (Door*)doorBuffer->entities;
     Object* objectEntitiesInBuffer = (Object*)objectBuffer->entities;
     Player* playerEntitiesInBuffer = (Player*)playerBuffer->entities;
-	
+	Event* eventEntitiesInBuffer = (Event*)eventBuffer->entities;
+
 	//      Handle Player Input for Movement
     InputPlayerController(&playerEntitiesInBuffer[0]);
 	
@@ -113,6 +116,7 @@ void MyGameUpdate()
 
 	
     ExecuteEvents();
+
 
 
 	//**********************
@@ -194,6 +198,14 @@ void MyGameUpdate()
     //          ***************
     //          ***************
 
+    for (int i = 0; i < eventBuffer->count; i++)
+    {
+        Event* eventEntity = (Event*)GetEntity(&Data->em, eventEntitiesInBuffer[i].handle);
+        if (eventEntity->toDelete)
+        {
+            DeleteEntity(&Data->em, eventEntity->handle);
+        }
+    }
 
 
 }

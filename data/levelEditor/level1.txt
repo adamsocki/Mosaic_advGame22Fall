@@ -71,7 +71,7 @@ $door
 #activeRoom
 1
 #roomNumber
-0
+1
 
 
 $door
@@ -92,7 +92,7 @@ $door
 #activeRoom
 0
 #roomNumber
-0
+2
 
 
 $door
@@ -113,7 +113,7 @@ $door
 #activeRoom
 0
 #roomNumber
-0
+3
 
 
 $door
@@ -134,7 +134,7 @@ $door
 #activeRoom
 0
 #roomNumber
-0
+3
 
 
 $door
@@ -176,7 +176,7 @@ $door
 #activeRoom
 0
 #roomNumber
-0
+3
 
 
 $door
