@@ -443,7 +443,7 @@ struct Object : Entity
 	int32 spriteNumber;
 	bool mouseOverobject;
 	
-	
+	bool isTriggered;
 	
 	
 	

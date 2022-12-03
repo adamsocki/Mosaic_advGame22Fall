@@ -17,6 +17,7 @@ MemoryArena barrierArena = {};
 #include "gameCode/levelParser.cpp"
 #include "gameCode/MouseLogic.cpp"
 #include "gameCode/EventManager.cpp"
+#include "gameCode/ObjectLogicRender.cpp"
 
 void MyInit()
 {
@@ -115,7 +116,7 @@ void MyGameUpdate()
     BarrierCheck();
 	
 
-
+    ObjectLogic();
 	
     ExecuteEvents();
 
@@ -149,18 +150,7 @@ void MyGameUpdate()
         }
     }	
     //              RENDER OBJECTS
-    for (int i = 0; i < objectBuffer->count; i++) {
-        Object* objectEntity = (Object*)GetEntity(&Data->em, objectEntitiesInBuffer[i].handle);
-        if (objectEntity != NULL) {
-            if (objectEntity->activeRoom) {
-                DrawSpriteBottomLeft(objectEntity->position1, objectEntity->size, 0, &Data->sprites.crosshairUnlocked1Sprite);
-            }
-            if (objectEntity->isTriggered)
-            {
-
-            }
-        }
-    }
+    ObjectRender();
     //              RENDER DOOR
     for (int i = 0; i < doorBuffer->count; i++) {
         Door* doorEntity = (Door*)GetEntity(&Data->em, doorEntitiesInBuffer[i].handle);
